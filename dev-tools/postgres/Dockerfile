@@ -1,3 +1,4 @@
+# DOCKERFILE COPIED FROM https://github.com/docker-library/postgres
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
 #

@@ -1,3 +1,4 @@
+# DOCKER FILE COPIED FROM https://github.com/dockerfile/redis
 #
 # Redis Dockerfile
 #
