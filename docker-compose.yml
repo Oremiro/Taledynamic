@@ -15,6 +15,9 @@ services:
   postgres:
     image: postgres
     container_name: taledynamic_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-test}
     volumes:
       - $PWD/dev-tools/postgres/data:/var/lib/postgresql/data
     ports:
