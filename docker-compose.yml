@@ -1,0 +1,31 @@
+version: "3.2"
+
+services:
+  redis_cache:
+    image: "redis:alpine"
+    container_name: taledynamic_redis_cache
+    command: redis-server --requirepass test
+    ports:
+      - "6379:6379"
+    volumes:
+      - $PWD/dev-tools/redis/data:/var/lib/redis
+      - $PWD/dev-tools/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_REPLICATION_MODE=master
+  postgres:
+    image: postgres
+    container_name: taledynamic_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-test}
+    volumes:
+      - $PWD/dev-tools/postgres/data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  main_api:
+    container_name: talydynamic_main_api
+    build:
+      context: $PWD/Taledynamic.Api
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"

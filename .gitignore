@@ -387,3 +387,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# dev-tools
+dev-tools/postgres/data
+dev-tools/redis/data
