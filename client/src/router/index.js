@@ -1,26 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import Login from '../views/Login.vue'
-import Registration from '../views/Registration.vue'
-
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: () => import('@/views/Home.vue')
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: Login
+    path: '/signin',
+    name: 'Sign In',
+    component: () => import('@/views/SignIn.vue')
   },
   {
-    path: '/reg',
-    name: Registration.name,
-    component: Registration
+    path: '/signup',
+    name: 'Sign Up',
+    component: () => import('@/views/SignUp.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'Not Found',
+    component: () => import('@/views/NotFound.vue')
   }
-  
-  // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
 ]
 
 const router = createRouter({
