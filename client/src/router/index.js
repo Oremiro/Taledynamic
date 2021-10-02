@@ -6,14 +6,9 @@ const routes = [
     component: () => import('@/views/Home.vue')
   },
   {
-    path: '/signin',
-    name: 'Sign In',
-    component: () => import('@/views/SignIn.vue')
-  },
-  {
-    path: '/signup',
-    name: 'Sign Up',
-    component: () => import('@/views/SignUp.vue')
+    path: '/auth',
+    name: 'Auth',
+    component: () => import('@/views/Auth.vue')
   },
   {
     path: '/:pathMatch(.*)*',

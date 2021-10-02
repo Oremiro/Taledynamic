@@ -1,66 +1,39 @@
 <template>
-  <form novalidate class="sign-in-form" @submit.prevent="submitForm">
-    <div class="input-group-base">
-      <label for="si-email">Email</label>
-      <input id="si-email" type="email" v-model="formData.email">
-      <div v-if="v$.formData.email.$error">Email field has an error.</div>
-    </div>
-    <div class="input-group-base">
-      <label for="si-password">Пароль</label>
-      <input id="si-password" type="password" v-model="formData.password">
-    </div>
-    <div class="input-group-checkbox">
-      <label for="si-checkbox">Запомнить пароль</label>
-      <input id="si-checkbox" type="checkbox" v-model="formData.remembered">
-    </div>
-    <button type="submit">Войти</button>
-  </form>
+  <n-form>
+    <n-form-item label="Email" path="">
+      <n-input placeholder="" v-model:value="formData.email" />
+    </n-form-item>
+    <n-form-item label="Пароль" path="">
+      <n-input type="password" show-password-on="click" placeholder="" v-model:value="formData.password" />
+    </n-form-item>
+    <n-form-item label-placement="left" label="Запомнить меня" path="">
+      <n-checkbox v-model:checked="formData.remembered" />
+    </n-form-item>
+    <n-form-item>
+      <n-button :disabled="v$.formData.$invalid">Войти</n-button>
+    </n-form-item>
+  </n-form>
 </template>
 
 <style lang="scss" scoped>
-input {
-  padding: .6rem .7rem;
-  border: .05rem solid #ddd;
-  border-radius: .2rem;
-}
-input[type=button] {
-  cursor: pointer;
-}
-%input-group {
-  display: flex;
-  align-items: flex-start;
-}
-%input-group:not(:last-child) {
-  margin-bottom: 1rem;
-}
-.input-group-base {
-  @extend %input-group;
-  flex-direction: column;
-  label {
-    margin-bottom: .25rem;
-  }
-}
-.input-group-checkbox {
-  @extend %input-group;
-  flex-direction: row;
-  label {
-    margin-right: .5rem;
-  }
-}
-.sign-in-form {
-  max-width: 30rem;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem 1.5rem;
-  border: .05rem solid #ddd;
-  border-radius: .2rem;
-}
+
 </style>
 
 <script>
 import axios from 'axios'
 import useVuelidate from '@vuelidate/core'
-import { required, email } from '@vuelidate/validators'
+import { required, email, helpers } from '@vuelidate/validators'
+
+const requiredValidator = helpers.withMessage('Поле не должно быть пустым', required);
+const emailValidator = helpers.withMessage('Неверный Email', email);
+
+const passwordValidator = helpers.withMessage('', (value) => {
+  const containsUppercase = /[A-Z]/.test(value);
+  const containsLowercase = /[a-z]/.test(value);
+  const containsDigit = /\d/.test(value);
+  const containsSpecial = /[#?!@$%^&*_(),.+-]/.test(value);
+  return containsUppercase && containsLowercase && containsDigit && containsSpecial;
+})
 
 export default {
     name: 'SignInForm',
@@ -79,15 +52,12 @@ export default {
     validations() {
       return {
         formData: {
-          email: { required, email },
-          password: { required },
+          email: { requiredValidator, emailValidator },
+          password: { requiredValidator, passwordValidator},
         }
       }
     },
     methods: {
-      validateForm() {
-        console.log('Validation');
-      },
       submitForm() {
         axios.post('', this.formData)
           .then((response) => { console.log(response) })

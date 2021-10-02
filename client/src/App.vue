@@ -1,19 +1,16 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Главная страница</router-link>
-    <div>
-      <router-link to="/signin">Вход</router-link>
-      <router-link to="/signup">Регистрация</router-link>
-    </div>
-  </div>
-  <router-view></router-view>
+  <n-config-provider :theme="theme">
+    <n-global-style />
+    <n-layout>
+      <Header />
+      <n-layout-content>
+        <router-view />
+      </n-layout-content>
+    </n-layout>
+  </n-config-provider>
 </template>
 
 <style lang="scss">
-
-body {
-  margin: 0;
-}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -22,21 +19,22 @@ body {
   color: #2c3e50;
   min-height: 100vh;
 }
+</style>
 
-#nav {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  border-bottom: rgba(44, 62, 80, 0.2) solid thin;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    margin: 0 1rem;
-    text-decoration-line: none;
 
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+import { darkTheme } from 'naive-ui'
+import Header from '@/components/Header.vue'
+
+
+export default {
+  data() {
+    return {
+      theme: darkTheme
     }
+  },
+  components: {
+    Header
   }
 }
-</style>
+</script>
