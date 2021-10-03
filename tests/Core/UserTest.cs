@@ -19,8 +19,8 @@ namespace Core
         [Fact]
         public async Task CreateUser_Success()
         {
-            var mock = new Mock<UserService>();
-            var setup = mock.Setup(service => service.GetAllAsync());
+            // var mock = new Mock<UserService>();Mock
+            // var setup = mock.Setup(service => service.GetAllAsync());
         }
         
         [Fact]
