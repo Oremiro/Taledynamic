@@ -4,11 +4,10 @@ using Taledynamic.Core.Models.Responses;
 
 namespace Taledynamic.Core.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserService
     {
         public Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress);
         public Task<AuthenticateResponse> RefreshTokenAsync(string token, string ipAddress);
-        public Task<bool> RevokeTokenAsync(string token, string ipAddress);
-        
+        public Task<RevokeTokenResponse> RevokeTokenAsync(string token, string ipAddress);
     }
 }

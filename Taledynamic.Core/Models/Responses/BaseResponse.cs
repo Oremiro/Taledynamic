@@ -2,8 +2,9 @@ using System.Net;
 
 namespace Taledynamic.Core.Models.Responses
 {
-    public abstract class BaseResponse
+    public class BaseResponse
     {
         public HttpStatusCode StatusCode { get; set; }
+        public string Message { get; set; }
     }
 }
