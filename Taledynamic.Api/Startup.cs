@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Taledynamic.Api.Middlewares;
 
 
 namespace Taledynamic.Api
@@ -32,6 +33,17 @@ namespace Taledynamic.Api
 
             app.UseRouting();
             app.UseAuthorization();
+            
+            app.UseCors(x => x
+                .SetIsOriginAllowed(origin => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+            app.UseMiddleware<JwtMiddleware>();
+
+
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

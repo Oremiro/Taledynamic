@@ -13,8 +13,4 @@
       <ProjectReference Include="..\Taledynamic.Core\Taledynamic.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Middlewares" />
-    </ItemGroup>
-
 </Project>
