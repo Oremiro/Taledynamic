@@ -9,16 +9,18 @@ using Taledynamic.Core;
 using Taledynamic.Core.Entities;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Models.Requests;
+using Taledynamic.Core.Models.Requests.UserRequests;
 using Taledynamic.Core.Models.Responses;
+using Taledynamic.Core.Models.Responses.UserResponses;
 
 namespace Taledynamic.Core.Services
 {
-    public class UserService: IUserService
+    public class UserService: BaseService<User>, IUserService
     {
         private TaledynamicContext _context { get; set; }
         private IOptions<AppSettings> _appSettings { get; set; }
         private UserHelper _userHelper { get; set; }
-        public UserService(TaledynamicContext context, IOptions<AppSettings> appSettings)
+        public UserService(TaledynamicContext context, IOptions<AppSettings> appSettings): base(context)
         {
             _context = context;
             _appSettings = appSettings;

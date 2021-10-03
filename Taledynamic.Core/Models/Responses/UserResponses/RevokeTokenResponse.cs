@@ -1,4 +1,4 @@
-namespace Taledynamic.Core.Models.Responses
+namespace Taledynamic.Core.Models.Responses.UserResponses
 {
     public class RevokeTokenResponse: BaseResponse
     {

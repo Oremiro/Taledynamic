@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Taledynamic.Core.Entities
 {
     [Owned]
-    public class RefreshToken
+    public class RefreshToken: BaseEntity
     {
         [Key]
         [JsonIgnore]
-        public int Id { get; set; }
+        public new int Id { get; set; }
         
         public string Token { get; set; }
         public DateTime Expires { get; set; }
@@ -20,6 +20,6 @@ namespace Taledynamic.Core.Entities
         public DateTime? Revoked { get; set; }
         public string RevokedByIp { get; set; }
         public string ReplacedByToken { get; set; }
-        public bool IsActive => Revoked == null && !IsExpired;
+        public new bool IsActive => Revoked == null && !IsExpired;
     }
 }

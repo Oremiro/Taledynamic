@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Taledynamic.Core.Models.Requests
+namespace Taledynamic.Core.Models.Requests.UserRequests
 {
     public class AuthenticateRequest: BaseRequest
     {

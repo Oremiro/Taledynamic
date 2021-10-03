@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Taledynamic.Core.Entities;
 
-namespace Taledynamic.Core.Models.Responses
+namespace Taledynamic.Core.Models.Responses.UserResponses
 {
     public class AuthenticateResponse: BaseResponse
     {
