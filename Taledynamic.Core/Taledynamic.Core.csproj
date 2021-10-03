@@ -6,10 +6,16 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.12.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models" />
+      <Content Include="..\Taledynamic.Api\appsettings.Development.json">
+        <Link>appsettings.Development.json</Link>
+      </Content>
+      <Content Include="..\Taledynamic.Api\appsettings.json">
+        <Link>appsettings.json</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
