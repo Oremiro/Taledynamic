@@ -10,11 +10,11 @@ namespace Core
 {
     public class UserTest
     {
-        private IUserService _userService { get; set; }
-        public UserTest(UserService userService)
-        {
-            _userService = userService;
-        }
+        // private IUserService _userService { get; set; }
+        // public UserTest(UserService userService)
+        // {
+        //     _userService = userService;
+        // }
         
         [Fact]
         public async Task CreateUser_Success()
