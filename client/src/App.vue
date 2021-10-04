@@ -12,17 +12,20 @@
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: v-sans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  min-height: 100vh;
 }
 </style>
 
 
 <script>
+// import 'vfonts/Lato.css'
+// import 'vfonts/IBMPlexSans.css'
+import 'vfonts/Inter.css'
+// import 'vfonts/OpenSans.css'
+// import 'vfonts/Roboto.css'
+import 'vfonts/FiraCode.css'
 import { darkTheme, useOsTheme } from 'naive-ui'
 import Header from '@/components/Header.vue'
 
@@ -38,7 +41,9 @@ export default {
   methods: {
     setTheme(value) {
       this.currentTheme = value;
-      this.$cookie.setCookie('theme', value === null ? 'light' : 'dark');
+      this.$cookie.setCookie('theme', value === null ? 'light' : 'dark', {
+        expire: Infinity
+      });
     }
   },
   mounted() {
