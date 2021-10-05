@@ -27,7 +27,6 @@ namespace Taledynamic.Api.Middlewares
             {
                 var response = context.Response;
                 response.ContentType = "application/json";
-
                 response.StatusCode = error switch
                 {
                     

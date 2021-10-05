@@ -17,42 +17,66 @@ namespace Taledynamic.Api.Controllers
     [Route("auth")]
     public class UserController: ControllerBase
     {
-        public UserController(DbContext context)
+        private IUserService _userService { get; }
+        public UserController(IUserService userService)
         {
+            _userService = userService;
         }
-        
+
+        public async Task<AuthenticateResponse> Authenticate([FromBody] AuthenticateRequest request)
+        {
+            //TODO change nulls
+            AuthenticateResponse response = await _userService.AuthenticateAsync(request, "");
+            return response;
+        }
+        [HttpPost("refresh-token")]
+        public async Task<RefreshTokenResponse> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            //TODO change nulls
+            RefreshTokenResponse response = await _userService.RefreshTokenAsync(null, null);
+            return response;
+        }
+
         [HttpPost("revoke-token")]
         public async Task<RevokeTokenResponse> RevokeToken([FromBody] RevokeTokenRequest request)
         {
-            throw new NotImplementedException();
+            //TODO change nulls
+            RevokeTokenResponse response = await _userService.RevokeTokenAsync(request.Token, "");
+            return response;
         }
 
         public async Task IsEmailUsed()
         {
-            
+            throw new NotImplementedException();
+
         }
         
-        public async Task GetAll()
-        {
-            
+        public async Task<GetUsersResponse> GetAll()
+        {   
+            throw new NotImplementedException();
+
         }
         
-        public async Task GetById()
+        public async Task<GetUserResponse> GetById()
         {
-            
+            throw new NotImplementedException();
+
         }
         
-        public async Task Update()
+        public async Task<UpdateUserRequest> Update()
         {
-            
+            throw new NotImplementedException();
+
         }
-        public async Task Delete()
+        public async Task<DeleteUserResponse> Delete()
         {
-            
+            throw new NotImplementedException();
+
         }
-        public async Task Create()
+        public async Task<CreateUserResponse> Create()
         {
-            
+            //CreateUserResponse response = await _userService.CreateAsync();
+            throw new NotImplementedException();
         }
         
 

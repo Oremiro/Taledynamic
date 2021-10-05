@@ -56,9 +56,9 @@ namespace Taledynamic.Core.Services
             return new AuthenticateResponse(user, jwtToken, refreshToken.Token);
         }
 
-        public async Task<AuthenticateResponse> RefreshTokenAsync(string token, string ipAddress)
+        public async Task<RefreshTokenResponse> RefreshTokenAsync(string token, string ipAddress)
         {
-            var response = new AuthenticateResponse(user: null, jwtToken: null, refreshToken: null)
+            var response = new RefreshTokenResponse(user: null, jwtToken: null, refreshToken: null)
             {
                 StatusCode = HttpStatusCode.OK
             };
@@ -94,7 +94,7 @@ namespace Taledynamic.Core.Services
             
             var jwtToken = _userHelper.GenerateJwtToken(user);
 
-            return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token);
+            return new RefreshTokenResponse(user, jwtToken, newRefreshToken.Token);
         }
 
         public async Task<RevokeTokenResponse> RevokeTokenAsync(string token, string ipAddress)

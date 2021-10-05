@@ -5,11 +5,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Taledynamic.Core.Entities;
+using Taledynamic.Core.Interfaces;
 
 namespace Taledynamic.Core.Services
 {
-    public abstract class BaseService<TEntity> 
-        where TEntity : BaseEntity, new()
+    public class BaseService<TEntity>: IBaseService<TEntity> where TEntity : BaseEntity, new()
     {
         private DbContext _context { get; set; }
 
