@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,40 +46,45 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
 
-        public async Task IsEmailUsed()
+        [HttpGet("is-email-used/{email}")]
+        public async Task IsEmailUsed(string email)
         {
             throw new NotImplementedException();
 
         }
         
+        [HttpGet("get-all")]
         public async Task<GetUsersResponse> GetAll()
         {   
             throw new NotImplementedException();
 
         }
-        
-        public async Task<GetUserResponse> GetById()
+        [HttpGet("get/{id:int}")]
+        public async Task<GetUserResponse> GetById(int id)
         {
             throw new NotImplementedException();
 
         }
         
-        public async Task<UpdateUserRequest> Update()
+        [HttpPut("update")]
+        public async Task<UpdateUserRequest> Update([FromBody] UpdateUserRequest request)
         {
             throw new NotImplementedException();
 
         }
-        public async Task<DeleteUserResponse> Delete()
+        
+        [HttpDelete("delete")]
+        public async Task<DeleteUserResponse> Delete([FromBody] DeleteUserRequest request)
         {
             throw new NotImplementedException();
 
         }
-        public async Task<CreateUserResponse> Create()
+        
+        [HttpPost("create")]
+        public async Task<CreateUserResponse> Create([FromBody] CreateUserRequest request)
         {
             //CreateUserResponse response = await _userService.CreateAsync();
             throw new NotImplementedException();
         }
-        
-
     }
 }
