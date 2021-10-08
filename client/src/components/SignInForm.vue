@@ -10,7 +10,7 @@
       <n-checkbox v-model:checked="formData.remembered.value" />
     </n-form-item>
     <n-form-item>
-      <n-button :loading="submitLoading" :disabled="!formData.email.value || !formData.password.value" @click="handleValidateClick">Войти</n-button>
+      <n-button type="primary" ghost :loading="submitLoading" :disabled="!formData.email.value || !formData.password.value" @click="handleValidateClick">Войти</n-button>
     </n-form-item>
   </n-form>
 </template>
@@ -21,7 +21,7 @@
 
 <script>
 import { useMessage } from 'naive-ui'
-import { externalOptions } from '@/variables/auth-vars.js'
+import { emailRegex, externalOptions } from '@/variables/auth-vars.js'
 
 
 export default {
@@ -47,7 +47,7 @@ export default {
           email: { 
             value: [
               {
-                type: 'email',
+                pattern: emailRegex,
                 message: 'Введите корректный email',
                 trigger: ['input', 'blur']
               }

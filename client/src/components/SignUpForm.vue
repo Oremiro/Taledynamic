@@ -11,7 +11,7 @@
     </n-form-item>
     
     <n-form-item>
-      <n-button :loading="submitLoading" :disabled="!formData.email.isValid  || !formData.password.isValid " @click="handleValidateClick">Войти</n-button>
+      <n-button type="primary" ghost :loading="submitLoading" :disabled="!formData.email.isValid  || !formData.password.isValid " @click="handleValidateClick">Зарегистрироваться</n-button>
     </n-form-item>
   </n-form>
 </template>
@@ -22,7 +22,7 @@
 
 <script>
 import { useMessage } from 'naive-ui'
-import { emailStartsWithRegex, emailRegex, emailDomainRegex, passwordRegex, externalOptions } from '@/variables/auth-vars.js'
+import { emailRegex, passwordRegex, externalOptions } from '@/variables/auth-vars.js'
 
 export default {
     name: 'SignUpForm',
@@ -55,19 +55,13 @@ export default {
               {
                 asyncValidator: (rule, value) => {
                   return new Promise((resolve, reject) => {
-                    setTimeout(()=>{
-                      this.formData.email.isValid = false
-                      if (!emailStartsWithRegex.test(value)) {
-                        reject(new Error('Email должен начинаться с латинской буквы'));
-                      } else if (!emailRegex.test(value)) {
-                        reject(new Error('Email должен содержать @ и только латинские буквы, цифры, точку, подчеркивание или минус'));
-                      } else if (!emailDomainRegex.test(value)) {
-                        reject(new Error('Домен email должен быть допустимым'));
-                      } else {
-                        this.formData.email.isValid = true
-                        resolve();
-                      }
-                    }, 500);
+                    this.formData.email.isValid = false
+                    if (!emailRegex.test(value)) {
+                      reject(new Error('Введите корректный email'));
+                    } else {
+                      this.formData.email.isValid = true
+                      resolve();
+                    }
                   });
                 },
                 trigger: ['blur', 'input']
@@ -84,22 +78,20 @@ export default {
               {
                 asyncValidator: (rule, value) => {
                   return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                      if (!passwordRegex.test(value)) {
-                        this.formData.password.isValid = false
-                        reject(
-                          new Error('Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ')
-                        );
-                      } else if (this.formData.repeatedPassword.value !== '' && value !== this.formData.repeatedPassword.value) {
-                        this.formData.password.isValid = false
-                        reject(
-                          new Error('Пароли не совпадают')
-                        );
-                      } else {
-                        this.formData.password.isValid = true
-                        resolve();
-                      }
-                    }, 500)
+                    if (!passwordRegex.test(value)) {
+                      this.formData.password.isValid = false
+                      reject(
+                        new Error('Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ')
+                      );
+                    } else if (this.formData.repeatedPassword.value !== '' && value !== this.formData.repeatedPassword.value) {
+                      this.formData.password.isValid = false
+                      reject(
+                        new Error('Пароли не совпадают')
+                      );
+                    } else {
+                      this.formData.password.isValid = true
+                      resolve();
+                    }
                   });
                 },
                 trigger: ['blur', 'input']
@@ -116,17 +108,15 @@ export default {
               {
                 asyncValidator: (rule, value) => {
                   return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                      if (value !== this.formData.password.value) {
-                        this.formData.repeatedPassword.isValid = false
-                        reject(
-                          new Error('Пароли не совпадают')
-                        );
-                      } else {
-                        this.formData.repeatedPassword.isValid = true
-                        resolve();
-                      }
-                    }, 500)
+                    if (value !== this.formData.password.value) {
+                      this.formData.repeatedPassword.isValid = false
+                      reject(
+                        new Error('Пароли не совпадают')
+                      );
+                    } else {
+                      this.formData.repeatedPassword.isValid = true
+                      resolve();
+                    }
                   });
                 },
                 trigger: ['blur', 'input']

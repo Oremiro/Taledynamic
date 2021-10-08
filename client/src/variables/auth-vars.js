@@ -1,6 +1,4 @@
-export const emailStartsWithRegex = /^[a-zA-Z]/;
-export const emailRegex = /^[\w.-]*@/;
-export const emailDomainRegex = /(\.[a-zA-Z]{2,})+$/;
+export const emailRegex = /^[a-zA-Z0-9][\w.-]*@[a-zA-Z]{2,}(\.[a-zA-Z]{2,})+$/;
 export const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*_(),.+-]).{8,64}$/;
 
 export function externalOptions(value) {
