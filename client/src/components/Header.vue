@@ -72,7 +72,7 @@ const menuOptions = [
         {
           to: '/'
         },
-        { default: () => 'Главная страница' }
+        { default: () => 'О проекте' }
       ),
     key: 'Home'
   },
@@ -83,7 +83,7 @@ const menuOptions = [
         {
           to: 'auth'
         },
-        { default: () => 'Вход / Регистрация' }
+        { default: () => 'Вход' }
       ),
     key: 'Auth'
   }

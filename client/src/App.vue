@@ -1,12 +1,14 @@
 <template>
   <n-config-provider :theme="currentTheme">
     <n-global-style />
-    <n-layout>
-      <Header @changeTheme="setTheme" :currentTheme="currentTheme" />
-      <n-layout-content>
-        <router-view />
-      </n-layout-content>
-    </n-layout>
+    <n-message-provider>
+      <n-layout>
+        <Header @changeTheme="setTheme" :currentTheme="currentTheme" />
+        <n-layout-content>
+          <router-view />
+        </n-layout-content>
+      </n-layout>
+    </n-message-provider>
   </n-config-provider>
 </template>
 
@@ -22,8 +24,8 @@
 <script>
 // import 'vfonts/Lato.css'
 // import 'vfonts/IBMPlexSans.css'
-import 'vfonts/Inter.css'
-// import 'vfonts/OpenSans.css'
+// import 'vfonts/Inter.css'
+import 'vfonts/OpenSans.css'
 // import 'vfonts/Roboto.css'
 import 'vfonts/FiraCode.css'
 import { darkTheme, useOsTheme } from 'naive-ui'
