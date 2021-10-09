@@ -1,9 +1,17 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Taledynamic.Api.Middlewares;
+using Taledynamic.Core;
+using Taledynamic.Core.Helpers;
+using Taledynamic.Core.Interfaces;
+using Taledynamic.Core.Services;
 
 
 namespace Taledynamic.Api
@@ -20,6 +28,16 @@ namespace Taledynamic.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddDbContext<TaledynamicContext>();
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            services.AddScoped<IUserService, UserService>();
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo {Title = "Taledynamic", Version = "v1"});
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -29,21 +47,30 @@ namespace Taledynamic.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
+            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
-            
+
             app.UseCors(x => x
                 .SetIsOriginAllowed(origin => true)
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
 
-            app.UseMiddleware<ErrorHandlerMiddleware>();
-            app.UseMiddleware<JwtMiddleware>();
+            #region Middlewares
 
+            // app.UseMiddleware<JwtMiddleware>();
 
+            # endregion
+
+            #region Swagger
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("v1/swagger.json", "Taledynamic Api V1"); });
+
+            #endregion
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
