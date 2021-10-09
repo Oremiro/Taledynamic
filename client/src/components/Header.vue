@@ -1,5 +1,5 @@
 <template>
-  <n-layout-header bordered="" style="padding: .3rem 0 .3rem 0;">
+  <n-layout-header position="absolute" bordered style="padding: .3rem 0 .3rem 0; z-index: 1">
     <n-grid cols="12">
       <n-gi span="2">
         <div class="nav-logo">

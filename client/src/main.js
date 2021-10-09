@@ -10,7 +10,7 @@ import {
     NForm, NFormItem, NInput, NCheckbox,
     NCard, NTabs, NTabPane, NH1, NA, NGrid, NGridItem,
     NIcon, NLayout, NLayoutContent, NResult, NMessageProvider, 
-    NAutoComplete
+    NAutoComplete, NTooltip
     
 } from 'naive-ui'
 
@@ -21,7 +21,8 @@ const naive = create({
         NForm, NFormItem, NInput, NCheckbox,
         NCard, NTabs, NTabPane, NH1, NA, NGrid,
         NGridItem, NIcon, NLayout, NLayoutContent,
-        NResult, NMessageProvider, NAutoComplete
+        NResult, NMessageProvider, NAutoComplete, 
+        NTooltip
     ]
 })
 

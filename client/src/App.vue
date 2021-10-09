@@ -2,9 +2,9 @@
   <n-config-provider :theme="currentTheme">
     <n-global-style />
     <n-message-provider>
-      <n-layout>
+      <n-layout position="absolute" style="min-height: 100vh">
         <Header @changeTheme="setTheme" :currentTheme="currentTheme" />
-        <n-layout-content>
+        <n-layout-content position="absolute" embedded>
           <router-view />
         </n-layout-content>
       </n-layout>
