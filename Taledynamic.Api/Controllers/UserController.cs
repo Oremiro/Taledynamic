@@ -13,9 +13,8 @@ using Taledynamic.Core.Models.Responses.UserResponses;
 
 namespace Taledynamic.Api.Controllers
 {
-    [Authorize]
     [ApiController]
-    [Route("auth")]
+    [Route("auth/user")]
     public class UserController: ControllerBase
     {
         private IUserService _userService { get; }
@@ -24,6 +23,7 @@ namespace Taledynamic.Api.Controllers
             _userService = userService;
         }
 
+        [HttpPost("authenticate")]
         public async Task<AuthenticateResponse> Authenticate([FromBody] AuthenticateRequest request)
         {
             //TODO change nulls
@@ -49,34 +49,33 @@ namespace Taledynamic.Api.Controllers
         [HttpGet("is-email-used/{email}")]
         public async Task IsEmailUsed(string email)
         {
-            throw new NotImplementedException();
 
         }
         
         [HttpGet("get-all")]
         public async Task<GetUsersResponse> GetAll()
-        {   
-            throw new NotImplementedException();
+        {
+            return null;
 
         }
         [HttpGet("get/{id:int}")]
         public async Task<GetUserResponse> GetById(int id)
         {
-            throw new NotImplementedException();
+            return null;
 
         }
         
         [HttpPut("update")]
         public async Task<UpdateUserRequest> Update([FromBody] UpdateUserRequest request)
         {
-            throw new NotImplementedException();
+            return null;
 
         }
         
         [HttpDelete("delete")]
         public async Task<DeleteUserResponse> Delete([FromBody] DeleteUserRequest request)
         {
-            throw new NotImplementedException();
+            return null;
 
         }
         
@@ -84,7 +83,7 @@ namespace Taledynamic.Api.Controllers
         public async Task<CreateUserResponse> Create([FromBody] CreateUserRequest request)
         {
             //CreateUserResponse response = await _userService.CreateAsync();
-            throw new NotImplementedException();
+            return null;
         }
     }
 }
