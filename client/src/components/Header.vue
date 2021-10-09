@@ -86,6 +86,17 @@ const menuOptions = [
         { default: () => 'Вход' }
       ),
     key: 'Auth'
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: 'profile'
+        },
+        { default: () => 'Профиль' }
+      ),
+    key: 'Profile'
   }
 ]
 
