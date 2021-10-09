@@ -3,6 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,5 +14,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Taledynamic.Core\Taledynamic.Core.csproj" />
     </ItemGroup>
-
 </Project>

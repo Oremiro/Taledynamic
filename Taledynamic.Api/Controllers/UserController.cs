@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,19 +29,28 @@ namespace Taledynamic.Api.Controllers
         /// Аутентификация пользователя
         /// </summary>
         /// <remarks>
+        /// Метод пытается найти в источнике данных пользователя с заданными email-password;
+        /// Если пользователь найден - создается jwt-token (15 минут), refresh-token (7 дней)
         /// </remarks>
-        /// <response code="200"> </response>
-        /// <response code="200"> </response>
-        /// <response code="200"> </response>
-
+        /// <response code="200">Authenticate proccess ended with success.</response>
+        /// <response code="404">User is not found.</response>
+        /// <response code="400">Some exception.</response>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("authenticate")]
         public async Task<AuthenticateResponse> Authenticate([FromBody] AuthenticateRequest request)
         {
-            AuthenticateResponse response = await _userService.AuthenticateAsync(request, GetIpAddress());
-            SetTokenCookie(response.RefreshToken);
-            return response;
+            try
+            {
+                AuthenticateResponse response = await _userService.AuthenticateAsync(request, GetIpAddress());
+                SetTokenCookie(response.RefreshToken);
+                return response;
+            }
+            catch (Exception exception)
+            {
+                Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                throw;
+            }
         }
         
         [HttpPost("refresh-token")]
