@@ -28,10 +28,7 @@ namespace Taledynamic.Core.Services
         }
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress)
         {
-            var response = new AuthenticateResponse(user: null, jwtToken: null, refreshToken: null)
-            {
-                StatusCode = HttpStatusCode.OK
-            };
+            var response = new AuthenticateResponse(user: null, jwtToken: null, refreshToken: null);
 
             User user = await _context
                 .Users
@@ -42,7 +39,7 @@ namespace Taledynamic.Core.Services
             if (user == null)
             {
                 response.Message = "User is not found.";
-                response.StatusCode = HttpStatusCode.NoContent;
+                response.StatusCode = HttpStatusCode.NotFound;
                 return response;
             }
             
@@ -53,7 +50,12 @@ namespace Taledynamic.Core.Services
             _context.Update(user);
             await _context.SaveChangesAsync();
 
-            return new AuthenticateResponse(user, jwtToken, refreshToken.Token);
+            response = new AuthenticateResponse(user, jwtToken, refreshToken.Token)
+            {
+                Message = "Authenticate proccess ended with success.",
+                StatusCode = HttpStatusCode.OK
+            };
+            return response;
         }
 
         public async Task<RefreshTokenResponse> RefreshTokenAsync(string token, string ipAddress)

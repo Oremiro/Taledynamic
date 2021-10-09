@@ -24,6 +24,17 @@ namespace Taledynamic.Api.Controllers
             _userService = userService;
         }
 
+        /// <summary>
+        /// Аутентификация пользователя
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <response code="200"> </response>
+        /// <response code="200"> </response>
+        /// <response code="200"> </response>
+
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("authenticate")]
         public async Task<AuthenticateResponse> Authenticate([FromBody] AuthenticateRequest request)
         {
@@ -31,11 +42,12 @@ namespace Taledynamic.Api.Controllers
             SetTokenCookie(response.RefreshToken);
             return response;
         }
+        
         [HttpPost("refresh-token")]
         public async Task<RefreshTokenResponse> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            //TODO change nulls
-            RefreshTokenResponse response = await _userService.RefreshTokenAsync(null, GetIpAddress());
+            var token = GetRefreshTokenFromCookie();
+            RefreshTokenResponse response = await _userService.RefreshTokenAsync(token, GetIpAddress());
             SetTokenCookie(response.RefreshToken);
             return response;
         }
@@ -43,7 +55,6 @@ namespace Taledynamic.Api.Controllers
         [HttpPost("revoke-token")]
         public async Task<RevokeTokenResponse> RevokeToken([FromBody] RevokeTokenRequest request)
         {
-            //TODO change nulls
             RevokeTokenResponse response = await _userService.RevokeTokenAsync(request.Token, GetIpAddress());
             return response;
         }
