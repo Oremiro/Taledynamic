@@ -2,22 +2,28 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    name: 'Home',
     component: () => import('@/views/Home.vue')
   },
   {
     path: '/auth',
-    name: 'Auth',
     component: () => import('@/views/Auth.vue')
   },
   {
     path: '/profile',
-    name: 'Profile',
-    component: () => import('@/views/Profile.vue')
+    component: () => import('@/views/Profile.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('@/components/ProfileMain.vue'),
+      },
+      {
+        path: 'settings',
+        component: () => import('@/components/ProfileSettings.vue'),
+      }
+    ]
   },
   {
     path: '/:pathMatch(.*)*',
-    name: 'Not Found',
     component: () => import('@/views/NotFound.vue')
   }
 ]

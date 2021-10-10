@@ -8,7 +8,7 @@ import {
     NButton, NConfigProvider, NGlobalStyle, 
     NLayoutHeader, NMenu, NText, NSpace,
     NForm, NFormItem, NInput, NCheckbox,
-    NCard, NTabs, NTabPane, NH1, NA, NGrid, NGridItem,
+    NCard, NTabs, NTabPane, NH1, NH2, NA, NGrid, NGridItem,
     NIcon, NLayout, NLayoutContent, NResult, NMessageProvider, 
     NAutoComplete, NTooltip
     
@@ -19,7 +19,7 @@ const naive = create({
         NButton, NConfigProvider, NGlobalStyle, 
         NLayoutHeader, NMenu, NText, NSpace, 
         NForm, NFormItem, NInput, NCheckbox,
-        NCard, NTabs, NTabPane, NH1, NA, NGrid,
+        NCard, NTabs, NTabPane, NH1, NH2, NA, NGrid,
         NGridItem, NIcon, NLayout, NLayoutContent,
         NResult, NMessageProvider, NAutoComplete, 
         NTooltip
