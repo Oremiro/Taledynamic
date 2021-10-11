@@ -52,14 +52,6 @@ const menuOptions = [
                 { default: () => 'Настройки' }
             ),
         key: '/profile/settings'
-    },
-    {
-        label: 'Данные',
-        key: 'Some'
-    },
-    {
-        label: 'Выйти',
-        key: 'Quit'
     }
 ]
 
