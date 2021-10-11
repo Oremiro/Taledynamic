@@ -57,7 +57,8 @@
 }
 </style>
 
-<script>
+
+<script lang="ts">
 import { h }  from 'vue'
 import { RouterLink } from 'vue-router'
 import { darkTheme } from 'naive-ui'
@@ -97,8 +98,9 @@ const menuOptions = [
     key: '/profile'
   }
 ]
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   data() {
     return {
       menuOptions: menuOptions
@@ -116,5 +118,5 @@ export default {
       }
     }
   }
-}
+})
 </script>

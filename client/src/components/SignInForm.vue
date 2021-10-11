@@ -31,11 +31,13 @@
 <style lang="scss" scoped>
 </style>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useMessage } from "naive-ui";
 import { emailRegex, externalOptions } from "@/variables/auth-vars.js";
 
-export default {
+export default defineComponent({
+  
   name: "SignInForm",
   data() {
     return {
@@ -97,6 +99,6 @@ export default {
         this.submitLoading = false;
       });
     },
-  },
-};
+  }
+})
 </script>

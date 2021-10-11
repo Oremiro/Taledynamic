@@ -20,18 +20,19 @@
 }
 </style>
 
-
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 // import 'vfonts/Lato.css'
 // import 'vfonts/IBMPlexSans.css'
 // import 'vfonts/Inter.css'
 import 'vfonts/OpenSans.css'
 // import 'vfonts/Roboto.css'
 import 'vfonts/FiraCode.css'
+
 import { darkTheme, useOsTheme } from 'naive-ui'
 import Header from '@/components/Header.vue'
 
-export default {
+export default defineComponent({
   data() {
     return {
       currentTheme: darkTheme
@@ -58,5 +59,5 @@ export default {
       this.currentTheme = (cookieTheme === 'dark' ? darkTheme : null);
     }
   }
-}
+})
 </script>

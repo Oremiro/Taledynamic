@@ -52,7 +52,8 @@
 }
 </style>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useMessage } from "naive-ui";
 import {
   emailRegex,
@@ -61,7 +62,7 @@ import {
 } from "@/variables/auth-vars.js";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
 
-export default {
+export default defineComponent({
   name: "SignUpForm",
   components: {
     QuestionTooltip
@@ -177,5 +178,5 @@ export default {
       });
     },
   },
-};
+})
 </script>

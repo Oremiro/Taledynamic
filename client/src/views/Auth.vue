@@ -23,14 +23,15 @@
 }
 </style>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import SignInForm from '@/components/SignInForm.vue'
 import SignUpForm from '@/components/SignUpForm.vue'
 
-export default {
+export default defineComponent({
   name: 'Sign In',
   components: {
     SignInForm, SignUpForm
   }
-}
+})
 </script>

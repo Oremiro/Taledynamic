@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import { VueCookieNext } from 'vue-cookie-next'
 
 import { 
@@ -26,4 +27,4 @@ const naive = create({
     ]
 })
 
-createApp(App).use(router).use(naive).use(VueCookieNext).mount('#app')
+createApp(App).use(store).use(router).use(naive).use(VueCookieNext).mount('#app')

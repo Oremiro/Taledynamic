@@ -26,7 +26,8 @@
 }
 </style>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { h } from 'vue'
 import { RouterLink } from 'vue-router'
 
@@ -55,12 +56,12 @@ const menuOptions = [
     }
 ]
 
-export default {
+export default defineComponent({
     name: 'Profile',
     data() {
         return {
             menuOptions
         }
     }
-}
+})
 </script>
