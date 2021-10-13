@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Taledynamic.Core;
+using Taledynamic.Core.Entities;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.Core.Models.Requests;
 using Taledynamic.Core.Models.Requests.UserRequests;
@@ -69,45 +70,49 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
 
-        [HttpGet("is-email-used/{email}")]
-        public async Task IsEmailUsed(string email)
+        [HttpGet("is-email-used")]
+        public async Task<IsEmailUsedResponse> IsEmailUsed([FromQuery] IsEmailUsedRequest request)
         {
-
+            var response = await _userService.IsEmailUsedAsync(request);
+            return response;
         }
         
         [HttpGet("get-all")]
-        public async Task<GetUsersResponse> GetAll()
+        public async Task<GetUsersResponse> GetAll([FromQuery] GetUsersRequest request)
         {
-            return null;
+            var response = await _userService.GetUsersAsync(request);
+            return response;
 
         }
-        [HttpGet("get/{id:int}")]
-        public async Task<GetUserResponse> GetById(int id)
+        [HttpGet("get")]
+        public async Task<GetUserResponse> GetById([FromQuery] GetUserRequest request)
         {
-            return null;
+            var response = await _userService.GetUserByIdAsync(request);
+            return response;
 
         }
         
-        [HttpPut("update/{id:int}")]
-        public async Task<UpdateUserRequest> Update(int id, [FromBody] UpdateUserRequest request)
+        [HttpPut("update")]
+        public async Task<UpdateUserResponse> Update([FromBody] UpdateUserRequest request)
         {
-            return null;
-            
-
+            var response = await _userService.UpdateUserAsync(request);
+            return response;
         }
         
         [HttpDelete("delete")]
         public async Task<DeleteUserResponse> Delete([FromQuery] DeleteUserRequest request)
         {
-            return null;
+            
+            var response = await _userService.DeleteUserAsync(request);
+            return response;
 
         }
         
         [HttpPost("create")]
         public async Task<CreateUserResponse> Create([FromBody] CreateUserRequest request)
         {
-            //CreateUserResponse response = await _userService.CreateAsync();
-            return null;
+            var response = await _userService.CreateUserAsync(request);
+            return response;
         }
 
         private string GetRefreshTokenFromCookie()

@@ -7,10 +7,16 @@ using Taledynamic.Core.Models.Responses.UserResponses;
 
 namespace Taledynamic.Core.Interfaces
 {
-    public interface IUserService: IBaseService<User>
+    public interface IUserService
     {
         public Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress);
         public Task<RefreshTokenResponse> RefreshTokenAsync(string token, string ipAddress);
         public Task<RevokeTokenResponse> RevokeTokenAsync(string token, string ipAddress);
+        public Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request);
+        public Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request);
+        public Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request);
+        public Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request);
+        public Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request);
+        public Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request);
     }
 }

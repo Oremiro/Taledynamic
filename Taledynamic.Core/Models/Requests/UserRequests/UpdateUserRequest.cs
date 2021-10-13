@@ -4,6 +4,8 @@ namespace Taledynamic.Core.Models.Requests.UserRequests
 {
     public class UpdateUserRequest: BaseRequest
     {
+        [Required]
+        public int Id { get; set; }
         [EmailAddress]
         public string Email { get; set; }
 
