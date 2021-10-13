@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Taledynamic.Core.Entities;
 using Taledynamic.Core.Interfaces;
@@ -10,11 +11,14 @@ namespace Core
 {
     public class UserTest
     {
-        // private IUserService _userService { get; set; }
-        // public UserTest(UserService userService)
-        // {
-        //     _userService = userService;
-        // }
+        public UserTest()
+        {
+            var services = new ServiceCollection();
+            services.AddScoped<IUserService, UserService>();
+            var serviceProvider = services.BuildServiceProvider();
+
+
+        }
         
         [Fact]
         public async Task CreateUser_Success()

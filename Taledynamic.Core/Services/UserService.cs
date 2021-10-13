@@ -138,5 +138,35 @@ namespace Taledynamic.Core.Services
             response.IsSuccess = true;
             return response;
         }
+
+        public Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<GetUserResponse> GetUserAsync(GetUserRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task UpdateAsync(User entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
