@@ -70,10 +70,11 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
 
-        [HttpGet("is-email-used/{email}")]
-        public async Task IsEmailUsed(string email)
+        [HttpGet("is-email-used")]
+        public async Task<IsEmailUsedResponse> IsEmailUsed(IsEmailUsedRequest request)
         {
-
+            var response = await _userService.IsEmailUsedAsync(request);
+            return response;
         }
         
         [HttpGet("get-all")]

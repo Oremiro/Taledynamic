@@ -164,6 +164,11 @@ namespace Taledynamic.Core.Services
             throw new NotImplementedException();
         }
 
+        public Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override Task UpdateAsync(User entity)
         {
             throw new NotImplementedException();

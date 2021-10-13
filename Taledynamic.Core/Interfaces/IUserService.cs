@@ -17,5 +17,6 @@ namespace Taledynamic.Core.Interfaces
         public Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request);
         public Task<GetUserResponse> GetUserAsync(GetUserRequest request);
         public Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request);
+        public Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request);
     }
 }
