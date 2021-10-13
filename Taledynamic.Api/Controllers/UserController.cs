@@ -71,7 +71,7 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpGet("is-email-used")]
-        public async Task<IsEmailUsedResponse> IsEmailUsed(IsEmailUsedRequest request)
+        public async Task<IsEmailUsedResponse> IsEmailUsed([FromQuery] IsEmailUsedRequest request)
         {
             var response = await _userService.IsEmailUsedAsync(request);
             return response;
