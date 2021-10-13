@@ -18,7 +18,16 @@ namespace Taledynamic.Core.Services
             _context = context;
         }
 
-        protected abstract Task UpdateAsync(TEntity entity);
+        protected virtual async Task UpdateAsync(TEntity entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
+            } 
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+        
         protected virtual async Task CreateAsync(TEntity entity)
         {
             if (entity == null)

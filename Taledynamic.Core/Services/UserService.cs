@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Taledynamic.Core.Interfaces;
 using Taledynamic.Core;
 using Taledynamic.Core.Entities;
 using Taledynamic.Core.Helpers;
+using Taledynamic.Core.Models.DTOs;
 using Taledynamic.Core.Models.Requests;
 using Taledynamic.Core.Models.Requests.UserRequests;
 using Taledynamic.Core.Models.Responses;
@@ -15,17 +17,19 @@ using Taledynamic.Core.Models.Responses.UserResponses;
 
 namespace Taledynamic.Core.Services
 {
-    public class UserService: BaseService<User>, IUserService
+    public class UserService : BaseService<User>, IUserService
     {
         private TaledynamicContext _context { get; set; }
         private IOptions<AppSettings> _appSettings { get; set; }
         private UserHelper _userHelper { get; set; }
-        public UserService(TaledynamicContext context, IOptions<AppSettings> appSettings): base(context)
+
+        public UserService(TaledynamicContext context, IOptions<AppSettings> appSettings) : base(context)
         {
             _context = context;
             _appSettings = appSettings;
             _userHelper = new UserHelper(_appSettings);
         }
+
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress)
         {
             var response = new AuthenticateResponse(user: null, jwtToken: null, refreshToken: null);
@@ -42,10 +46,10 @@ namespace Taledynamic.Core.Services
                 response.StatusCode = HttpStatusCode.NotFound;
                 return response;
             }
-            
+
             var jwtToken = _userHelper.GenerateJwtToken(user);
             var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
-            
+
             user.RefreshTokens.Add(refreshToken);
             _context.Update(user);
             await _context.SaveChangesAsync();
@@ -69,7 +73,7 @@ namespace Taledynamic.Core.Services
                 .Users
                 .AsQueryable()
                 .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
-            
+
             if (user == null)
             {
                 response.Message = "User with token is not found.";
@@ -78,14 +82,14 @@ namespace Taledynamic.Core.Services
             }
 
             var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
-            
+
             if (!refreshToken.IsActive)
             {
                 response.Message = "Token is not active.";
                 response.StatusCode = HttpStatusCode.NotFound;
                 return response;
             }
-            
+
             var newRefreshToken = _userHelper.GenerateRefreshToken(ipAddress);
             refreshToken.Revoked = DateTime.UtcNow;
             refreshToken.RevokedByIp = ipAddress;
@@ -93,7 +97,7 @@ namespace Taledynamic.Core.Services
             user.RefreshTokens.Add(newRefreshToken);
             _context.Update(user);
             await _context.SaveChangesAsync();
-            
+
             var jwtToken = _userHelper.GenerateJwtToken(user);
 
             return new RefreshTokenResponse(user, jwtToken, newRefreshToken.Token);
@@ -110,18 +114,17 @@ namespace Taledynamic.Core.Services
                 .Users
                 .AsQueryable()
                 .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
-            
+
             if (user == null)
             {
                 response.Message = "User with token is not found.";
                 response.StatusCode = HttpStatusCode.NotFound;
                 response.IsSuccess = false;
                 return response;
-                
             }
 
             var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
-            
+
             if (!refreshToken.IsActive)
             {
                 response.Message = "Token is not active.";
@@ -139,39 +142,108 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
-        public Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request)
+        public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request)
         {
-            throw new NotImplementedException();
+            User user = new User
+            {
+                IsActive = true,
+                Email = request.Email,
+                Password = request.Password,
+                RefreshTokens = new List<RefreshToken>()
+            };
+
+            var refreshToken = _userHelper.GenerateRefreshToken(null);
+            user.RefreshTokens.Add(refreshToken);
+            await this.CreateAsync(user);
+            var response = new CreateUserResponse
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "User was created successfully"
+            };
+
+            return response;
         }
 
-        public Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request)
+        public async Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request)
         {
-            throw new NotImplementedException();
+            var userId = request.UserId;
+            await this.DeleteAsync(userId);
+            var response = new DeleteUserResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "User was deleted successfully"
+            };
+
+            return response;
         }
 
-        public Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request)
+        public async Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request)
         {
-            throw new NotImplementedException();
+            var userId = request.Id;
+            var user = await GetByIdAsync(userId);
+            user.Email = request.Email;
+            request.Password = request.Password;
+            await this.UpdateAsync(user);
+            var response = new UpdateUserResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "User was updated successfully"
+            };
+
+            return response;
         }
 
-        public Task<GetUserResponse> GetUserAsync(GetUserRequest request)
+        public async Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request)
         {
-            throw new NotImplementedException();
+            var userId = request.Id;
+            var user = await this.GetByIdAsync(userId);
+            var response = new GetUserResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "User was got successfully",
+                UserDto = new GetUserDto
+                {
+                    Email = user.Email,
+                    Id = user.Id
+                }
+            };
+
+            return response;
         }
 
-        public Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request)
+        public async Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request)
         {
-            throw new NotImplementedException();
+            var users = (await this.GetAllAsync()).Select(u => new GetUserDto
+            {
+                Id = u.Id,
+                Email = u.Email
+            }).ToList();
+            
+            var response = new GetUsersResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "User was got successfully",
+                Users = users
+            };
+
+            return response;
         }
 
-        public Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request)
+        public async Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request)
         {
-            throw new NotImplementedException();
-        }
+            var user = await _context
+                .Users
+                .AsQueryable()
+                .SingleOrDefaultAsync(u => u.Email == request.Email);
+            
+            var response = new IsEmailUsedResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "User was got successfully",
+                IsEmailUsed = user != null
+            };
 
-        protected override Task UpdateAsync(User entity)
-        {
-            throw new NotImplementedException();
+            return response;
         }
     }
 }

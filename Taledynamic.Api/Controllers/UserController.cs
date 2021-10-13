@@ -87,7 +87,7 @@ namespace Taledynamic.Api.Controllers
         [HttpGet("get")]
         public async Task<GetUserResponse> GetById([FromQuery] GetUserRequest request)
         {
-            var response = await _userService.GetUserAsync(request);
+            var response = await _userService.GetUserByIdAsync(request);
             return response;
 
         }

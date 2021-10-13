@@ -15,7 +15,7 @@ namespace Taledynamic.Core.Interfaces
         public Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request);
         public Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request);
         public Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request);
-        public Task<GetUserResponse> GetUserAsync(GetUserRequest request);
+        public Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request);
         public Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request);
         public Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request);
     }
