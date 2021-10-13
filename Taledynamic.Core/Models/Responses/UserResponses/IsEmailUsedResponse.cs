@@ -1,6 +1,6 @@
 namespace Taledynamic.Core.Models.Responses.UserResponses
 {
-    public class IsEmailUsedResponse
+    public class IsEmailUsedResponse: BaseResponse
     {
         
     }
