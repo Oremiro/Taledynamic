@@ -10,5 +10,11 @@ namespace Taledynamic.Core
         public TaledynamicContext(DbContextOptions<TaledynamicContext> options) : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+        }
     }
 }

@@ -253,9 +253,10 @@ namespace Taledynamic.Core.Services
                 
                 var userId = request.Id;
                 var user = await GetByIdAsync(userId);
+                await DeleteAsync(userId);
                 user.Email = request.Email;
                 request.Password = request.Password;
-                await this.UpdateAsync(user);
+                await this.CreateAsync(user);
                 var response = new UpdateUserResponse()
                 {
                     StatusCode = (HttpStatusCode) 200,
