@@ -20,7 +20,15 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'settings',
         component: () => import('@/components/ProfileSettings.vue'),
-      }
+      },
+			{
+				path: 'password',
+				component: () => import('@/components/ProfilePassword.vue')
+			},
+			{
+				path: 'email',
+				component: () => import('@/components/ProfileEmail.vue')
+			}
     ]
   },
   {
