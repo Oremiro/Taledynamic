@@ -145,7 +145,7 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
-        public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request)
+        public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request, string ipAddress)
         {
             try
             {
@@ -158,6 +158,20 @@ namespace Taledynamic.Core.Services
                         Message = validator.Message
                     };
                 }
+                
+                var isExist = await _context
+                    .Users
+                    .AsQueryable()
+                    .AnyAsync(u => u.Email == request.Email);
+
+                if (isExist)
+                {
+                    return new CreateUserResponse
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = "User with the same email already exist."
+                    };
+                }
 
                 User user = new User
                 {
@@ -166,8 +180,8 @@ namespace Taledynamic.Core.Services
                     Password = request.Password,
                     RefreshTokens = new List<RefreshToken>()
                 };
-
-                var refreshToken = _userHelper.GenerateRefreshToken(null);
+                
+                var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
                 user.RefreshTokens.Add(refreshToken);
                 await this.CreateAsync(user);
                 var response = new CreateUserResponse

@@ -111,7 +111,8 @@ namespace Taledynamic.Api.Controllers
         [HttpPost("create")]
         public async Task<CreateUserResponse> Create([FromBody] CreateUserRequest request)
         {
-            var response = await _userService.CreateUserAsync(request);
+            var ipAddress = GetIpAddress();
+            var response = await _userService.CreateUserAsync(request, ipAddress);
             return response;
         }
 
