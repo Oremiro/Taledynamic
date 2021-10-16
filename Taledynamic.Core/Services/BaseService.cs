@@ -9,7 +9,7 @@ using Taledynamic.Core.Interfaces;
 
 namespace Taledynamic.Core.Services
 {
-    public class BaseService<TEntity>: IBaseService<TEntity> where TEntity : BaseEntity, new()
+    public abstract class BaseService<TEntity> where TEntity : BaseEntity, new()
     {
         private DbContext _context { get; set; }
 
@@ -18,7 +18,17 @@ namespace Taledynamic.Core.Services
             _context = context;
         }
 
-        public async Task CreateAsync(TEntity entity)
+        protected virtual async Task UpdateAsync(TEntity entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
+            } 
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+        
+        protected virtual async Task CreateAsync(TEntity entity)
         {
             if (entity == null)
             {
@@ -28,7 +38,7 @@ namespace Taledynamic.Core.Services
             await _context.SaveChangesAsync();
         }
         
-        public async Task DeleteAsync(int? id)
+        protected virtual async Task DeleteAsync(int? id)
         {
             if (id == null)
             {
@@ -41,7 +51,7 @@ namespace Taledynamic.Core.Services
             await _context.SaveChangesAsync();
         }
         
-        public async Task<TEntity> GetByIdAsync(int? id)
+        protected virtual async Task<TEntity> GetByIdAsync(int? id)
         {
             if (id == null)
             {
@@ -54,7 +64,7 @@ namespace Taledynamic.Core.Services
             return entity;
         }
         
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        protected virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             var entities = await _context.Set<TEntity>().AsNoTracking().ToListAsync();
             return entities;

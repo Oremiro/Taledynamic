@@ -10,7 +10,7 @@ namespace Taledynamic.Core.Entities
         [JsonIgnore]
         public string Password { get; set; }
         [JsonIgnore]
-        public List<RefreshToken> RefreshTokens { get; set; }
+        public virtual List<RefreshToken> RefreshTokens { get; set; }
 
     }
 }

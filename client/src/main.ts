@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import { VueCookieNext } from 'vue-cookie-next'
 
 import { 
@@ -8,9 +9,9 @@ import {
     NButton, NConfigProvider, NGlobalStyle, 
     NLayoutHeader, NMenu, NText, NSpace,
     NForm, NFormItem, NInput, NCheckbox,
-    NCard, NTabs, NTabPane, NH1, NA, NGrid, NGridItem,
+    NCard, NTabs, NTabPane, NH1, NH2, NA, NGrid, NGridItem,
     NIcon, NLayout, NLayoutContent, NResult, NMessageProvider, 
-    NAutoComplete, NTooltip
+    NAutoComplete, NTooltip, NH3, NH4, NCollapseTransition
     
 } from 'naive-ui'
 
@@ -19,11 +20,11 @@ const naive = create({
         NButton, NConfigProvider, NGlobalStyle, 
         NLayoutHeader, NMenu, NText, NSpace, 
         NForm, NFormItem, NInput, NCheckbox,
-        NCard, NTabs, NTabPane, NH1, NA, NGrid,
+        NCard, NTabs, NTabPane, NH1, NH2, NH3, NH4, NA, NGrid,
         NGridItem, NIcon, NLayout, NLayoutContent,
         NResult, NMessageProvider, NAutoComplete, 
-        NTooltip
+        NTooltip, NCollapseTransition
     ]
 })
 
-createApp(App).use(router).use(naive).use(VueCookieNext).mount('#app')
+createApp(App).use(store).use(router).use(naive).use(VueCookieNext).mount('#app')

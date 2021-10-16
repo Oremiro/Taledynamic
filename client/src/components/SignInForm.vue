@@ -31,72 +31,76 @@
 <style lang="scss" scoped>
 </style>
 
-<script>
-import { useMessage } from "naive-ui";
-import { emailRegex, externalOptions } from "@/variables/auth-vars.js";
+<script lang="ts">
+import { computed, defineComponent, reactive, ref } from 'vue'
+import { NForm, useMessage, FormRules } from "naive-ui"
+import { emailRegex, externalOptions } from "@/variables/auth-vars"
+import { SignInFormData } from '@/interfaces/auth-interfaces'
 
-export default {
+export default defineComponent({
+  
   name: "SignInForm",
-  data() {
-    return {
-      submitLoading: false,
-      message: useMessage(),
-      formData: {
-        email: {
-          value: "",
-          isValid: false,
-        },
-        password: {
-          value: "",
-          isValid: false,
-        },
-        remembered: {
-          value: false,
-        },
+  setup() {
+    const formData = reactive<SignInFormData>({
+      email: {
+        value: "",
+        isValid: false,
       },
-      rules: {
-        email: {
-          value: [
-            {
-              asyncValidator: (rule, value) => {
-                return new Promise((resolve, reject) => {
-                  if (emailRegex.test(value)) {
-                    this.formData.email.isValid = true;
-                    resolve();
+      password: {
+        value: "",
+        isValid: false,
+      },
+      remembered: {
+        value: false,
+      },
+    });
+    const rules: FormRules = {
+      email: {
+        value: [
+          {
+            asyncValidator: (rule, value) => {
+              return new Promise<void>((resolve, reject) => {
+                if (emailRegex.test(value)) {
+                  formData.email.isValid = true;
+                  resolve();
+                } else {
+                  formData.email.isValid = false;
+                  if (formData.email.value === "") {
+                    resolve()
                   } else {
-                    this.formData.email.isValid = false;
-                    if (this.formData.email.value === "") {
-                      resolve()
-                    } else {
-                      reject(new Error("Введите корректный email"));
-                    }
+                    reject(new Error("Введите корректный email"));
                   }
-                });
-              },
-              trigger: ["blur", "input"],
+                }
+              });
             },
-          ],
-        },
+            trigger: ["blur", "input"],
+          },
+        ],
       },
     };
-  },
-  computed: {
-    options() {
-      return externalOptions(this.formData.email.value);
-    },
-  },
-  methods: {
-    submitForm() {
-      this.submitLoading = true;
-      this.$refs.formRef.validate((errors) => {
+    const formRef = ref<InstanceType<typeof NForm>>();
+    const message = useMessage();
+    const submitLoading = ref<boolean>(false);
+    const submitForm = (): void => {
+      submitLoading.value = true;
+      formRef.value?.validate((errors) => {
         if (!errors) {
-          this.message.success("Valid");
+          message.success("Valid");
         } else {
-          this.message.error("Invalid");
+          message.error("Invalid");
         }
-        this.submitLoading = false;
+        submitLoading.value = false;
       });
-    },
-  },
-};
+    };
+    return {
+      formData,
+      rules,
+      submitLoading,
+      message,
+      submitForm,
+      options: computed(() => externalOptions(formData.email.value))
+    }
+  }
+})
 </script>
+
