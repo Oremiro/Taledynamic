@@ -34,8 +34,8 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { NForm, useMessage, FormRules } from "naive-ui"
-import { emailRegex, externalOptions } from "@/variables/auth-vars"
-import { SignInFormData } from '@/interfaces/auth-interfaces'
+import { emailRegex, externalOptions } from "@/helpers"
+import { SignInFormData } from '@/interfaces'
 import { useStore } from '@/store'
 import { useRouter } from 'vue-router'
 

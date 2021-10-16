@@ -55,13 +55,9 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { useMessage, NForm, FormRules } from "naive-ui";
-import {
-	emailRegex,
-	passwordRegex,
-	externalOptions
-} from "@/variables/auth-vars";
+import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
-import { SignUpFormData } from '@/interfaces/auth-interfaces'
+import { SignUpFormData } from '@/interfaces'
 import { useStore } from '@/store';
 import { useRouter } from 'vue-router';
 

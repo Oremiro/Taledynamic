@@ -1,7 +1,7 @@
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import axios from 'axios'
-import { SignInFormData, SignUpFormData } from '@/interfaces/auth-interfaces'
+import { SignInFormData, SignUpFormData } from '@/interfaces'
 
 export interface User {
 	id: number | null,
