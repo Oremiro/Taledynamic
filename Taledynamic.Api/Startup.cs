@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +29,15 @@ namespace Taledynamic.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<TaledynamicContext>();
+            var connectionStrings = Configuration.GetSection("ConnectionStrings");
+            services.AddDbContext<TaledynamicContext>(options =>
+            {
+                options.UseNpgsql(connectionStrings["PostgresDatabase"],
+                    o =>
+                    {
+                        o.MigrationsAssembly("Taledynamic.Core");
+                    });
+            });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.AddScoped<IUserService, UserService>();
             services.AddSwaggerGen(options =>

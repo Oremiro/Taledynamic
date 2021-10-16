@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -10,6 +12,7 @@ using Taledynamic.Core;
 using Taledynamic.Core.Entities;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Models.DTOs;
+using Taledynamic.Core.Models.Internal;
 using Taledynamic.Core.Models.Requests;
 using Taledynamic.Core.Models.Requests.UserRequests;
 using Taledynamic.Core.Models.Responses;
@@ -142,108 +145,357 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
-        public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request)
+        public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request, string ipAddress)
         {
-            User user = new User
+            try
             {
-                IsActive = true,
-                Email = request.Email,
-                Password = request.Password,
-                RefreshTokens = new List<RefreshToken>()
-            };
+                var validator = ValidateCreateRequest(request);
+                if (!validator.Status)
+                {
+                    return new CreateUserResponse
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = validator.Message
+                    };
+                }
+                
+                var isExist = await _context
+                    .Users
+                    .AsQueryable()
+                    .AnyAsync(u => u.Email == request.Email);
 
-            var refreshToken = _userHelper.GenerateRefreshToken(null);
-            user.RefreshTokens.Add(refreshToken);
-            await this.CreateAsync(user);
-            var response = new CreateUserResponse
+                if (isExist)
+                {
+                    return new CreateUserResponse
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = "User with the same email already exist."
+                    };
+                }
+
+                User user = new User
+                {
+                    IsActive = true,
+                    Email = request.Email,
+                    Password = request.Password,
+                    RefreshTokens = new List<RefreshToken>()
+                };
+                
+                var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
+                user.RefreshTokens.Add(refreshToken);
+                await this.CreateAsync(user);
+                var response = new CreateUserResponse
+                {
+                    StatusCode = (HttpStatusCode) 200,
+                    Message = "User was created successfully"
+                };
+
+                return response;
+            }
+            catch (Exception e)
             {
-                StatusCode = (HttpStatusCode) 200,
-                Message = "User was created successfully"
-            };
-
-            return response;
+                return new CreateUserResponse
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"CreateUserAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
         }
 
         public async Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request)
         {
-            var userId = request.UserId;
-            await this.DeleteAsync(userId);
-            var response = new DeleteUserResponse()
+            try
             {
-                StatusCode = (HttpStatusCode) 200,
-                Message = "User was deleted successfully"
-            };
+                
+                var validator = ValidateDeleteUserRequest(request);
+                if (!validator.Status)
+                {
+                    return new DeleteUserResponse()
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = validator.Message
+                    };
+                }
+                
+                var userId = request.UserId;
+                await this.DeleteAsync(userId);
+                var response = new DeleteUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 200,
+                    Message = "User was deleted successfully"
+                };
 
-            return response;
+                return response;
+            }
+            catch (Exception e)
+            {
+                return new DeleteUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"DeleteUserAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
         }
 
         public async Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request)
         {
-            var userId = request.Id;
-            var user = await GetByIdAsync(userId);
-            user.Email = request.Email;
-            request.Password = request.Password;
-            await this.UpdateAsync(user);
-            var response = new UpdateUserResponse()
+            try
             {
-                StatusCode = (HttpStatusCode) 200,
-                Message = "User was updated successfully"
-            };
+                var validator = ValidateUpdateUserRequest(request);
+                if (!validator.Status)
+                {
+                    return new UpdateUserResponse()
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = validator.Message
+                    };
+                }
+                
+                var userId = request.Id;
+                var oldUser = await _context
+                    .Users
+                    .AsNoTracking()
+                    .Include(u => u.RefreshTokens)
+                    .SingleOrDefaultAsync(u => u.Id == userId);
 
-            return response;
+                if (!oldUser.IsActive)
+                {
+                    return new UpdateUserResponse()
+                    {
+                        StatusCode = HttpStatusCode.NoContent,
+                        Message = "Nothing to update by this id."
+                    };
+                }
+                
+                await DeleteAsync(userId);
+
+                var refreshTokens = oldUser.RefreshTokens;
+                User newUser = new User
+                {
+                    IsActive = true,
+                    Email = request.Email,
+                    Password = request.Password,
+                    RefreshTokens = refreshTokens
+                };
+                
+                await this.CreateAsync(newUser);
+                var response = new UpdateUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 200,
+                    Message = "User was updated successfully"
+                };
+
+                return response;
+            }
+            catch(Exception e)
+            {
+                return new UpdateUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"UpdateUserAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
         }
 
         public async Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request)
         {
-            var userId = request.Id;
-            var user = await this.GetByIdAsync(userId);
-            var response = new GetUserResponse()
+            try
             {
-                StatusCode = (HttpStatusCode) 200,
-                Message = "User was got successfully",
-                UserDto = new GetUserDto
+                var validator = ValidateGetUserRequest(request);
+                if (!validator.Status)
                 {
-                    Email = user.Email,
-                    Id = user.Id
+                    return new GetUserResponse()
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = validator.Message
+                    };
                 }
-            };
+                
+                var userId = request.Id;
+                var user = await this.GetByIdAsync(userId);
+                var response = new GetUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 200,
+                    Message = "User was got successfully",
+                    UserDto = new GetUserDto
+                    {
+                        Email = user.Email,
+                        Id = user.Id
+                    }
+                };
 
-            return response;
+                return response;
+            }
+            catch(Exception e)
+            {
+                return new GetUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"GetUserByIdAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
         }
 
         public async Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request)
         {
-            var users = (await this.GetAllAsync()).Select(u => new GetUserDto
+            try
             {
-                Id = u.Id,
-                Email = u.Email
-            }).ToList();
-            
-            var response = new GetUsersResponse()
-            {
-                StatusCode = (HttpStatusCode) 200,
-                Message = "User was got successfully",
-                Users = users
-            };
+                var users = (await this.GetAllAsync()).Select(u => new GetUserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email
+                }).ToList();
 
-            return response;
+                var response = new GetUsersResponse()
+                {
+                    StatusCode = (HttpStatusCode) 200,
+                    Message = "User was got successfully",
+                    Users = users
+                };
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                return new GetUsersResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"GetUsersAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
+            
         }
 
         public async Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request)
         {
-            var user = await _context
-                .Users
-                .AsQueryable()
-                .SingleOrDefaultAsync(u => u.Email == request.Email);
-            
-            var response = new IsEmailUsedResponse()
+            try
             {
-                StatusCode = (HttpStatusCode) 200,
-                Message = "User was got successfully",
-                IsEmailUsed = user != null
-            };
+                
+                var validator = ValidateIsEmailUsedRequest(request);
+                if (!validator.Status)
+                {
+                    return new IsEmailUsedResponse()
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = validator.Message
+                    };
+                }
+                
+                var user = await _context
+                    .Users
+                    .AsQueryable()
+                    .SingleOrDefaultAsync(u => u.Email == request.Email);
 
-            return response;
+                var response = new IsEmailUsedResponse()
+                {
+                    StatusCode = (HttpStatusCode) 200,
+                    Message = "User was got successfully",
+                    IsEmailUsed = user != null
+                };
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                return new IsEmailUsedResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"IsEmailUsedAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
+            
+        }
+
+        private ValidateState ValidateCreateRequest(CreateUserRequest request)
+        {
+            StringBuilder sb = new StringBuilder();
+            
+            if (request.Email == null)
+            {
+                sb.Append("Email is not set.");
+;           }
+
+            if (request.Password == null || request.ConfirmPassword == null)
+            {
+                sb.Append("Password is not set.");
+            }
+
+            if (sb.Length != 0)
+            {
+                return new ValidateState(false, sb.ToString());
+            }
+
+            return new ValidateState(true, "Success");
+        }
+
+        private ValidateState ValidateUpdateUserRequest(UpdateUserRequest request)
+        {
+            StringBuilder sb = new StringBuilder();
+            
+            if (request.Email == null)
+            {
+                sb.Append("Email is not set.");
+            }
+
+            if (request.Password == null || request.ConfirmPassword == null)
+            {
+                sb.Append("Password is not set.");
+            }
+
+            if (sb.Length != 0)
+            {
+                return new ValidateState(false, sb.ToString());
+            }
+
+            return new ValidateState(true, "Success");}
+        
+        private ValidateState ValidateDeleteUserRequest(DeleteUserRequest request)
+        {
+            StringBuilder sb = new StringBuilder();
+            
+            if (request.UserId == default)
+            {
+                sb.Append("UserId is default.");
+            }
+
+            if (sb.Length != 0)
+            {
+                return new ValidateState(false, sb.ToString());
+            }
+
+            return new ValidateState(true, "Success");
+
+        }
+        private ValidateState ValidateGetUserRequest(GetUserRequest request)
+        {  StringBuilder sb = new StringBuilder();
+            
+            if (request.Id == default)
+            {
+                sb.Append("UserId is default.");
+            }
+
+            if (sb.Length != 0)
+            {
+                return new ValidateState(false, sb.ToString());
+            }
+
+            return new ValidateState(true, "Success");
+        }
+
+        private ValidateState ValidateIsEmailUsedRequest(IsEmailUsedRequest request)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (request.Email == null)
+            {
+                sb.Append("UserId is default.");
+            }
+
+            if (sb.Length == 0)
+            {
+                return new ValidateState(false, sb.ToString());
+            }
+
+            return new ValidateState(true, "Success");
         }
     }
 }

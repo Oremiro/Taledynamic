@@ -12,7 +12,7 @@ namespace Taledynamic.Core.Interfaces
         public Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress);
         public Task<RefreshTokenResponse> RefreshTokenAsync(string token, string ipAddress);
         public Task<RevokeTokenResponse> RevokeTokenAsync(string token, string ipAddress);
-        public Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request);
+        public Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request, string ipAddress);
         public Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request);
         public Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request);
         public Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request);
