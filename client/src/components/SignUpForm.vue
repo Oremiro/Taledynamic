@@ -27,12 +27,12 @@
 			ref="pwdRef"
 			first
 			label="Повторите пароль"
-			path="repeatedPassword.value">
+			path="confirmedPassword.value">
 			<n-input
 				type="password"
 				show-password-on="click"
 				placeholder=""
-				v-model:value="formData.repeatedPassword.value"/>
+				v-model:value="formData.confirmedPassword.value"/>
 		</n-form-item>
 
 		<n-form-item>
@@ -40,7 +40,7 @@
 				type="primary"
 				ghost
 				:loading="submitLoading"
-				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.repeatedPassword.isValid"
+				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid || submitLoading"
 				@click="submitForm">Зарегистрироваться</n-button>
 		</n-form-item>
 	</n-form>
@@ -62,6 +62,8 @@ import {
 } from "@/variables/auth-vars";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
 import { SignUpFormData } from '@/interfaces/auth-interfaces'
+import { useStore } from '@/store';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
 	name: 'SignUpForm',
@@ -69,6 +71,7 @@ export default defineComponent({
 		QuestionTooltip
 	},
 	setup() {
+		// data
 		const formData = reactive<SignUpFormData>({
 			email: {
 				value: "",
@@ -78,7 +81,7 @@ export default defineComponent({
 				value: "",
 				isValid: false,
 			},
-			repeatedPassword: {
+			confirmedPassword: {
 				value: "",
 				isValid: false,
 			},
@@ -132,7 +135,7 @@ export default defineComponent({
 					},
 				],
 			},
-			repeatedPassword: {
+			confirmedPassword: {
 				value: [
 					{
 						required: true,
@@ -143,10 +146,10 @@ export default defineComponent({
 						asyncValidator: (rule, value) => {
 							return new Promise<void>((resolve, reject) => {
 								if (value !== formData.password.value) {
-									formData.repeatedPassword.isValid = false;
+									formData.confirmedPassword.isValid = false;
 									reject(new Error("Пароли не совпадают"));
 								} else {
-									formData.repeatedPassword.isValid = true;
+									formData.confirmedPassword.isValid = true;
 									resolve();
 								}
 							});
@@ -159,17 +162,32 @@ export default defineComponent({
 		const formRef = ref<InstanceType<typeof NForm>>();
 		const message = useMessage();
 		const submitLoading = ref<boolean>(false);
-		const submitForm = (): void => {
+		const store = useStore();
+
+		// methods
+    const submitForm = (): void => {
 			submitLoading.value = true;
-			formRef.value?.validate((errors) => {
-				if (!errors) {
-					message.success("Valid");
-				} else {
-					message.error("Invalid");
-				}
-				submitLoading.value = false;
-			});
-		};
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+					message.success('Данные являются корректными');
+					store.dispatch('register', formData)
+					.then(() => {
+						const router = useRouter();
+						message.success('Вы успешно зарегистрировались!');
+						router.push('/profile');
+					})
+					.catch((error) => {
+						message.error(error);
+					})
+					.finally(() => {
+						submitLoading.value = false;	
+					});
+        } else {
+          message.error('Данные не являются корректными');
+					submitLoading.value = false;
+        }
+      });
+    };
 		return {
 			formData,
 			rules,

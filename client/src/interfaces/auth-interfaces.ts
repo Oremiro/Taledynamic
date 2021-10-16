@@ -6,7 +6,7 @@ export interface FormItemData<Type extends string | boolean> {
 export interface SignUpFormData {
     email: FormItemData<string>,
     password: FormItemData<string>,
-    repeatedPassword: FormItemData<string>
+    confirmedPassword: FormItemData<string>
 }
 
 export interface SignInFormData {

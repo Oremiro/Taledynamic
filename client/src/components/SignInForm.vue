@@ -36,11 +36,14 @@ import { computed, defineComponent, reactive, ref } from 'vue'
 import { NForm, useMessage, FormRules } from "naive-ui"
 import { emailRegex, externalOptions } from "@/variables/auth-vars"
 import { SignInFormData } from '@/interfaces/auth-interfaces'
+import { useStore } from '@/store'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   
   name: "SignInForm",
   setup() {
+		// data
     const formData = reactive<SignInFormData>({
       email: {
         value: "",
@@ -81,18 +84,34 @@ export default defineComponent({
     const formRef = ref<InstanceType<typeof NForm>>();
     const message = useMessage();
     const submitLoading = ref<boolean>(false);
+		const store = useStore();
+
+		// methods
     const submitForm = (): void => {
-      submitLoading.value = true;
+			submitLoading.value = true;
       formRef.value?.validate((errors) => {
         if (!errors) {
-          message.success("Valid");
+					message.success('Данные являются корректными');
+					store.dispatch('login', formData)
+					.then(() => {
+						const router = useRouter();
+						message.success('Вы успешно вошли!');
+						router.push('/profile');
+					})
+					.catch((error) => {
+						message.error(error);
+					})
+					.finally(() => {
+						submitLoading.value = false;	
+					});
         } else {
-          message.error("Invalid");
+          message.error('Данные не являются корректными');
+					submitLoading.value = false;
         }
-        submitLoading.value = false;
       });
     };
     return {
+			formRef,
       formData,
       rules,
       submitLoading,
