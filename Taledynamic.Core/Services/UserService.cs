@@ -252,11 +252,33 @@ namespace Taledynamic.Core.Services
                 }
                 
                 var userId = request.Id;
-                var user = await GetByIdAsync(userId);
+                var oldUser = await _context
+                    .Users
+                    .AsNoTracking()
+                    .Include(u => u.RefreshTokens)
+                    .SingleOrDefaultAsync(u => u.Id == userId);
+
+                if (!oldUser.IsActive)
+                {
+                    return new UpdateUserResponse()
+                    {
+                        StatusCode = HttpStatusCode.NoContent,
+                        Message = "Nothing to update by this id."
+                    };
+                }
+                
                 await DeleteAsync(userId);
-                user.Email = request.Email;
-                request.Password = request.Password;
-                await this.CreateAsync(user);
+
+                var refreshTokens = oldUser.RefreshTokens;
+                User newUser = new User
+                {
+                    IsActive = true,
+                    Email = request.Email,
+                    Password = request.Password,
+                    RefreshTokens = refreshTokens
+                };
+                
+                await this.CreateAsync(newUser);
                 var response = new UpdateUserResponse()
                 {
                     StatusCode = (HttpStatusCode) 200,

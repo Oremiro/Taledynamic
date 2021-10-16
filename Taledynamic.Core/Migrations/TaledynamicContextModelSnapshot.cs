@@ -37,9 +37,6 @@ namespace Taledynamic.Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.ToTable("Users");
                 });
 
@@ -83,7 +80,7 @@ namespace Taledynamic.Core.Migrations
 
                             b1.HasIndex("UserId");
 
-                            b1.ToTable("RefreshToken");
+                            b1.ToTable("RefreshTokens");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");

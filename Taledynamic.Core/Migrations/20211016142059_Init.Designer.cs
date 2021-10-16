@@ -10,8 +10,8 @@ using Taledynamic.Core;
 namespace Taledynamic.Core.Migrations
 {
     [DbContext(typeof(TaledynamicContext))]
-    [Migration("20211015114548_MakeEmailUnique")]
-    partial class MakeEmailUnique
+    [Migration("20211016142059_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -38,9 +38,6 @@ namespace Taledynamic.Core.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -85,7 +82,7 @@ namespace Taledynamic.Core.Migrations
 
                             b1.HasIndex("UserId");
 
-                            b1.ToTable("RefreshToken");
+                            b1.ToTable("RefreshTokens");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");

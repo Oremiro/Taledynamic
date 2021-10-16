@@ -6,6 +6,8 @@ namespace Taledynamic.Core.Models.Requests.UserRequests
     {
         [Required]
         public int Id { get; set; }
+        
+        [Required]
         [EmailAddress]
         public string Email { get; set; }
 
