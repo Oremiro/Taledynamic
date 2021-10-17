@@ -6,9 +6,30 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Serilog" Version="2.11.0-dev-01371" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
+      <PackageReference Include="Serilog.Settings.AppSettings" Version="2.2.3-dev-00066" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1-dev-00876" />
+      <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00947" />
       <PackageReference Include="Telegram.Bot" Version="16.0.2" />
       <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
       <PackageReference Include="Telegram.Bot.Framework" Version="1.1.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Log\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Log\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Log\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Logs" />
     </ItemGroup>
 
 </Project>
