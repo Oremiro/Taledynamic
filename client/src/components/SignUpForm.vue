@@ -170,7 +170,7 @@ export default defineComponent({
 					.then(() => {
 						const router = useRouter();
 						message.success('Вы успешно зарегистрировались!');
-						router.push('/profile');
+						router.push('/auth');
 					})
 					.catch((error) => {
 						message.error(error);
