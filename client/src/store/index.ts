@@ -62,7 +62,7 @@ export const store = createStore<IState>({
 					}
 				}).catch((error) => {
 					console.log(error.response);
-					reject('Ошибка регистрации');
+					reject(new Error('Ошибка регистрации'));
 				});
 			});
 		},
@@ -89,7 +89,7 @@ export const store = createStore<IState>({
 				})
 				.catch((error) => {
 					console.log(error.message);
-					reject('Ошибка авторизации');
+					reject(new Error('Ошибка авторизации'));
 				});
 			});
 		},

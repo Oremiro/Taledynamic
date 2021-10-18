@@ -81,17 +81,6 @@ export default defineComponent({
 						{ default: () => 'О проекте' }
 					),
 				key: '/',
-			},
-			{
-				label: () =>
-					h(
-						RouterLink,
-						{
-							to: '/auth'
-						},
-						{ default: () => 'Вход' }
-					),
-				key: '/auth'
 			}
 		]
 		const store = useStore();
@@ -105,7 +94,18 @@ export default defineComponent({
 					),
 				key: '/profile'
 			})
+		} else {
+			menuOptions.push({
+				label: () =>
+					h(
+						RouterLink,
+						{ to: '/auth' },
+						{ default: () => 'Вход' }
+					),
+				key: '/auth'
+			})
 		}
+		
 
 		const changeTheme = (): void => {
 			if (props.currentTheme === null) {

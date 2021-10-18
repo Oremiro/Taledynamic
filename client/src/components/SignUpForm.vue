@@ -61,7 +61,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { useMessage, NForm, FormRules, NFormItem } from "naive-ui";
-import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
+import { emailRegex, passwordRegex, externalOptions, holdSubmitDisabled } from "@/helpers";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
 import { SignUpFormData } from '@/interfaces'
 import { useStore } from '@/store';
@@ -173,15 +173,6 @@ export default defineComponent({
 				confirmedPasswordRef.value?.validate({ trigger: 'password-input'}).catch(() => true);
 			}
 		}
-		const holdSubmitDisabled = () => {
-			submitDisabled.value = 15;
-			const submitDisabledTimer = setInterval(() => {
-				submitDisabled.value--;
-				if (submitDisabled.value == 0) {
-					clearInterval(submitDisabledTimer);
-				}
-			}, 1000);
-		}
     const submitForm = (): void => {
 			submitLoading.value = true;
       formRef.value?.validate((errors) => {
@@ -196,12 +187,12 @@ export default defineComponent({
 					})
 					.finally(() => {
 						submitLoading.value = false;
-						holdSubmitDisabled();
+						holdSubmitDisabled(submitDisabled);
 					});
         } else {
           message.error('Данные не являются корректными');
 					submitLoading.value = false;
-					holdSubmitDisabled();
+					holdSubmitDisabled(submitDisabled);
         }
       });
     };

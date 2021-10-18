@@ -18,12 +18,15 @@
     </n-form-item>
     
     <n-form-item>
-      <n-button
-        type="primary"
-        ghost
-        :loading="submitLoading"
-        :disabled="!formData.email.isValid || !formData.password.value"
-        @click="submitForm">Войти</n-button>
+			<n-button-group>
+				<n-button
+					type="primary"
+					ghost
+					:loading="submitLoading"
+					:disabled="!formData.email.isValid || !formData.password.value || submitLoading || (submitDisabled != 0)"
+					@click="submitForm">Войти</n-button>
+				<n-button v-if="submitDisabled" disabled type="primary" ghost>{{ submitDisabled }}</n-button>
+			</n-button-group>
     </n-form-item>
   </n-form>
 </template>
@@ -34,7 +37,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { NForm, useMessage, FormRules } from "naive-ui"
-import { emailRegex, externalOptions } from "@/helpers"
+import { emailRegex, externalOptions, holdSubmitDisabled } from "@/helpers"
 import { SignInFormData } from '@/interfaces'
 import { useStore } from '@/store'
 import { useRouter } from 'vue-router'
@@ -84,6 +87,7 @@ export default defineComponent({
     const formRef = ref<InstanceType<typeof NForm>>();
     const message = useMessage();
     const submitLoading = ref<boolean>(false);
+		const submitDisabled = ref<number>(0);
 		const store = useStore();
 
 		// methods
@@ -91,7 +95,7 @@ export default defineComponent({
 			submitLoading.value = true;
       formRef.value?.validate((errors) => {
         if (!errors) {
-					message.success('Данные являются корректными');
+					console.log(formData);					
 					store.dispatch('login', formData)
 					.then(() => {
 						const router = useRouter();
@@ -99,15 +103,16 @@ export default defineComponent({
 						router.push('/profile');
 					})
 					.catch((error) => {
-						console.log(error);
-						// message.error(error);
+						message.error(error.message);
 					})
 					.finally(() => {
-						submitLoading.value = false;	
+						submitLoading.value = false;
+						holdSubmitDisabled(submitDisabled);	
 					});
         } else {
           message.error('Данные не являются корректными');
 					submitLoading.value = false;
+					holdSubmitDisabled(submitDisabled);
         }
       });
     };
@@ -116,6 +121,7 @@ export default defineComponent({
       formData,
       rules,
       submitLoading,
+			submitDisabled,
       message,
       submitForm,
       options: computed(() => externalOptions(formData.email.value))
