@@ -2,9 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Taledynamic.Core.Models.Requests.UserRequests
 {
-    public class IsEmailUsedRequest
+    public class GetActiveUserByEmailRequest: BaseRequest
     {
         [Required]
-        public string Email { get; set; }
+        [EmailAddress]
+        public string Email { get; set; } 
     }
 }

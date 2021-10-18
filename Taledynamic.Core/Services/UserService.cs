@@ -35,114 +35,157 @@ namespace Taledynamic.Core.Services
 
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress)
         {
-            var response = new AuthenticateResponse(user: null, jwtToken: null, refreshToken: null);
-
-            User user = await _context
-                .Users
-                .AsQueryable()
-                .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
-
-            if (user == null)
+            try
             {
-                response.Message = "User is not found.";
-                response.StatusCode = HttpStatusCode.NotFound;
+                var response = new AuthenticateResponse();
+
+                User user = await _context
+                    .Users
+                    .AsQueryable()
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+
+                if (user == null)
+                {
+                    response.Message = "User is not found.";
+                    response.StatusCode = HttpStatusCode.NotFound;
+                    return response;
+                }
+
+                var jwtToken = _userHelper.GenerateJwtToken(user);
+                var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
+
+                user.RefreshTokens.Add(refreshToken);
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                response = new AuthenticateResponse()
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    JwtToken = jwtToken,
+                    RefreshToken = refreshToken.Token,
+                    Message = "Authenticate proccess ended with success.",
+                    StatusCode = HttpStatusCode.OK
+                };
                 return response;
             }
-
-            var jwtToken = _userHelper.GenerateJwtToken(user);
-            var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
-
-            user.RefreshTokens.Add(refreshToken);
-            _context.Update(user);
-            await _context.SaveChangesAsync();
-
-            response = new AuthenticateResponse(user, jwtToken, refreshToken.Token)
+            catch (Exception e)
             {
-                Message = "Authenticate proccess ended with success.",
-                StatusCode = HttpStatusCode.OK
-            };
-            return response;
+                return new AuthenticateResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"AuthenticateAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
         }
 
         public async Task<RefreshTokenResponse> RefreshTokenAsync(string token, string ipAddress)
         {
-            var response = new RefreshTokenResponse(user: null, jwtToken: null, refreshToken: null)
+            try
             {
-                StatusCode = HttpStatusCode.OK
-            };
+                var response = new RefreshTokenResponse();
 
-            var user = await _context
-                .Users
-                .AsQueryable()
-                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+                var user = await _context
+                    .Users
+                    .AsQueryable()
+                    .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
 
-            if (user == null)
-            {
-                response.Message = "User with token is not found.";
-                response.StatusCode = HttpStatusCode.NotFound;
-                return response;
+                if (user == null)
+                {
+                    response.Message = "User with token is not found.";
+                    response.StatusCode = HttpStatusCode.NotFound;
+                    return response;
+                }
+
+                var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+
+                if (!refreshToken.IsActive)
+                {
+                    response.Message = "Token is not active.";
+                    response.StatusCode = HttpStatusCode.NotFound;
+                    return response;
+                }
+
+                var newRefreshToken = _userHelper.GenerateRefreshToken(ipAddress);
+                refreshToken.Revoked = DateTime.UtcNow;
+                refreshToken.RevokedByIp = ipAddress;
+                refreshToken.ReplacedByToken = newRefreshToken.Token;
+                user.RefreshTokens.Add(newRefreshToken);
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                var jwtToken = _userHelper.GenerateJwtToken(user);
+
+                return new RefreshTokenResponse
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    JwtToken = jwtToken,
+                    RefreshToken = refreshToken.Token,
+                    Message = "Refresh proccess ended with success.",
+                    StatusCode = HttpStatusCode.OK
+                };
             }
-
-            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
-
-            if (!refreshToken.IsActive)
+            catch (Exception e)
             {
-                response.Message = "Token is not active.";
-                response.StatusCode = HttpStatusCode.NotFound;
-                return response;
+                return new RefreshTokenResponse
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message = $"There was an exception in method \"RefreshTokenAsync\". Stacktrace - {e.StackTrace}"
+                };
             }
-
-            var newRefreshToken = _userHelper.GenerateRefreshToken(ipAddress);
-            refreshToken.Revoked = DateTime.UtcNow;
-            refreshToken.RevokedByIp = ipAddress;
-            refreshToken.ReplacedByToken = newRefreshToken.Token;
-            user.RefreshTokens.Add(newRefreshToken);
-            _context.Update(user);
-            await _context.SaveChangesAsync();
-
-            var jwtToken = _userHelper.GenerateJwtToken(user);
-
-            return new RefreshTokenResponse(user, jwtToken, newRefreshToken.Token);
         }
 
         public async Task<RevokeTokenResponse> RevokeTokenAsync(string token, string ipAddress)
         {
-            var response = new RevokeTokenResponse
+            try
             {
-                StatusCode = HttpStatusCode.OK
-            };
+                var response = new RevokeTokenResponse
+                {
+                    StatusCode = HttpStatusCode.OK
+                };
 
-            var user = await _context
-                .Users
-                .AsQueryable()
-                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+                var user = await _context
+                    .Users
+                    .AsQueryable()
+                    .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
 
-            if (user == null)
-            {
-                response.Message = "User with token is not found.";
-                response.StatusCode = HttpStatusCode.NotFound;
-                response.IsSuccess = false;
+                if (user == null)
+                {
+                    response.Message = "User with token is not found.";
+                    response.StatusCode = HttpStatusCode.NotFound;
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+
+                if (!refreshToken.IsActive)
+                {
+                    response.Message = "Token is not active.";
+                    response.StatusCode = HttpStatusCode.NotFound;
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                refreshToken.Revoked = DateTime.UtcNow;
+                refreshToken.RevokedByIp = ipAddress;
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                response.IsSuccess = true;
                 return response;
             }
-
-            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
-
-            if (!refreshToken.IsActive)
+            catch (Exception e)
             {
-                response.Message = "Token is not active.";
-                response.StatusCode = HttpStatusCode.NotFound;
-                response.IsSuccess = false;
-                return response;
+                return new RevokeTokenResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    IsSuccess = false,
+                    Message = $"There was an exception in method \"RevokeTokenAsync\". Stacktrace - {e.StackTrace}"
+                };
             }
-
-            refreshToken.Revoked = DateTime.UtcNow;
-            refreshToken.RevokedByIp = ipAddress;
-            _context.Update(user);
-            await _context.SaveChangesAsync();
-
-            response.IsSuccess = true;
-            return response;
         }
 
         public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request, string ipAddress)
@@ -158,7 +201,7 @@ namespace Taledynamic.Core.Services
                         Message = validator.Message
                     };
                 }
-                
+
                 var isExist = await _context
                     .Users
                     .AsQueryable()
@@ -180,7 +223,7 @@ namespace Taledynamic.Core.Services
                     Password = request.Password,
                     RefreshTokens = new List<RefreshToken>()
                 };
-                
+
                 var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
                 user.RefreshTokens.Add(refreshToken);
                 await this.CreateAsync(user);
@@ -206,7 +249,6 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                
                 var validator = ValidateDeleteUserRequest(request);
                 if (!validator.Status)
                 {
@@ -216,7 +258,7 @@ namespace Taledynamic.Core.Services
                         Message = validator.Message
                     };
                 }
-                
+
                 var userId = request.UserId;
                 await this.DeleteAsync(userId);
                 var response = new DeleteUserResponse()
@@ -250,7 +292,7 @@ namespace Taledynamic.Core.Services
                         Message = validator.Message
                     };
                 }
-                
+
                 var userId = request.Id;
                 var oldUser = await _context
                     .Users
@@ -266,7 +308,7 @@ namespace Taledynamic.Core.Services
                         Message = "Nothing to update by this id."
                     };
                 }
-                
+
                 await DeleteAsync(userId);
 
                 var refreshTokens = oldUser.RefreshTokens;
@@ -277,7 +319,7 @@ namespace Taledynamic.Core.Services
                     Password = request.Password,
                     RefreshTokens = refreshTokens
                 };
-                
+
                 await this.CreateAsync(newUser);
                 var response = new UpdateUserResponse()
                 {
@@ -287,7 +329,7 @@ namespace Taledynamic.Core.Services
 
                 return response;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return new UpdateUserResponse()
                 {
@@ -310,9 +352,19 @@ namespace Taledynamic.Core.Services
                         Message = validator.Message
                     };
                 }
-                
+
                 var userId = request.Id;
                 var user = await this.GetByIdAsync(userId);
+
+                if (user == null)
+                {
+                    return new GetUserResponse
+                    {
+                        Message = "User is not found.",
+                        StatusCode = HttpStatusCode.NotFound
+                    };
+                }
+                
                 var response = new GetUserResponse()
                 {
                     StatusCode = (HttpStatusCode) 200,
@@ -326,7 +378,7 @@ namespace Taledynamic.Core.Services
 
                 return response;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return new GetUserResponse()
                 {
@@ -346,10 +398,11 @@ namespace Taledynamic.Core.Services
                     Email = u.Email
                 }).ToList();
 
+                
                 var response = new GetUsersResponse()
                 {
                     StatusCode = (HttpStatusCode) 200,
-                    Message = "User was got successfully",
+                    Message = "Users was found successfully",
                     Users = users
                 };
 
@@ -363,14 +416,12 @@ namespace Taledynamic.Core.Services
                     Message = $"There was an exception in method \"GetUsersAsync\". Stacktrace - {e.StackTrace}"
                 };
             }
-            
         }
 
         public async Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request)
         {
             try
             {
-                
                 var validator = ValidateIsEmailUsedRequest(request);
                 if (!validator.Status)
                 {
@@ -380,7 +431,7 @@ namespace Taledynamic.Core.Services
                         Message = validator.Message
                     };
                 }
-                
+
                 var user = await _context
                     .Users
                     .AsQueryable()
@@ -389,7 +440,7 @@ namespace Taledynamic.Core.Services
                 var response = new IsEmailUsedResponse()
                 {
                     StatusCode = (HttpStatusCode) 200,
-                    Message = "User was got successfully",
+                    Message = "Method ended without errors.",
                     IsEmailUsed = user != null
                 };
 
@@ -403,17 +454,72 @@ namespace Taledynamic.Core.Services
                     Message = $"There was an exception in method \"IsEmailUsedAsync\". Stacktrace - {e.StackTrace}"
                 };
             }
-            
+        }
+
+        public async Task<GetUserResponse> GetActiveUserByEmailAsync(GetActiveUserByEmailRequest request)
+        {
+            try
+            {
+                var validator = ValidateGetActiveUserByEmailRequest(request);
+                if (!validator.Status)
+                {
+                    return new GetUserResponse()
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = validator.Message
+                    };
+                }
+
+                var user = await _context
+                    .Users
+                    .AsQueryable()
+                    .SingleOrDefaultAsync(u => u.Email == request.Email);
+
+                if (user == null)
+                {
+                    return new GetUserResponse
+                    {
+                        Message = "User is not found.",
+                        StatusCode = HttpStatusCode.NotFound
+                    };
+                }
+                
+                GetUserDto userDto = new GetUserDto
+                {
+                    Email = user.Email,
+                    Id = user.Id,
+                };
+                
+                
+                var response = new GetUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 200,
+                    Message = "User was found.",
+                    UserDto = userDto
+                };
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                return new GetUserResponse()
+                {
+                    StatusCode = (HttpStatusCode) 400,
+                    Message =
+                        $"There was an exception in method \"GetActiveUserByEmailAsync\". Stacktrace - {e.StackTrace}"
+                };
+            }
         }
 
         private ValidateState ValidateCreateRequest(CreateUserRequest request)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             if (request.Email == null)
             {
                 sb.Append("Email is not set.");
-;           }
+                ;
+            }
 
             if (request.Password == null || request.ConfirmPassword == null)
             {
@@ -431,7 +537,7 @@ namespace Taledynamic.Core.Services
         private ValidateState ValidateUpdateUserRequest(UpdateUserRequest request)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             if (request.Email == null)
             {
                 sb.Append("Email is not set.");
@@ -447,12 +553,13 @@ namespace Taledynamic.Core.Services
                 return new ValidateState(false, sb.ToString());
             }
 
-            return new ValidateState(true, "Success");}
-        
+            return new ValidateState(true, "Success");
+        }
+
         private ValidateState ValidateDeleteUserRequest(DeleteUserRequest request)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             if (request.UserId == default)
             {
                 sb.Append("UserId is default.");
@@ -464,11 +571,12 @@ namespace Taledynamic.Core.Services
             }
 
             return new ValidateState(true, "Success");
-
         }
+
         private ValidateState ValidateGetUserRequest(GetUserRequest request)
-        {  StringBuilder sb = new StringBuilder();
-            
+        {
+            StringBuilder sb = new StringBuilder();
+
             if (request.Id == default)
             {
                 sb.Append("UserId is default.");
@@ -491,6 +599,23 @@ namespace Taledynamic.Core.Services
             }
 
             if (sb.Length == 0)
+            {
+                return new ValidateState(false, sb.ToString());
+            }
+
+            return new ValidateState(true, "Success");
+        }
+
+        private ValidateState ValidateGetActiveUserByEmailRequest(GetActiveUserByEmailRequest request)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                sb.Append("Email is empty.");
+            }
+
+            if (sb.Length != 0)
             {
                 return new ValidateState(false, sb.ToString());
             }
