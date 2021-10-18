@@ -17,14 +17,15 @@
 				type="password"
 				show-password-on="click"
 				placeholder=""
-				v-model:value="formData.password.value">
+				v-model:value="formData.password.value"
+				@input="handlePasswordInput">
 				<template v-if="!formData.password.isValid" #prefix>
 					<question-tooltip text="Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ."/>
 				</template>
 			</n-input>
 		</n-form-item>
 		<n-form-item
-			ref="pwdRef"
+			ref="confirmedPasswordRef"
 			first
 			label="Повторите пароль"
 			path="confirmedPassword.value">
@@ -32,12 +33,14 @@
 				type="password"
 				show-password-on="click"
 				placeholder=""
+				:disabled="!formData.password.isValid"
 				v-model:value="formData.confirmedPassword.value"/>
 		</n-form-item>
 
 		<n-form-item>
 			<n-button-group>
 				<n-button
+					attr-type="submit"
 					type="primary"
 					ghost
 					:loading="submitLoading"
@@ -57,7 +60,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
-import { useMessage, NForm, FormRules } from "naive-ui";
+import { useMessage, NForm, FormRules, NFormItem } from "naive-ui";
 import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
 import { SignUpFormData } from '@/interfaces'
@@ -113,7 +116,7 @@ export default defineComponent({
 					{
 						required: true,
 						message: "Пожалуйста, введите пароль",
-						trigger: "blur",
+						trigger: ["blur", 'some']
 					},
 					{
 						asyncValidator: (rule, value) => {
@@ -137,34 +140,39 @@ export default defineComponent({
 				value: [
 					{
 						required: true,
-						message: "Пожалуйста, повторите пароль",
-						trigger: "blur",
+						message: 'Пожалуйста, повторите пароль',
+						trigger: 'blur',
 					},
 					{
 						asyncValidator: (rule, value) => {
 							return new Promise<void>((resolve, reject) => {
 								if (value !== formData.password.value) {
 									formData.confirmedPassword.isValid = false;
-									reject(new Error("Пароли не совпадают"));
+									reject(new Error('Пароли не совпадают'));
 								} else {
 									formData.confirmedPassword.isValid = true;
 									resolve();
 								}
 							});
 						},
-						trigger: ["blur", "input"],
+						trigger: ['blur', 'input', 'password-input'],
 					},
 				],
 			},
 		};
 		const formRef = ref<InstanceType<typeof NForm>>();
+		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
 		const message = useMessage();
 		const submitLoading = ref<boolean>(false);
 		const submitDisabled = ref<number>(0);
 		const store = useStore();
 
-
 		// methods
+		const handlePasswordInput = () => {
+			if (formData.confirmedPassword.value != '') {
+				confirmedPasswordRef.value?.validate({ trigger: 'password-input'}).catch(() => true);
+			}
+		}
 		const holdSubmitDisabled = () => {
 			submitDisabled.value = 15;
 			const submitDisabledTimer = setInterval(() => {
@@ -201,9 +209,11 @@ export default defineComponent({
 			formData,
 			rules,
 			formRef,
+			confirmedPasswordRef,
 			message,
 			submitLoading,
 			submitDisabled,
+			handlePasswordInput,
 			submitForm,
 			options: computed(() => externalOptions(formData.email.value))
 		}
