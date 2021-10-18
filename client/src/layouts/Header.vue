@@ -62,6 +62,7 @@
 import { defineComponent, h } from 'vue'
 import { RouterLink } from 'vue-router'
 import { darkTheme, MenuOption } from 'naive-ui'
+import { useStore } from '@/store'
 
 export default defineComponent({
 	name: 'Header',
@@ -80,30 +81,32 @@ export default defineComponent({
 						{ default: () => 'О проекте' }
 					),
 				key: '/',
-			},
-			{
+			}
+		]
+		const store = useStore();
+		if (store.getters.isLoggedIn) {
+			menuOptions.push({
 				label: () =>
 					h(
 						RouterLink,
-						{
-							to: '/auth'
-						},
-						{ default: () => 'Вход' }
-					),
-				key: '/auth'
-			},
-			{
-				label: () =>
-					h(
-						RouterLink,
-						{
-							to: '/profile'
-						},
+						{ to: '/profile' },
 						{ default: () => 'Профиль' }
 					),
 				key: '/profile'
-			}
-		]
+			})
+		} else {
+			menuOptions.push({
+				label: () =>
+					h(
+						RouterLink,
+						{ to: '/auth' },
+						{ default: () => 'Вход' }
+					),
+				key: '/auth'
+			})
+		}
+		
+
 		const changeTheme = (): void => {
 			if (props.currentTheme === null) {
 				context.emit('changeTheme', darkTheme)
