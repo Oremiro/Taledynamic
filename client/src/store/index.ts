@@ -50,11 +50,16 @@ export const store = createStore<IState>({
 				ApiHelper.userCreate({
 					email: formData.email.value, 
 					password: formData.password.value, 
-					confirmedPassword: formData.confirmedPassword.value
+					confirmPassword: formData.confirmedPassword.value
 				})
 				.then((response) => {
-					console.log(response.data.message);
-					resolve();
+					if (response.data.statusCode == 200) {
+						resolve();
+					} else if (response.data.statusCode == 400) {
+						reject(new Error('Пользователь с таким почтовым адресом уже существует'))
+					} else {
+						reject(new Error('Ошибка регистрации'))
+					}
 				}).catch((error) => {
 					console.log(error.response);
 					reject('Ошибка регистрации');

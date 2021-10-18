@@ -8,7 +8,7 @@ import {
 	NButton, NConfigProvider, NGlobalStyle, NLayoutHeader, NMenu, NText, NSpace,
 	NForm, NFormItem, NInput, NCheckbox, NCard, NTabs, NTabPane, NH1, NH2, NH3, NH4, NA,
 	NGrid, NGridItem, NIcon, NLayout, NLayoutContent, NResult, NMessageProvider,
-	NAutoComplete, NTooltip, NCollapseTransition
+	NAutoComplete, NTooltip, NCollapseTransition, NButtonGroup
 } from 'naive-ui'
 
 const naive = create({
@@ -16,7 +16,7 @@ const naive = create({
 		NButton, NConfigProvider, NGlobalStyle, NLayoutHeader, NMenu, NText, NSpace,
 		NForm, NFormItem, NInput, NCheckbox, NCard, NTabs, NTabPane, NH1, NH2, NH3, NH4, NA,
 		NGrid, NGridItem, NIcon, NLayout, NLayoutContent, NResult, NMessageProvider,
-		NAutoComplete, NTooltip, NCollapseTransition
+		NAutoComplete, NTooltip, NCollapseTransition, NButtonGroup
 	]
 })
 

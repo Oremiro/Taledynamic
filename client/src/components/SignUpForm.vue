@@ -36,12 +36,15 @@
 		</n-form-item>
 
 		<n-form-item>
-			<n-button
-				type="primary"
-				ghost
-				:loading="submitLoading"
-				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid || submitLoading"
-				@click="submitForm">Зарегистрироваться</n-button>
+			<n-button-group>
+				<n-button
+					type="primary"
+					ghost
+					:loading="submitLoading"
+					:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid || submitLoading || (submitDisabled != 0)"
+					@click="submitForm">Зарегистрироваться</n-button>
+					<n-button v-if="submitDisabled" disabled type="primary" ghost>{{ submitDisabled }}</n-button>
+			</n-button-group>
 		</n-form-item>
 	</n-form>
 </template>
@@ -59,14 +62,13 @@ import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
 import { SignUpFormData } from '@/interfaces'
 import { useStore } from '@/store';
-import { useRouter } from 'vue-router';
 
 export default defineComponent({
 	name: 'SignUpForm',
 	components: {
 		QuestionTooltip
 	},
-	setup() {
+	setup(props, context) {
 		// data
 		const formData = reactive<SignUpFormData>({
 			email: {
@@ -158,29 +160,40 @@ export default defineComponent({
 		const formRef = ref<InstanceType<typeof NForm>>();
 		const message = useMessage();
 		const submitLoading = ref<boolean>(false);
+		const submitDisabled = ref<number>(0);
 		const store = useStore();
 
+
 		// methods
+		const holdSubmitDisabled = () => {
+			submitDisabled.value = 15;
+			const submitDisabledTimer = setInterval(() => {
+				submitDisabled.value--;
+				if (submitDisabled.value == 0) {
+					clearInterval(submitDisabledTimer);
+				}
+			}, 1000);
+		}
     const submitForm = (): void => {
 			submitLoading.value = true;
       formRef.value?.validate((errors) => {
         if (!errors) {
-					message.success('Данные являются корректными');
 					store.dispatch('register', formData)
 					.then(() => {
-						const router = useRouter();
-						message.success('Вы успешно зарегистрировались!');
-						router.push('/auth');
+						message.success('Вы успешно зарегистрировались');
+						context.emit('setTab', 'signin');
 					})
 					.catch((error) => {
-						message.error(error);
+						message.error(error.message);
 					})
 					.finally(() => {
-						submitLoading.value = false;	
+						submitLoading.value = false;
+						holdSubmitDisabled();
 					});
         } else {
           message.error('Данные не являются корректными');
 					submitLoading.value = false;
+					holdSubmitDisabled();
         }
       });
     };
@@ -190,6 +203,7 @@ export default defineComponent({
 			formRef,
 			message,
 			submitLoading,
+			submitDisabled,
 			submitForm,
 			options: computed(() => externalOptions(formData.email.value))
 		}

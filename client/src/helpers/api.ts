@@ -17,7 +17,7 @@ interface IAuthenticateUserResponse extends IBaseResponse{
 }
 
 interface ICreateUserRequest extends IAuthenticateUserRequest {
-	confirmedPassword: string
+	confirmPassword: string
 }
 
 interface ICreateUserResponse extends IBaseResponse {}
@@ -70,7 +70,7 @@ export class ApiHelper {
 			`${this.baseUrl}/auth/user/create`, {
 			email: userData.email,
 			password: userData.password,
-			confirmedPassword: userData.confirmedPassword
+			confirmPassword: userData.confirmPassword
 		})
 	}
 
