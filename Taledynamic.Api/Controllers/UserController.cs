@@ -77,6 +77,13 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         
+        [HttpGet("get-by-email")]
+        public async Task<GetUserResponse> GetActiveUserByEmail([FromQuery] GetActiveUserByEmailRequest request)
+        {
+            var response = await _userService.GetActiveUserByEmailAsync(request);
+            return response;
+        }
+        
         [HttpGet("get-all")]
         public async Task<GetUsersResponse> GetAll([FromQuery] GetUsersRequest request)
         {

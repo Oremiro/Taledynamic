@@ -473,7 +473,7 @@ namespace Taledynamic.Core.Services
                 var user = await _context
                     .Users
                     .AsQueryable()
-                    .SingleOrDefaultAsync(u => u.Email == request.Email);
+                    .SingleOrDefaultAsync(u => u.Email == request.Email && u.IsActive);
 
                 if (user == null)
                 {
