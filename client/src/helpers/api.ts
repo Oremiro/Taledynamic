@@ -22,10 +22,6 @@ interface ICreateUserResponse {
 	message?: string
 }
 
-interface IGetUserRequest {
-	Id: number
-}
-
 interface IGetUserResponse {
 	statusCode?: number,
 	message?: string,
@@ -35,8 +31,16 @@ interface IGetUserResponse {
 	}
 }
 
-interface IDeleteUserRequest {
-	UserId?: number
+interface IUpdateUserRequest {
+	id: number,
+	email?: string,
+	password?: string,
+	confirmPassword?: string
+}
+
+interface IUpdateUserResponse {
+	statusCode?: number,
+	message?: string
 }
 
 interface IDeleteUserResponse {
@@ -64,45 +68,67 @@ interface IRevokeTokenResponse {
 
 
 export class ApiHelper {
-	private baseUrl: string = process.env.VUE_APP_API_BASEURL;
+	private static baseUrl: string = process.env.VUE_APP_API_BASEURL;
 
 	static userAuthenticate(userData: IAuthenticateUserRequest): Promise<AxiosResponse<IAuthenticateUserResponse>> {
 		return axios.post<IAuthenticateUserRequest, AxiosResponse<IAuthenticateUserResponse>>(
-			`${process.env.VUE_APP_API_BASEURL}/auth/user/authenticate`, 
+			`${this.baseUrl}/auth/user/authenticate`, 
 			{ email: userData.email, password: userData.password }
 		)
 	}
 
 	static userCreate(userData: ICreateUserRequest): Promise<AxiosResponse<ICreateUserResponse>> {
 		return axios.post<ICreateUserRequest, AxiosResponse<ICreateUserResponse>>(
-			`${process.env.VUE_APP_API_BASEURL}/auth/user/create`, {
+			`${this.baseUrl}/auth/user/create`, {
 			email: userData.email,
 			password: userData.password,
 			confirmedPassword: userData.confirmedPassword
 		})
 	}
 
-	static userDelete(): void {
-		return;
+	static userDelete(userId: number): Promise<AxiosResponse<IDeleteUserResponse>> {
+		return axios.delete<IDeleteUserResponse>(
+			`${this.baseUrl}/auth/user/delete`,
+			{
+				params: { 
+					UserId: userId 
+				}
+			}
+		)
 	}
 
-	static userGet(): void {
-		return;
+	static userGet(userId: number): Promise<AxiosResponse<IGetUserResponse>> {
+		return axios.get<IGetUserResponse>(
+			`${this.baseUrl}/auth/user/get`, 
+			{
+				params: {
+					Id: userId
+				}
+			}
+		);
 	}
 
-	static userUpdate(): void {
-		return;
+	static userUpdate(userData: IUpdateUserRequest): Promise<AxiosResponse<IUpdateUserResponse>> {
+		return axios.put<IUpdateUserRequest, AxiosResponse<IUpdateUserResponse>>(
+			`${this.baseUrl}/auth/user/update`,
+			{ 
+				id: userData.id, 
+				email: userData.email, 
+				password: userData.password, 
+				confirmPassword: userData.confirmPassword 
+			}
+		);
 	}
 
 	static userRefreshToken(): Promise<AxiosResponse<IRefreshTokenResponse>> {
 		return axios.post<IRefreshTokenResponse>(
-			`${process.env.VUE_APP_API_BASEURL}/auth/user/refresh-token`
+			`${this.baseUrl}/auth/user/refresh-token`
 		)
 	}
 
 	static userRevokeToken(token: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
 		return axios.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
-			`${process.env.VUE_APP_API_BASEURL}/auth/user/revoke-token`,
+			`${this.baseUrl}/auth/user/revoke-token`,
 			{ token: token }
 		);
 	}
