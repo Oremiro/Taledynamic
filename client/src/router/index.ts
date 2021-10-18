@@ -62,15 +62,14 @@ router.beforeEach(async (to) => {
 		const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 		if (isRemembered === '1') {
 			try {
-				await store.dispatch('refresh')
+				await store.dispatch('refresh');
 				return true;
 			} catch (e) {
-				return toAuth;
+				VueCookieNext.removeCookie('remembered');
 			}
 		}
 		return toAuth;
 	}
-	return true;
 })
 
 export default router
