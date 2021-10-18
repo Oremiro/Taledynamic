@@ -99,7 +99,8 @@ export default defineComponent({
 						router.push('/profile');
 					})
 					.catch((error) => {
-						message.error(error);
+						console.log(error);
+						// message.error(error);
 					})
 					.finally(() => {
 						submitLoading.value = false;	

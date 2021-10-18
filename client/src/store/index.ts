@@ -1,7 +1,7 @@
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
-import { useCookie } from 'vue-cookie-next'
+import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
 
 interface IUser {
@@ -63,9 +63,8 @@ export const store = createStore<IState>({
 		},
 		login({ commit }, formData: SignInFormData) {
 			return new Promise<void>((resolve, reject) => {
-				const cookie = useCookie();
-				const expireValue: string = formData.remembered ? '7d' : '0';
-				cookie.setCookie('remembered', '1', { expire: expireValue })
+				const expireValue: string = formData.remembered.value ? '7d' : '0';
+				VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
 				ApiHelper.userAuthenticate({
 					email: formData.email.value, 
 					password: formData.password.value
