@@ -11,8 +11,7 @@ interface IUser {
 
 export interface IState {
 	user: IUser,
-	accessToken: string,
-	isLoggedIn: boolean
+	accessTokenInMemory: string,
 }
 
 interface ILoginPayload {
@@ -28,19 +27,21 @@ export const store = createStore<IState>({
 			id: null,
 			email: ''
 		},
-		accessToken: '',
-		isLoggedIn: false
+		accessTokenInMemory: '',
   },
+	getters: {
+		isLoggedIn(state): boolean {
+			return state.accessTokenInMemory != '';
+		}
+	},
 	mutations: {
 		login(state: IState, payload: ILoginPayload) {
 			state.user = payload.user;
-			state.accessToken = payload.token;
-			state.isLoggedIn = true;
+			state.accessTokenInMemory = payload.token;
 		},
 		logout(state: IState) {
 			state.user = { id: null, email: '' };
-			state.accessToken = '';
-			state.isLoggedIn = false;
+			state.accessTokenInMemory = '';
 		}
   },
   actions: {
@@ -63,21 +64,23 @@ export const store = createStore<IState>({
 		login({ commit }, formData: SignInFormData) {
 			return new Promise<void>((resolve, reject) => {
 				const cookie = useCookie();
-				if (formData.remembered) {
-					cookie.setCookie('remembered', '1', { expire: '7d'})
-				} else {
-					cookie.setCookie('remembered', '1', { expire: 0 })
-				}
+				const expireValue: string = formData.remembered ? '7d' : '0';
+				cookie.setCookie('remembered', '1', { expire: expireValue })
 				ApiHelper.userAuthenticate({
 					email: formData.email.value, 
 					password: formData.password.value
 				})
 				.then((response) => {
 					console.log(response);
+					const user: IUser = {
+						id: response.data.id ?? null, 
+						email: response.data.email ?? formData.email.value, 
+					}
 					commit('login', {
-						user: { email: formData.email.value, password: formData.password.value },
-						token: response.data
+						user: user,
+						token: response.data.jwtToken
 					});
+					localStorage.setItem('user', JSON.stringify(user))
 					resolve();
 				})
 				.catch((error) => {
@@ -88,11 +91,12 @@ export const store = createStore<IState>({
 		},
 		logout({ commit, state }) {
 			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userRevokeToken(state.accessToken)
+				ApiHelper.userRevokeToken(state.accessTokenInMemory)
 				.then((response) => {
 					console.log(response.data);
 					if (response.data.isSuccess) {
 						commit('logout');
+						localStorage.removeItem('user');
 						resolve();
 					} else {
 						reject();
@@ -100,7 +104,7 @@ export const store = createStore<IState>({
 				})
 				.catch((error) => {
 					console.log(error);
-					reject();
+					reject('Ошибка выхода');
 				});
 			});
 		},
@@ -109,13 +113,12 @@ export const store = createStore<IState>({
 				ApiHelper.userRefreshToken()
 				.then((response) => {
 					console.log(response.data);
-					const token = response.data.jwtToken;
 					const localStorageUser = localStorage.getItem('user');
 					if (localStorageUser) {
 						const user: IUser = JSON.parse(localStorageUser);
 						commit('login', {
 							user: user,
-							token: token
+							token: response.data.jwtToken
 						});
 						resolve();
 					} else {
@@ -123,8 +126,8 @@ export const store = createStore<IState>({
 					}
 				})
 				.catch((error) => {
-					console.log(error);
-					reject('Refresh error');
+					console.log(error.response);
+					reject('Ошибка обновления токена');
 				});
 			});
 		}

@@ -1,13 +1,16 @@
 import axios, { AxiosResponse } from "axios";
 
+interface IBaseResponse {
+	statusCode?: number,
+	message?: string
+}
+
 interface IAuthenticateUserRequest {
 	email: string,
 	password: string
 }
 
-interface IAuthenticateUserResponse {
-	statusCode?: number,
-	message?: string,
+interface IAuthenticateUserResponse extends IBaseResponse{
 	id?: number,
 	email?: string,
 	jwtToken?: string
@@ -17,14 +20,9 @@ interface ICreateUserRequest extends IAuthenticateUserRequest {
 	confirmedPassword: string
 }
 
-interface ICreateUserResponse {
-	statusCode?: number,
-	message?: string
-}
+interface ICreateUserResponse extends IBaseResponse {}
 
-interface IGetUserResponse {
-	statusCode?: number,
-	message?: string,
+interface IGetUserResponse extends IBaseResponse {
 	userDto?: {
 		id: number,
 		email: string
@@ -38,19 +36,11 @@ interface IUpdateUserRequest {
 	confirmPassword?: string
 }
 
-interface IUpdateUserResponse {
-	statusCode?: number,
-	message?: string
-}
+interface IUpdateUserResponse extends IBaseResponse {}
 
-interface IDeleteUserResponse {
-	statusCode?: number,
-	message?: string
-}
+interface IDeleteUserResponse extends IBaseResponse {}
 
-interface IRefreshTokenResponse {
-	statusCode?: number,
-	message?: string,
+interface IRefreshTokenResponse extends IBaseResponse {
 	id?: number,
 	email?: string,
 	jwtToken?: string
@@ -60,9 +50,7 @@ interface IRevokeTokenRequest {
 	token?: string
 }
 
-interface IRevokeTokenResponse {
-	statusCode?: number,
-	message?: string,
+interface IRevokeTokenResponse extends IBaseResponse {
 	isSuccess?: boolean
 }
 
@@ -91,7 +79,7 @@ export class ApiHelper {
 			`${this.baseUrl}/auth/user/delete`,
 			{
 				params: { 
-					UserId: userId 
+					userId: userId 
 				}
 			}
 		)
@@ -102,7 +90,7 @@ export class ApiHelper {
 			`${this.baseUrl}/auth/user/get`, 
 			{
 				params: {
-					Id: userId
+					id: userId
 				}
 			}
 		);

@@ -1,5 +1,5 @@
-import { useStore } from '@/store'
-import { useCookie } from 'vue-cookie-next'
+import { store } from '@/store'
+import { VueCookieNext } from 'vue-cookie-next'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
@@ -52,22 +52,21 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to) => {
-	const store = useStore();
-  if (to.meta.requiresAuth && !store.state.isLoggedIn) {
+router.beforeEach(async (to) => {
+  if (to.meta.requiresAuth && !store.getters.isLoggedIn) {
 		console.log(store.state);
 		const toAuth = {
 			name: 'Auth',
 			query: { redirect: to.fullPath },
 		};
-		const cookie = useCookie();
-		const isRemembered: string | null = cookie.getCookie('remembered');
+		const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 		if (isRemembered === '1') {
 			store.dispatch('refresh')
 			.catch((error) => {
 				console.log(error);
 				return toAuth;
 			});
+			console.log('1');
 		} else {
 			return toAuth;
 		}
