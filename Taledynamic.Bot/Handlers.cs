@@ -13,6 +13,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using Serilog;
 
 namespace TaleDynamicBot
 {
@@ -28,40 +29,30 @@ namespace TaleDynamicBot
                 _ => exception.ToString()
             };
 
-            Console.WriteLine(ErrorMessage);
+            Log.Error(ErrorMessage);
             return Task.CompletedTask;
         }
 
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
             CancellationToken cancellationToken)
         {
-            var Message = new Dictionary<string, string>()
-            {
-                {"text",update.Message.Text}
-                
-            };
-
-
-            
-            
-            var handler = update.Type switch
-            {
-                UpdateType.Message            => BotOnMessageReceived(botClient, update.Message)
-            };
-
             try
             {
-                await handler;
+                await BotOnMessageReceived(botClient,update.Message);
             }
             catch (Exception exception)
             {
                 await HandleErrorAsync(botClient, exception, cancellationToken);
             }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
         {
-            Console.WriteLine($"Receive message type: {message.Type}");
+            Log.Information($"Receive message type: {message.Type}");
             if (message.Type != MessageType.Text)
                 return;
 
@@ -77,7 +68,7 @@ namespace TaleDynamicBot
                     "https://google.com"
                 ))
             );
-            Console.WriteLine($"The message was sent with id: {message.MessageId}");
+            Log.Information($"The message was sent with id: {message.MessageId}");
         }
 
     }
