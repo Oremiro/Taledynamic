@@ -43,11 +43,11 @@ namespace Taledynamic.Api.Middlewares
                 var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken) validatedToken;
@@ -57,7 +57,6 @@ namespace Taledynamic.Api.Middlewares
             }
             catch
             {
-                throw;
             }
         }
     }

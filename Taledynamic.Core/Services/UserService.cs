@@ -100,7 +100,7 @@ namespace Taledynamic.Core.Services
 
                 var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
 
-                if (!refreshToken.IsActive)
+                if (!(refreshToken.Revoked == null || refreshToken.IsExpired))
                 {
                     response.Message = "Token is not active.";
                     response.StatusCode = HttpStatusCode.NotFound;
@@ -111,6 +111,7 @@ namespace Taledynamic.Core.Services
                 refreshToken.Revoked = DateTime.UtcNow;
                 refreshToken.RevokedByIp = ipAddress;
                 refreshToken.ReplacedByToken = newRefreshToken.Token;
+                refreshToken.IsActive = false;
                 user.RefreshTokens.Add(newRefreshToken);
                 _context.Update(user);
                 await _context.SaveChangesAsync();
@@ -161,7 +162,7 @@ namespace Taledynamic.Core.Services
 
                 var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
 
-                if (!refreshToken.IsActive)
+                if (!(refreshToken.Revoked == null || refreshToken.IsExpired))
                 {
                     response.Message = "Token is not active.";
                     response.StatusCode = HttpStatusCode.NotFound;
