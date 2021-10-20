@@ -75,17 +75,24 @@ export const store = createStore<IState>({
 					password: formData.password.value
 				})
 				.then((response) => {
-					console.log(response);
-					const user: IUser = {
-						id: response.data.id ?? null, 
-						email: response.data.email ?? formData.email.value, 
+					if (response.data.statusCode == 200) {
+						const user: IUser = {
+							id: response.data.id ?? null, 
+							email: response.data.email ?? formData.email.value, 
+						}
+						commit('login', {
+							user: user,
+							token: response.data.jwtToken
+						});
+						localStorage.setItem('user', JSON.stringify(user))
+						console.log(response);
+						console.log(document.cookie);
+						resolve();
+					} else if (response.data.statusCode == 404) {
+						reject(new Error('Пользователь с такими данными не найден'));
+					} else {
+						reject(new Error('Ошибка авторизации'));
 					}
-					commit('login', {
-						user: user,
-						token: response.data.jwtToken
-					});
-					localStorage.setItem('user', JSON.stringify(user))
-					resolve();
 				})
 				.catch((error) => {
 					console.log(error.message);
@@ -116,17 +123,23 @@ export const store = createStore<IState>({
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userRefreshToken()
 				.then((response) => {
-					console.log(response.data);
-					const localStorageUser = localStorage.getItem('user');
-					if (localStorageUser) {
-						const user: IUser = JSON.parse(localStorageUser);
-						commit('login', {
-							user: user,
-							token: response.data.jwtToken
-						});
-						resolve();
+					console.log(response);
+					if (response.data.statusCode == 200) {
+						const localStorageUser = localStorage.getItem('user');
+						if (localStorageUser) {
+							const user: IUser = JSON.parse(localStorageUser);
+							commit('login', {
+								user: user,
+								token: response.data.jwtToken
+							});
+							resolve();
+						} else {
+							reject('Пользователь не найден в локальном хранилище');
+						}
+					} else if (response.data.statusCode == 404) {
+						reject(new Error('Сессия устарела'));
 					} else {
-						reject('User is none');
+						reject(new Error('Непредвиденная ошибка'));
 					}
 				})
 				.catch((error) => {

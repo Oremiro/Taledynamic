@@ -26,7 +26,6 @@ import "vfonts/OpenSans.css";
 import { darkTheme, GlobalTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
 import Header from "@/layouts/Header.vue";
-import { useStore } from "./store";
 
 type Theme = GlobalTheme | null;
 
@@ -44,8 +43,6 @@ export default defineComponent({
 		} else {
 			currentTheme.value = cookieTheme === "dark" ? darkTheme : null;
 		}
-		const store = useStore()
-		console.log(store.state);
 		const setTheme = (value: Theme) => {
 			currentTheme.value = value;
 			cookie.setCookie("theme", value === null ? "light" : "dark", {

@@ -95,8 +95,7 @@ export default defineComponent({
     const submitForm = (): void => {
 			submitLoading.value = true;
       formRef.value?.validate((errors) => {
-        if (!errors) {
-					console.log(formData);					
+        if (!errors) {		
 					store.dispatch('login', formData)
 					.then(() => {
 						message.success('Вы успешно вошли!');

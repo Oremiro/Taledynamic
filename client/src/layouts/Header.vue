@@ -8,7 +8,7 @@
 			</n-gi>
 			<n-gi span="6" offset="1">
 				<div class="nav-menu">
-					<n-menu :value="$route.path" :options="menuOptions" mode="horizontal" />
+					<n-menu :value="route.path" :options="menuOptions" mode="horizontal" />
 				</div>
 			</n-gi>
 			<n-gi span="2" offset="1">
@@ -59,7 +59,7 @@
 
 
 <script lang="ts">
-import { defineComponent, h, reactive, watch } from 'vue'
+import { computed, ComputedRef, defineComponent, h } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { darkTheme, MenuOption } from 'naive-ui'
 import { useStore } from '@/store'
@@ -70,49 +70,28 @@ export default defineComponent({
 		currentTheme: Object
 	},
 	setup(props, context) {
-		const menuOptions: MenuOption[] = reactive([
-			{
-				label: () =>
-					h(
-						RouterLink,
-						{
-							to: '/'
-						},
-						{ default: () => 'О проекте' }
-					),
-				key: '/',
-			}
-		])
-		const store = useStore();
-		const route = useRoute();
-
-		watch(
-      () => route.path,
-      () => {
-				if (store.getters.isLoggedIn) {
-					menuOptions.push({
-						label: () =>
-							h(
-								RouterLink,
-								{ to: '/profile' },
-								{ default: () => 'Профиль' }
-							),
-						key: '/profile'
-					})
-				} else {
-					menuOptions.push({
-						label: () =>
-							h(
-								RouterLink,
-								{ to: '/auth' },
-								{ default: () => 'Вход' }
-							),
-						key: '/auth'
-					})
+		const menuOptions: ComputedRef<MenuOption[]> = computed((): MenuOption[] => {
+			const baseMenuOptions = [
+				{
+					label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
+					key: '/',
 				}
+			];
+			
+			if (store.getters.isLoggedIn) {
+				baseMenuOptions.push({
+					label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
+					key: '/profile'
+				})
+			} else {
+				baseMenuOptions.push({
+					label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),
+					key: '/auth'
+				})
 			}
-    )
-		
+			return baseMenuOptions;
+		})
+		const store = useStore();
 
 		const changeTheme = (): void => {
 			if (props.currentTheme === null) {
@@ -122,8 +101,9 @@ export default defineComponent({
 			}
 		}
 		return {
+			route: useRoute(),
 			menuOptions,
-			changeTheme,
+			changeTheme
 		}
 	},
 })

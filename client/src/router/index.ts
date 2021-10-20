@@ -54,7 +54,6 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !store.getters.isLoggedIn) {
-		console.log(store.state);
 		const toAuth = {
 			name: 'Auth',
 			query: { redirect: to.fullPath },
@@ -66,6 +65,7 @@ router.beforeEach(async (to) => {
 				return true;
 			} catch (e) {
 				VueCookieNext.removeCookie('remembered');
+				localStorage.removeItem('user');
 			}
 		}
 		return toAuth;
