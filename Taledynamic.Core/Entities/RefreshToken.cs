@@ -8,10 +8,6 @@ namespace Taledynamic.Core.Entities
     [Owned]
     public class RefreshToken: BaseEntity
     {
-        [Key]
-        [JsonIgnore]
-        public new int Id { get; set; }
-        
         public string Token { get; set; }
         public DateTime Expires { get; set; }
         public bool IsExpired => DateTime.UtcNow >= Expires;
