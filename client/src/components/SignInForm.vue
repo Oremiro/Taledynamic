@@ -89,6 +89,7 @@ export default defineComponent({
     const submitLoading = ref<boolean>(false);
 		const submitDisabled = ref<number>(0);
 		const store = useStore();
+		const router = useRouter();
 
 		// methods
     const submitForm = (): void => {
@@ -98,7 +99,6 @@ export default defineComponent({
 					console.log(formData);					
 					store.dispatch('login', formData)
 					.then(() => {
-						const router = useRouter();
 						message.success('Вы успешно вошли!');
 						router.push('/profile');
 					})

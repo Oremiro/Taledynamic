@@ -59,8 +59,8 @@
 
 
 <script lang="ts">
-import { defineComponent, h } from 'vue'
-import { RouterLink } from 'vue-router'
+import { defineComponent, h, reactive, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { darkTheme, MenuOption } from 'naive-ui'
 import { useStore } from '@/store'
 
@@ -70,7 +70,7 @@ export default defineComponent({
 		currentTheme: Object
 	},
 	setup(props, context) {
-		const menuOptions: MenuOption[] = [
+		const menuOptions: MenuOption[] = reactive([
 			{
 				label: () =>
 					h(
@@ -82,29 +82,36 @@ export default defineComponent({
 					),
 				key: '/',
 			}
-		]
+		])
 		const store = useStore();
-		if (store.getters.isLoggedIn) {
-			menuOptions.push({
-				label: () =>
-					h(
-						RouterLink,
-						{ to: '/profile' },
-						{ default: () => 'Профиль' }
-					),
-				key: '/profile'
-			})
-		} else {
-			menuOptions.push({
-				label: () =>
-					h(
-						RouterLink,
-						{ to: '/auth' },
-						{ default: () => 'Вход' }
-					),
-				key: '/auth'
-			})
-		}
+		const route = useRoute();
+
+		watch(
+      () => route.path,
+      () => {
+				if (store.getters.isLoggedIn) {
+					menuOptions.push({
+						label: () =>
+							h(
+								RouterLink,
+								{ to: '/profile' },
+								{ default: () => 'Профиль' }
+							),
+						key: '/profile'
+					})
+				} else {
+					menuOptions.push({
+						label: () =>
+							h(
+								RouterLink,
+								{ to: '/auth' },
+								{ default: () => 'Вход' }
+							),
+						key: '/auth'
+					})
+				}
+			}
+    )
 		
 
 		const changeTheme = (): void => {
