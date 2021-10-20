@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Taledynamic.Api.Attributes;
 using Taledynamic.Core;
 using Taledynamic.Core.Entities;
 using Taledynamic.Core.Interfaces;
@@ -26,43 +27,24 @@ namespace Taledynamic.Api.Controllers
             _userService = userService;
         }
 
-        /// <summary>
-        /// Аутентификация пользователя
-        /// </summary>
-        /// <remarks>
-        /// Метод пытается найти в источнике данных пользователя с заданными email-password;
-        /// Если пользователь найден - создается jwt-token (15 минут), refresh-token (7 дней)
-        /// </remarks>
-        /// <response code="200">Authenticate proccess ended with success.</response>
-        /// <response code="404">User is not found.</response>
-        /// <response code="400">Some exception.</response>
-        /// <param name="request"></param>
-        /// <returns></returns>
         [HttpPost("authenticate")]
         public async Task<AuthenticateResponse> Authenticate([FromBody] AuthenticateRequest request)
         {
-            try
-            {
-                AuthenticateResponse response = await _userService.AuthenticateAsync(request, GetIpAddress());
-                SetTokenCookie(response.RefreshToken);
-                return response;
-            }
-            catch (Exception exception)
-            {
-                Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                throw;
-            }
+            AuthenticateResponse response = await _userService.AuthenticateAsync(request, GetIpAddress());
+            SetTokenCookie(response);
+            return response;
         }
         
         [HttpPost("refresh-token")]
-        public async Task<RefreshTokenResponse> RefreshToken([FromBody] RefreshTokenRequest request)
+        public async Task<RefreshTokenResponse> RefreshToken()
         {
             var token = GetRefreshTokenFromCookie();
             RefreshTokenResponse response = await _userService.RefreshTokenAsync(token, GetIpAddress());
-            SetTokenCookie(response.RefreshToken);
+            SetTokenCookie(response);
             return response;
         }
 
+        [JwtAuthorize]
         [HttpPost("revoke-token")]
         public async Task<RevokeTokenResponse> RevokeToken([FromBody] RevokeTokenRequest request)
         {
@@ -70,6 +52,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
 
+        [JwtAuthorize]
         [HttpGet("is-email-used")]
         public async Task<IsEmailUsedResponse> IsEmailUsed([FromQuery] IsEmailUsedRequest request)
         {
@@ -77,6 +60,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         
+        [JwtAuthorize]
         [HttpGet("get-by-email")]
         public async Task<GetUserResponse> GetActiveUserByEmail([FromQuery] GetActiveUserByEmailRequest request)
         {
@@ -84,6 +68,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         
+        [JwtAuthorize]
         [HttpGet("get-all")]
         public async Task<GetUsersResponse> GetAll([FromQuery] GetUsersRequest request)
         {
@@ -91,6 +76,8 @@ namespace Taledynamic.Api.Controllers
             return response;
 
         }
+        
+        [JwtAuthorize]
         [HttpGet("get")]
         public async Task<GetUserResponse> GetById([FromQuery] GetUserRequest request)
         {
@@ -99,6 +86,7 @@ namespace Taledynamic.Api.Controllers
 
         }
         
+        [JwtAuthorize]
         [HttpPut("update")]
         public async Task<UpdateUserResponse> Update([FromBody] UpdateUserRequest request)
         {
@@ -106,6 +94,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         
+        [JwtAuthorize]
         [HttpDelete("delete")]
         public async Task<DeleteUserResponse> Delete([FromQuery] DeleteUserRequest request)
         {
@@ -115,6 +104,7 @@ namespace Taledynamic.Api.Controllers
 
         }
         
+        [JwtAuthorize]
         [HttpPost("create")]
         public async Task<CreateUserResponse> Create([FromBody] CreateUserRequest request)
         {
@@ -128,14 +118,19 @@ namespace Taledynamic.Api.Controllers
             string refreshToken = Request.Cookies["refreshToken"];
             return refreshToken;
         }
-        private void SetTokenCookie(string token)
+        private void SetTokenCookie(AuthenticateResponse response)
         {
+            if (response == null || string.IsNullOrEmpty(response.RefreshToken))
+            {
+                return;
+            }
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
-            Response.Cookies.Append("refreshToken", token, cookieOptions);
+            Response.Cookies.Append("refreshToken", response.RefreshToken, cookieOptions);
         }
 
         private string GetIpAddress()
