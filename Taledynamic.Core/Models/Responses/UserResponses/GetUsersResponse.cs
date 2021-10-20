@@ -5,6 +5,6 @@ namespace Taledynamic.Core.Models.Responses.UserResponses
 {
     public class GetUsersResponse: BaseResponse
     {
-        public List<GetUserDto> Users { get; set; }  
+        public List<UserDto> Users { get; set; }  
     }
 }

@@ -370,7 +370,7 @@ namespace Taledynamic.Core.Services
                 {
                     StatusCode = (HttpStatusCode) 200,
                     Message = "User was got successfully",
-                    UserDto = new GetUserDto
+                    User = new UserDto
                     {
                         Email = user.Email,
                         Id = user.Id
@@ -393,7 +393,7 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                var users = (await this.GetAllAsync()).Select(u => new GetUserDto
+                var users = (await this.GetAllAsync()).Select(u => new UserDto
                 {
                     Id = u.Id,
                     Email = u.Email
@@ -485,7 +485,7 @@ namespace Taledynamic.Core.Services
                     };
                 }
                 
-                GetUserDto userDto = new GetUserDto
+                UserDto userDto = new UserDto
                 {
                     Email = user.Email,
                     Id = user.Id,
@@ -496,7 +496,7 @@ namespace Taledynamic.Core.Services
                 {
                     StatusCode = (HttpStatusCode) 200,
                     Message = "User was found.",
-                    UserDto = userDto
+                    User = userDto
                 };
 
                 return response;
