@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Taledynamic.Core.Entities;
+using Taledynamic.Core.Models.Internal;
 using Taledynamic.Core.Models.Requests.WorkspaceRequests;
 using Taledynamic.Core.Models.Responses.WorkspaceResponses;
 
@@ -74,7 +75,5 @@ namespace Taledynamic.Core.Services
                 throw new NotImplementedException();
             }
         }
-        
-        
     }
 }
