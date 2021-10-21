@@ -51,16 +51,30 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
-        public async Task<GetWorkspaceByIdResponse> GetWorkspaceByIdAsync(GetWorkspaceByIdRequest request)
+        public async Task<GetWorkspaceByIdResponse> GetWorkspaceByIdAsync(GetWorkspaceByIdRequest request, User user)
         {
-            try
+            if (user == null)
             {
-                throw new NotImplementedException();
+                throw new UnauthorizedException("User is not authorized.");
             }
-            catch (Exception exception)
+
+            var validator = request.IsValid();
+            if (!validator.Status)
             {
-                throw new NotImplementedException();
+                throw new BadRequestException(validator.Message);
             }
+
+            var workspace = await _context
+                .Workspaces
+                .AsNoTracking()
+                .FirstOrDefaultAsync(w => w.IsActive && w.User.Equals(user) && w.User.Equals(user));
+
+            return new GetWorkspaceByIdResponse
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "Success.",
+                Workspace = workspace
+            };
         }
 
         public async Task<CreateWorkspaceResponse> CreateWorkspaceAsync(CreateWorkspaceRequest request, User user)

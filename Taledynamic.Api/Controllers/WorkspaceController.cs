@@ -30,9 +30,10 @@ namespace Taledynamic.Api.Controllers
         }
         
         [HttpGet("get")]
-        public async Task GetByIdAsync()
+        public async Task<GetWorkspaceByIdResponse> GetWorkspaceByIdAsync([FromQuery] GetWorkspaceByIdRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.GetWorkspaceByIdAsync(request, CustomUser);
+            return response;
         }
         
         [HttpPost("create")]
