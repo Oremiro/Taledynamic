@@ -40,10 +40,42 @@ namespace Taledynamic.Core.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Taledynamic.Core.Entities.Workspace", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Workspaces");
+                });
+
             modelBuilder.Entity("Taledynamic.Core.Entities.User", b =>
                 {
                     b.OwnsMany("Taledynamic.Core.Entities.RefreshToken", "RefreshTokens", b1 =>
                         {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("integer");
+
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
@@ -73,12 +105,7 @@ namespace Taledynamic.Core.Migrations
                             b1.Property<string>("Token")
                                 .HasColumnType("text");
 
-                            b1.Property<int>("UserId")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("UserId");
+                            b1.HasKey("UserId", "Id");
 
                             b1.ToTable("RefreshTokens");
 
@@ -87,6 +114,20 @@ namespace Taledynamic.Core.Migrations
                         });
 
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Taledynamic.Core.Entities.Workspace", b =>
+                {
+                    b.HasOne("Taledynamic.Core.Entities.User", "User")
+                        .WithMany("Workspaces")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Taledynamic.Core.Entities.User", b =>
+                {
+                    b.Navigation("Workspaces");
                 });
 #pragma warning restore 612, 618
         }

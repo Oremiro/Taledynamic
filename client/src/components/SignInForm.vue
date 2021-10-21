@@ -18,12 +18,15 @@
     </n-form-item>
     
     <n-form-item>
-      <n-button
-        type="primary"
-        ghost
-        :loading="submitLoading"
-        :disabled="!formData.email.isValid || !formData.password.value"
-        @click="submitForm">Войти</n-button>
+			<n-button-group>
+				<n-button
+					type="primary"
+					ghost
+					:loading="submitLoading"
+					:disabled="!formData.email.isValid || !formData.password.value || submitLoading || (submitDisabled != 0)"
+					@click="submitForm">Войти</n-button>
+				<n-button v-if="submitDisabled" disabled type="primary" ghost>{{ submitDisabled }}</n-button>
+			</n-button-group>
     </n-form-item>
   </n-form>
 </template>
@@ -34,13 +37,16 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { NForm, useMessage, FormRules } from "naive-ui"
-import { emailRegex, externalOptions } from "@/variables/auth-vars"
-import { SignInFormData } from '@/interfaces/auth-interfaces'
+import { emailRegex, externalOptions, holdSubmitDisabled } from "@/helpers"
+import { SignInFormData } from '@/interfaces'
+import { useStore } from '@/store'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   
   name: "SignInForm",
   setup() {
+		// data
     const formData = reactive<SignInFormData>({
       email: {
         value: "",
@@ -81,21 +87,41 @@ export default defineComponent({
     const formRef = ref<InstanceType<typeof NForm>>();
     const message = useMessage();
     const submitLoading = ref<boolean>(false);
+		const submitDisabled = ref<number>(0);
+		const store = useStore();
+
+		// methods
     const submitForm = (): void => {
-      submitLoading.value = true;
+			submitLoading.value = true;
       formRef.value?.validate((errors) => {
         if (!errors) {
-          message.success("Valid");
+					console.log(formData);					
+					store.dispatch('login', formData)
+					.then(() => {
+						const router = useRouter();
+						message.success('Вы успешно вошли!');
+						router.push('/profile');
+					})
+					.catch((error) => {
+						message.error(error.message);
+					})
+					.finally(() => {
+						submitLoading.value = false;
+						holdSubmitDisabled(submitDisabled);	
+					});
         } else {
-          message.error("Invalid");
+          message.error('Данные не являются корректными');
+					submitLoading.value = false;
+					holdSubmitDisabled(submitDisabled);
         }
-        submitLoading.value = false;
       });
     };
     return {
+			formRef,
       formData,
       rules,
       submitLoading,
+			submitDisabled,
       message,
       submitForm,
       options: computed(() => externalOptions(formData.email.value))

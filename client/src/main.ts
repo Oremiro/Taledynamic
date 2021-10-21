@@ -1,30 +1,23 @@
 import { createApp } from 'vue'
+import { VueCookieNext } from 'vue-cookie-next'
 import App from './App.vue'
 import router from './router'
-import store from './store'
-import { VueCookieNext } from 'vue-cookie-next'
-
-import { 
-    create, 
-    NButton, NConfigProvider, NGlobalStyle, 
-    NLayoutHeader, NMenu, NText, NSpace,
-    NForm, NFormItem, NInput, NCheckbox,
-    NCard, NTabs, NTabPane, NH1, NH2, NA, NGrid, NGridItem,
-    NIcon, NLayout, NLayoutContent, NResult, NMessageProvider, 
-    NAutoComplete, NTooltip, NH3, NH4, NCollapseTransition
-    
+import { store, key } from './store'
+import {
+	create,
+	NButton, NConfigProvider, NGlobalStyle, NLayoutHeader, NMenu, NText, NSpace,
+	NForm, NFormItem, NInput, NCheckbox, NCard, NTabs, NTabPane, NH1, NH2, NH3, NH4, NA,
+	NGrid, NGridItem, NIcon, NLayout, NLayoutContent, NResult, NMessageProvider,
+	NAutoComplete, NTooltip, NCollapseTransition, NButtonGroup
 } from 'naive-ui'
 
 const naive = create({
-    components: [
-        NButton, NConfigProvider, NGlobalStyle, 
-        NLayoutHeader, NMenu, NText, NSpace, 
-        NForm, NFormItem, NInput, NCheckbox,
-        NCard, NTabs, NTabPane, NH1, NH2, NH3, NH4, NA, NGrid,
-        NGridItem, NIcon, NLayout, NLayoutContent,
-        NResult, NMessageProvider, NAutoComplete, 
-        NTooltip, NCollapseTransition
-    ]
+	components: [
+		NButton, NConfigProvider, NGlobalStyle, NLayoutHeader, NMenu, NText, NSpace,
+		NForm, NFormItem, NInput, NCheckbox, NCard, NTabs, NTabPane, NH1, NH2, NH3, NH4, NA,
+		NGrid, NGridItem, NIcon, NLayout, NLayoutContent, NResult, NMessageProvider,
+		NAutoComplete, NTooltip, NCollapseTransition, NButtonGroup
+	]
 })
 
-createApp(App).use(store).use(router).use(naive).use(VueCookieNext).mount('#app')
+createApp(App).use(store, key).use(router).use(naive).use(VueCookieNext).mount('#app')

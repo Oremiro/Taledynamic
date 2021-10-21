@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
+using Taledynamic.Core.Models.Internal;
 
 namespace Taledynamic.Core.Models.Requests.UserRequests
 {
@@ -7,7 +9,6 @@ namespace Taledynamic.Core.Models.Requests.UserRequests
         [Required]
         public int Id { get; set; }
         
-        [Required]
         [EmailAddress]
         public string Email { get; set; }
 
@@ -16,5 +17,22 @@ namespace Taledynamic.Core.Models.Requests.UserRequests
 
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
+
+        public override ValidateState IsValid()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (Id == default)
+            {
+                sb.Append("Id is default.");
+            }
+
+            if (sb.Length != 0)
+            {
+                return new ValidateState(false, sb.ToString());
+            }
+
+            return new ValidateState(true, "Success");
+        }
     }
 }

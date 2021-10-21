@@ -23,10 +23,9 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import "vfonts/OpenSans.css";
-
 import { darkTheme, GlobalTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
-import Header from "@/components/Header.vue";
+import Header from "@/layouts/Header.vue";
 
 type Theme = GlobalTheme | null;
 

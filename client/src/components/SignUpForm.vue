@@ -17,31 +17,37 @@
 				type="password"
 				show-password-on="click"
 				placeholder=""
-				v-model:value="formData.password.value">
+				v-model:value="formData.password.value"
+				@input="handlePasswordInput">
 				<template v-if="!formData.password.isValid" #prefix>
 					<question-tooltip text="Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ."/>
 				</template>
 			</n-input>
 		</n-form-item>
 		<n-form-item
-			ref="pwdRef"
+			ref="confirmedPasswordRef"
 			first
 			label="Повторите пароль"
-			path="repeatedPassword.value">
+			path="confirmedPassword.value">
 			<n-input
 				type="password"
 				show-password-on="click"
 				placeholder=""
-				v-model:value="formData.repeatedPassword.value"/>
+				:disabled="!formData.password.isValid"
+				v-model:value="formData.confirmedPassword.value"/>
 		</n-form-item>
 
 		<n-form-item>
-			<n-button
-				type="primary"
-				ghost
-				:loading="submitLoading"
-				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.repeatedPassword.isValid"
-				@click="submitForm">Зарегистрироваться</n-button>
+			<n-button-group>
+				<n-button
+					attr-type="submit"
+					type="primary"
+					ghost
+					:loading="submitLoading"
+					:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid || submitLoading || (submitDisabled != 0)"
+					@click="submitForm">Зарегистрироваться</n-button>
+					<n-button v-if="submitDisabled" disabled type="primary" ghost>{{ submitDisabled }}</n-button>
+			</n-button-group>
 		</n-form-item>
 	</n-form>
 </template>
@@ -54,21 +60,19 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
-import { useMessage, NForm, FormRules } from "naive-ui";
-import {
-	emailRegex,
-	passwordRegex,
-	externalOptions
-} from "@/variables/auth-vars";
+import { useMessage, NForm, FormRules, NFormItem } from "naive-ui";
+import { emailRegex, passwordRegex, externalOptions, holdSubmitDisabled } from "@/helpers";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
-import { SignUpFormData } from '@/interfaces/auth-interfaces'
+import { SignUpFormData } from '@/interfaces'
+import { useStore } from '@/store';
 
 export default defineComponent({
 	name: 'SignUpForm',
 	components: {
 		QuestionTooltip
 	},
-	setup() {
+	setup(props, context) {
+		// data
 		const formData = reactive<SignUpFormData>({
 			email: {
 				value: "",
@@ -78,7 +82,7 @@ export default defineComponent({
 				value: "",
 				isValid: false,
 			},
-			repeatedPassword: {
+			confirmedPassword: {
 				value: "",
 				isValid: false,
 			},
@@ -112,7 +116,7 @@ export default defineComponent({
 					{
 						required: true,
 						message: "Пожалуйста, введите пароль",
-						trigger: "blur",
+						trigger: ["blur", 'some']
 					},
 					{
 						asyncValidator: (rule, value) => {
@@ -132,50 +136,75 @@ export default defineComponent({
 					},
 				],
 			},
-			repeatedPassword: {
+			confirmedPassword: {
 				value: [
 					{
 						required: true,
-						message: "Пожалуйста, повторите пароль",
-						trigger: "blur",
+						message: 'Пожалуйста, повторите пароль',
+						trigger: 'blur',
 					},
 					{
 						asyncValidator: (rule, value) => {
 							return new Promise<void>((resolve, reject) => {
 								if (value !== formData.password.value) {
-									formData.repeatedPassword.isValid = false;
-									reject(new Error("Пароли не совпадают"));
+									formData.confirmedPassword.isValid = false;
+									reject(new Error('Пароли не совпадают'));
 								} else {
-									formData.repeatedPassword.isValid = true;
+									formData.confirmedPassword.isValid = true;
 									resolve();
 								}
 							});
 						},
-						trigger: ["blur", "input"],
+						trigger: ['blur', 'input', 'password-input'],
 					},
 				],
 			},
 		};
 		const formRef = ref<InstanceType<typeof NForm>>();
+		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
 		const message = useMessage();
 		const submitLoading = ref<boolean>(false);
-		const submitForm = (): void => {
+		const submitDisabled = ref<number>(0);
+		const store = useStore();
+
+		// methods
+		const handlePasswordInput = () => {
+			if (formData.confirmedPassword.value != '') {
+				confirmedPasswordRef.value?.validate({ trigger: 'password-input'}).catch(() => true);
+			}
+		}
+    const submitForm = (): void => {
 			submitLoading.value = true;
-			formRef.value?.validate((errors) => {
-				if (!errors) {
-					message.success("Valid");
-				} else {
-					message.error("Invalid");
-				}
-				submitLoading.value = false;
-			});
-		};
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+					store.dispatch('register', formData)
+					.then(() => {
+						message.success('Вы успешно зарегистрировались');
+						context.emit('setTab', 'signin');
+					})
+					.catch((error) => {
+						message.error(error.message);
+					})
+					.finally(() => {
+						submitLoading.value = false;
+						holdSubmitDisabled(submitDisabled);
+					});
+        } else {
+          message.error('Данные не являются корректными');
+					submitLoading.value = false;
+					holdSubmitDisabled(submitDisabled);
+        }
+      });
+    };
 		return {
 			formData,
 			rules,
 			formRef,
+			confirmedPasswordRef,
 			message,
 			submitLoading,
+			submitDisabled,
+			handlePasswordInput,
 			submitForm,
 			options: computed(() => externalOptions(formData.email.value))
 		}

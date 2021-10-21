@@ -28,7 +28,7 @@ namespace Taledynamic.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
             var connectionStrings = Configuration.GetSection("ConnectionStrings");
             services.AddDbContext<TaledynamicContext>(options =>
             {
@@ -70,7 +70,8 @@ namespace Taledynamic.Api
 
             #region Middlewares
 
-            // app.UseMiddleware<JwtMiddleware>();
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
+            app.UseMiddleware<JwtMiddleware>();
 
             # endregion
 

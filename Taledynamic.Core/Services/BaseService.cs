@@ -24,8 +24,11 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
             } 
+            
             _context.Update(entity);
             await _context.SaveChangesAsync();
+        
+
         }
         
         protected virtual async Task CreateAsync(TEntity entity)
@@ -36,6 +39,7 @@ namespace Taledynamic.Core.Services
             }
             await _context.Set<TEntity>().AddAsync(entity);
             await _context.SaveChangesAsync();
+
         }
         
         protected virtual async Task DeleteAsync(int? id)
@@ -49,6 +53,7 @@ namespace Taledynamic.Core.Services
             entity.IsActive = false; 
             _context.Update(entity);
             await _context.SaveChangesAsync();
+
         }
         
         protected virtual async Task<TEntity> GetByIdAsync(int? id)
@@ -60,7 +65,8 @@ namespace Taledynamic.Core.Services
             var entity = await _context
                 .Set<TEntity>()
                 .AsNoTracking()
-                .FirstAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == id);
+
             return entity;
         }
         
