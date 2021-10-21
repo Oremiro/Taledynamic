@@ -20,6 +20,7 @@
     <n-form-item>
 			<n-button-group>
 				<n-button
+					attr-type="submit"
 					type="primary"
 					ghost
 					:loading="submitLoading"

@@ -3,6 +3,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
 import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
+import { AxiosError } from 'axios'
 
 interface IUser {
 	id: number | null,
@@ -45,6 +46,20 @@ export const store = createStore<IState>({
 		}
   },
   actions: {
+		async init() {
+			const isRemembered: string | null = VueCookieNext.getCookie('remembered');
+			const localStorageUser: string | null = localStorage.getItem('user');
+			if (isRemembered === '1' && localStorageUser) {
+				try {
+					await store.dispatch('refresh');
+					return true;
+				} catch (e) {
+					VueCookieNext.removeCookie('remembered');
+					localStorage.removeItem('user');
+				}
+			}
+			return false;
+		},
 		register(_context, formData: SignUpFormData) {
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userCreate({
@@ -122,29 +137,24 @@ export const store = createStore<IState>({
 				ApiHelper.userRefreshToken()
 				.then((response) => {
 					console.log(response);
-					if (response.data.statusCode == 200) {
-						const localStorageUser = localStorage.getItem('user');
-						if (localStorageUser) {
-							const user: IUser = JSON.parse(localStorageUser);
-							commit('login', {
-								user: user,
-								token: response.data.jwtToken
-							});
-							resolve();
-						} else {
-							reject(new Error('Пользователь не найден в локальном хранилище'));
-						}
-					} else if (response.data.statusCode == 404) {
-						console.log(response)
-						reject(new Error('Сессия устарела'));
+					if (response.data.id && response.data.email && response.data.jwtToken) {
+						const user: IUser = { id: response.data.id, email: response.data.email };
+						const token: string = response.data.jwtToken
+						commit('login', {
+							user: user,
+							token: token
+						});
+						resolve();
 					} else {
-						console.log(response)
-						reject(new Error('Непредвиденная ошибка'));
+						reject(new Error('Непредвиденная ошибка'))
 					}
 				})
-				.catch((error) => {
-					console.log(error.response);
-					reject('Ошибка обновления токена');
+				.catch((error: AxiosError) => {
+					if(error.response?.status == 404) {
+						reject(new Error('Сессия устарела'));
+					} else {
+						reject(new Error('Ошибка обновления токена'));
+					}
 				});
 			});
 		}
