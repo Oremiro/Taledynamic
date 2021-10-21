@@ -1,21 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Taledynamic.Core.Interfaces;
-using Taledynamic.Core;
 using Taledynamic.Core.Entities;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Models.DTOs;
-using Taledynamic.Core.Models.Internal;
-using Taledynamic.Core.Models.Requests;
 using Taledynamic.Core.Models.Requests.UserRequests;
-using Taledynamic.Core.Models.Responses;
 using Taledynamic.Core.Models.Responses.UserResponses;
 
 namespace Taledynamic.Core.Services
@@ -33,17 +27,27 @@ namespace Taledynamic.Core.Services
             _userHelper = new UserHelper(_appSettings);
         }
 
-        public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress)
+        public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest request, string ipAddress)
         {
             try
             {
                 var response = new AuthenticateResponse();
 
+                var validator = request.IsValid(); 
+                if (validator.Status)
+                {
+                    return new AuthenticateResponse
+                    {
+                        StatusCode = (HttpStatusCode) 400,
+                        Message = validator.Message
+                    };
+                }
+                
                 User user = await _context
                     .Users
                     .AsQueryable()
                     .AsNoTracking()
-                    .SingleOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+                    .SingleOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password);
 
                 if (user == null)
                 {
@@ -193,7 +197,7 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                var validator = ValidateCreateRequest(request);
+                var validator = request.IsValid();
                 if (!validator.Status)
                 {
                     return new CreateUserResponse
@@ -250,7 +254,7 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                var validator = ValidateDeleteUserRequest(request);
+                var validator = request.IsValid();
                 if (!validator.Status)
                 {
                     return new DeleteUserResponse()
@@ -284,7 +288,7 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                var validator = ValidateUpdateUserRequest(request);
+                var validator = request.IsValid();
                 if (!validator.Status)
                 {
                     return new UpdateUserResponse()
@@ -344,7 +348,7 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                var validator = ValidateGetUserRequest(request);
+                var validator = request.IsValid();
                 if (!validator.Status)
                 {
                     return new GetUserResponse()
@@ -423,7 +427,7 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                var validator = ValidateIsEmailUsedRequest(request);
+                var validator = request.IsValid();
                 if (!validator.Status)
                 {
                     return new IsEmailUsedResponse()
@@ -461,7 +465,7 @@ namespace Taledynamic.Core.Services
         {
             try
             {
-                var validator = ValidateGetActiveUserByEmailRequest(request);
+                var validator = request.IsValid();
                 if (!validator.Status)
                 {
                     return new GetUserResponse()
@@ -510,118 +514,6 @@ namespace Taledynamic.Core.Services
                         $"There was an exception in method \"GetActiveUserByEmailAsync\". Stacktrace - {e.StackTrace}"
                 };
             }
-        }
-
-        private ValidateState ValidateCreateRequest(CreateUserRequest request)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (request.Email == null)
-            {
-                sb.Append("Email is not set.");
-                ;
-            }
-
-            if (request.Password == null || request.ConfirmPassword == null)
-            {
-                sb.Append("Password is not set.");
-            }
-
-            if (sb.Length != 0)
-            {
-                return new ValidateState(false, sb.ToString());
-            }
-
-            return new ValidateState(true, "Success");
-        }
-
-        private ValidateState ValidateUpdateUserRequest(UpdateUserRequest request)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (request.Email == null)
-            {
-                sb.Append("Email is not set.");
-            }
-
-            if (request.Password == null || request.ConfirmPassword == null)
-            {
-                sb.Append("Password is not set.");
-            }
-
-            if (sb.Length != 0)
-            {
-                return new ValidateState(false, sb.ToString());
-            }
-
-            return new ValidateState(true, "Success");
-        }
-
-        private ValidateState ValidateDeleteUserRequest(DeleteUserRequest request)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (request.UserId == default)
-            {
-                sb.Append("UserId is default.");
-            }
-
-            if (sb.Length != 0)
-            {
-                return new ValidateState(false, sb.ToString());
-            }
-
-            return new ValidateState(true, "Success");
-        }
-
-        private ValidateState ValidateGetUserRequest(GetUserRequest request)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (request.Id == default)
-            {
-                sb.Append("UserId is default.");
-            }
-
-            if (sb.Length != 0)
-            {
-                return new ValidateState(false, sb.ToString());
-            }
-
-            return new ValidateState(true, "Success");
-        }
-
-        private ValidateState ValidateIsEmailUsedRequest(IsEmailUsedRequest request)
-        {
-            StringBuilder sb = new StringBuilder();
-            if (request.Email == null)
-            {
-                sb.Append("UserId is default.");
-            }
-
-            if (sb.Length == 0)
-            {
-                return new ValidateState(false, sb.ToString());
-            }
-
-            return new ValidateState(true, "Success");
-        }
-
-        private ValidateState ValidateGetActiveUserByEmailRequest(GetActiveUserByEmailRequest request)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (string.IsNullOrEmpty(request.Email))
-            {
-                sb.Append("Email is empty.");
-            }
-
-            if (sb.Length != 0)
-            {
-                return new ValidateState(false, sb.ToString());
-            }
-
-            return new ValidateState(true, "Success");
         }
     }
 }
