@@ -215,33 +215,41 @@ namespace Taledynamic.Core.Services
                 throw new BadRequestException(validator.Message);
             }
 
+            await using var transation = await _context.Database.BeginTransactionAsync();
             var userId = request.Id;
             
-            await using var transaction = await _context.Database.BeginTransactionAsync();
             var oldUser = await _context
                 .Users
                 .Include(u => u.RefreshTokens)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.Id == userId);
-            await transaction.CommitAsync();
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (oldUser == null)
+            {
+                throw new NotFoundException("User with this id is not found.");
+            }
             if (!oldUser.IsActive)
             {
                 throw new BadRequestException("Nothing to update by this id.");
             }
-            var refreshTokens = oldUser.RefreshTokens;
-            _context.RefreshTokens.RemoveRange(refreshTokens);
+
+            var linkedRefreshTokens = oldUser.RefreshTokens.ToList();
+            
+            // Нет смысла хранить рефреши, историчность не нужна
+            oldUser.RefreshTokens.RemoveRange(0, oldUser.RefreshTokens.Count);
+            await _context.SaveChangesAsync();
+            _context.ChangeTracker.Clear();
+            await DeleteAsync(userId);
+
             User newUser = new User
             {
                 IsActive = true,
                 Email = request.Email,
                 Password = request.Password,
-                RefreshTokens = refreshTokens
+                RefreshTokens = linkedRefreshTokens
             };
             
             await this.CreateAsync(newUser);
-            _context.ChangeTracker.Clear();
-            await DeleteAsync(userId);
-            
+            await transation.CommitAsync();
             var response = new UpdateUserResponse()
             {
                 StatusCode = (HttpStatusCode) 200,

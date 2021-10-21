@@ -24,10 +24,10 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
             } 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
+            
             _context.Update(entity);
             await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
+        
 
         }
         
@@ -37,10 +37,8 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
             }
-            await using var transaction = await _context.Database.BeginTransactionAsync();
             await _context.Set<TEntity>().AddAsync(entity);
-            await _context.SaveChangesAsync();            
-            await transaction.CommitAsync();
+            await _context.SaveChangesAsync();
 
         }
         
@@ -64,21 +62,17 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"[{MethodBase.GetCurrentMethod()?.Name}] {typeof(TEntity)} id is null.");
             }
-            await using var transaction = await _context.Database.BeginTransactionAsync();
             var entity = await _context
                 .Set<TEntity>()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
-            await transaction.CommitAsync();
 
             return entity;
         }
         
         protected virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync();
             var entities = await _context.Set<TEntity>().AsNoTracking().ToListAsync();
-            await transaction.CommitAsync();
             return entities;
         }
     }
