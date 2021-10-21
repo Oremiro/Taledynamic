@@ -38,7 +38,8 @@ namespace Taledynamic.Api.Controllers
         [HttpPost("create")]
         public async Task<CreateWorkspaceResponse> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.CreateWorkspaceAsync(request, CustomUser);
+            return response;
         }
         [HttpPut("update")]
         public async Task UpdateAsync()

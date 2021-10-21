@@ -9,5 +9,7 @@ namespace Taledynamic.Core.Interfaces
     {
         public Task<GetWorkspacesByUserResponse> GetFilteredByUserIdAsync(GetWorkspacesByUserRequest request,
             User user);
+
+        public Task<CreateWorkspaceResponse> CreateWorkspaceAsync(CreateWorkspaceRequest request, User user);
     }
 }
