@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Taledynamic.Core;
@@ -9,9 +10,10 @@ using Taledynamic.Core;
 namespace Taledynamic.Core.Migrations
 {
     [DbContext(typeof(TaledynamicContext))]
-    partial class TaledynamicContextModelSnapshot : ModelSnapshot
+    [Migration("20211020094740_Workspaces")]
+    partial class Workspaces
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,35 +40,6 @@ namespace Taledynamic.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Taledynamic.Core.Entities.Workspace", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Workspaces");
                 });
 
             modelBuilder.Entity("Taledynamic.Core.Entities.User", b =>
@@ -114,20 +87,6 @@ namespace Taledynamic.Core.Migrations
                         });
 
                     b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("Taledynamic.Core.Entities.Workspace", b =>
-                {
-                    b.HasOne("Taledynamic.Core.Entities.User", "User")
-                        .WithMany("Workspaces")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Taledynamic.Core.Entities.User", b =>
-                {
-                    b.Navigation("Workspaces");
                 });
 #pragma warning restore 612, 618
         }

@@ -41,8 +41,7 @@ namespace Taledynamic.Core.Services
             User user = await _context
                 .Users
                 .AsQueryable()
-                .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password);
+                .FirstOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password && u.IsActive);
 
             if (user == null)
             {
@@ -53,7 +52,7 @@ namespace Taledynamic.Core.Services
             var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
 
             user.RefreshTokens.Add(refreshToken);
-            _context.Update(user);
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
             response = new AuthenticateResponse()
@@ -75,7 +74,7 @@ namespace Taledynamic.Core.Services
             var user = await _context
                 .Users
                 .AsQueryable()
-                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token) && u.IsActive);
 
             if (user == null)
             {
@@ -94,6 +93,7 @@ namespace Taledynamic.Core.Services
             {
                 throw new InternalServerErrorException("New jwt token is not generated properly");
             }
+
             refreshToken.Revoked = DateTime.UtcNow;
             refreshToken.RevokedByIp = ipAddress;
             refreshToken.ReplacedByToken = newRefreshToken.Token;
@@ -126,7 +126,7 @@ namespace Taledynamic.Core.Services
             var user = await _context
                 .Users
                 .AsQueryable()
-                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token) && u.IsActive);
 
             if (user == null)
             {
@@ -161,7 +161,7 @@ namespace Taledynamic.Core.Services
             var isExist = await _context
                 .Users
                 .AsQueryable()
-                .AnyAsync(u => u.Email == request.Email);
+                .AnyAsync(u => u.Email == request.Email && u.IsActive);
 
             if (isExist)
             {
@@ -217,7 +217,7 @@ namespace Taledynamic.Core.Services
 
             await using var transation = await _context.Database.BeginTransactionAsync();
             var userId = request.Id;
-            
+
             var oldUser = await _context
                 .Users
                 .Include(u => u.RefreshTokens)
@@ -227,13 +227,14 @@ namespace Taledynamic.Core.Services
             {
                 throw new NotFoundException("User with this id is not found.");
             }
+
             if (!oldUser.IsActive)
             {
                 throw new BadRequestException("Nothing to update by this id.");
             }
 
             var linkedRefreshTokens = oldUser.RefreshTokens.ToList();
-            
+
             // Нет смысла хранить рефреши, историчность не нужна
             oldUser.RefreshTokens.RemoveRange(0, oldUser.RefreshTokens.Count);
             await _context.SaveChangesAsync();
@@ -247,7 +248,7 @@ namespace Taledynamic.Core.Services
                 Password = request.Password,
                 RefreshTokens = linkedRefreshTokens
             };
-            
+
             await this.CreateAsync(newUser);
             await transation.CommitAsync();
             var response = new UpdateUserResponse()
@@ -270,7 +271,7 @@ namespace Taledynamic.Core.Services
             var userId = request.Id;
             var user = await this.GetByIdAsync(userId);
 
-            if (user == null)
+            if (user == null || !user.IsActive)
             {
                 throw new NotFoundException("User is not found.");
             }
@@ -279,7 +280,7 @@ namespace Taledynamic.Core.Services
             {
                 StatusCode = (HttpStatusCode) 200,
                 Message = "Success.",
-                UserDto = new GetUserDto
+                User = new UserDto()
                 {
                     Email = user.Email,
                     Id = user.Id
@@ -291,11 +292,13 @@ namespace Taledynamic.Core.Services
 
         public async Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request)
         {
-            var users = (await this.GetAllAsync()).Select(u => new GetUserDto
-            {
-                Id = u.Id,
-                Email = u.Email
-            }).ToList();
+            var users = (await this.GetAllAsync())
+                .Where(u => u.IsActive)
+                .Select(u => new UserDto()
+                {
+                    Id = u.Id,
+                    Email = u.Email
+                }).ToList();
 
 
             var response = new GetUsersResponse()
@@ -319,7 +322,7 @@ namespace Taledynamic.Core.Services
             var user = await _context
                 .Users
                 .AsQueryable()
-                .SingleOrDefaultAsync(u => u.Email == request.Email);
+                .SingleOrDefaultAsync(u => u.Email == request.Email && u.IsActive);
 
             var response = new IsEmailUsedResponse()
             {
@@ -349,7 +352,7 @@ namespace Taledynamic.Core.Services
                 throw new NotFoundException("User is not found.");
             }
 
-            GetUserDto userDto = new GetUserDto
+            UserDto userDto = new UserDto()
             {
                 Email = user.Email,
                 Id = user.Id,
@@ -360,7 +363,7 @@ namespace Taledynamic.Core.Services
             {
                 StatusCode = (HttpStatusCode) 200,
                 Message = "User was found.",
-                UserDto = userDto
+                User = userDto
             };
 
             return response;

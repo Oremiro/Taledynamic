@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Taledynamic.Core;
@@ -9,9 +10,10 @@ using Taledynamic.Core;
 namespace Taledynamic.Core.Migrations
 {
     [DbContext(typeof(TaledynamicContext))]
-    partial class TaledynamicContextModelSnapshot : ModelSnapshot
+    [Migration("20211020094936_WorkspaceDbSet")]
+    partial class WorkspaceDbSet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,12 +61,7 @@ namespace Taledynamic.Core.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Workspaces");
                 });
@@ -114,20 +111,6 @@ namespace Taledynamic.Core.Migrations
                         });
 
                     b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("Taledynamic.Core.Entities.Workspace", b =>
-                {
-                    b.HasOne("Taledynamic.Core.Entities.User", "User")
-                        .WithMany("Workspaces")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Taledynamic.Core.Entities.User", b =>
-                {
-                    b.Navigation("Workspaces");
                 });
 #pragma warning restore 612, 618
         }
