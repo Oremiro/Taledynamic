@@ -22,14 +22,9 @@ namespace Taledynamic.Core.Models.Requests.UserRequests
         {
             StringBuilder sb = new StringBuilder();
 
-            if (Email == null)
+            if (Id == default)
             {
-                sb.Append("Email is not set.");
-            }
-
-            if (Password == null || ConfirmPassword == null)
-            {
-                sb.Append("Password is not set.");
+                sb.Append("Id is default.");
             }
 
             if (sb.Length != 0)

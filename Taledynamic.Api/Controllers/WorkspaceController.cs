@@ -5,6 +5,9 @@ using Microsoft.Extensions.Options;
 using Taledynamic.Api.Attributes;
 using Taledynamic.Core;
 using Taledynamic.Core.Helpers;
+using Taledynamic.Core.Interfaces;
+using Taledynamic.Core.Models.Requests.WorkspaceRequests;
+using Taledynamic.Core.Models.Responses.WorkspaceResponses;
 
 namespace Taledynamic.Api.Controllers
 {
@@ -13,40 +16,43 @@ namespace Taledynamic.Api.Controllers
     [Route("data/[controller]")]
     public class WorkspaceController: BaseController
     {
-        private TaledynamicContext _context { get; set; }
-        private IOptions<AppSettings> _appSettings { get; set; }
-        public WorkspaceController(TaledynamicContext context, IOptions<AppSettings> appSettings)
+        private IWorkspaceService _workspaceService { get;  }
+        public WorkspaceController(IWorkspaceService workspaceService)
         {
-            _context = context;
-            _appSettings = appSettings;
+            _workspaceService = workspaceService;
         }
 
-        [HttpGet("get-filtered-by-id")]
-        public async Task GetFilteredByIdAsync()
+        [HttpGet("get-filtered-by-user")]
+        public async Task<GetWorkspacesByUserResponse> GetFilteredByUfer([FromQuery] GetWorkspacesByUserRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.GetFilteredByUserIdAsync(request, CustomUser);
+            return response;
         }
         
         [HttpGet("get")]
-        public async Task GetByIdAsync()
+        public async Task<GetWorkspaceByIdResponse> Get([FromQuery] GetWorkspaceByIdRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.GetUserWorkspaceByIdAsync(request, CustomUser);
+            return response;
         }
         
         [HttpPost("create")]
-        public async Task CreateAsync()
+        public async Task<CreateWorkspaceResponse> Create([FromBody] CreateWorkspaceRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.CreateWorkspaceAsync(request, CustomUser);
+            return response;
         }
         [HttpPut("update")]
-        public async Task UpdateAsync()
+        public async Task<UpdateWorkspaceResponse> Update([FromBody] UpdateWorkspaceRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.UpdateWorkspaceAsync(request);
+            return response;
         }
         [HttpDelete("delete")]
-        public async Task DeleteAsync()
+        public async Task<DeleteWorkspaceResponse> Delete([FromQuery] DeleteWorkspaceRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.DeleteWorkspaceAsync(request);
+            return response;
         }
     }
 }

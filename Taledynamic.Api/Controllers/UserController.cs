@@ -19,7 +19,7 @@ namespace Taledynamic.Api.Controllers
 {
     [ApiController]
     [Route("auth/[controller]")]
-    public class UserController: ControllerBase
+    public class UserController: BaseController
     {
         private IUserService _userService { get; }
         public UserController(IUserService userService)
@@ -104,7 +104,7 @@ namespace Taledynamic.Api.Controllers
 
         }
         
-        //[JwtAuthorize]
+        //TODO : [JwtAuthorize]
         [HttpPost("create")]
         public async Task<CreateUserResponse> Create([FromBody] CreateUserRequest request)
         {
@@ -128,6 +128,7 @@ namespace Taledynamic.Api.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
             Response.Cookies.Append("refreshToken", response.RefreshToken, cookieOptions);
