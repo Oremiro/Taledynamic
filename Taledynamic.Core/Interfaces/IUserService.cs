@@ -9,7 +9,7 @@ namespace Taledynamic.Core.Interfaces
 {
     public interface IUserService
     {
-        public Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress);
+        public Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest request, string ipAddress);
         public Task<RefreshTokenResponse> RefreshTokenAsync(string token, string ipAddress);
         public Task<RevokeTokenResponse> RevokeTokenAsync(string token, string ipAddress);
         public Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request, string ipAddress);
