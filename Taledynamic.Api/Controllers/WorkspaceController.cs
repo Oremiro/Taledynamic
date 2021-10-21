@@ -5,6 +5,9 @@ using Microsoft.Extensions.Options;
 using Taledynamic.Api.Attributes;
 using Taledynamic.Core;
 using Taledynamic.Core.Helpers;
+using Taledynamic.Core.Interfaces;
+using Taledynamic.Core.Models.Requests.WorkspaceRequests;
+using Taledynamic.Core.Models.Responses.WorkspaceResponses;
 
 namespace Taledynamic.Api.Controllers
 {
@@ -13,17 +16,17 @@ namespace Taledynamic.Api.Controllers
     [Route("data/[controller]")]
     public class WorkspaceController: BaseController
     {
-        private TaledynamicContext _context { get; set; }
-        private IOptions<AppSettings> _appSettings { get; set; }
-        public WorkspaceController(TaledynamicContext context, IOptions<AppSettings> appSettings)
+        private IWorkspaceService _workspaceService { get;  }
+        public WorkspaceController(IWorkspaceService workspaceService)
         {
-            _context = context;
-            _appSettings = appSettings;
+            _workspaceService = workspaceService;
         }
 
-        [HttpGet("get-filtered-by-id")]
-        public async Task GetFilteredByIdAsync()
+        [HttpGet("get-filtered-by-user")]
+        public async Task GetFilteredByUserAsync()
         {
+            var userId = CustomUser.Id;
+            
             throw new NotImplementedException();
         }
         
@@ -34,7 +37,7 @@ namespace Taledynamic.Api.Controllers
         }
         
         [HttpPost("create")]
-        public async Task CreateAsync()
+        public async Task<CreateWorkspaceResponse> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
         {
             throw new NotImplementedException();
         }

@@ -19,7 +19,7 @@ namespace Taledynamic.Api.Controllers
 {
     [ApiController]
     [Route("auth/[controller]")]
-    public class UserController: ControllerBase
+    public class UserController: BaseController
     {
         private IUserService _userService { get; }
         public UserController(IUserService userService)

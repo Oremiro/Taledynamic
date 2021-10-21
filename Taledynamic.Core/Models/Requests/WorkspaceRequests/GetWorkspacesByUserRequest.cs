@@ -2,7 +2,7 @@ using Taledynamic.Core.Models.Internal;
 
 namespace Taledynamic.Core.Models.Requests.WorkspaceRequests
 {
-    public class GetWorkspacesByUserIdRequest: BaseRequest
+    public class GetWorkspacesByUserRequest: BaseRequest
     {
         public override ValidateState IsValid()
         {

@@ -16,7 +16,7 @@ namespace Taledynamic.Core.Services
             _context = context;
         }
 
-        public async Task<GetWorkspacesByUserIdResponse> GetFilteredByUserIdAsync(GetWorkspacesByUserIdRequest request)
+        public async Task<GetWorkspacesByUserIdResponse> GetFilteredByUserIdAsync(GetWorkspacesByUserRequest request)
         {
             try
             {
