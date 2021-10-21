@@ -60,7 +60,7 @@ namespace Taledynamic.Core.Services
             var entity = await _context
                 .Set<TEntity>()
                 .AsNoTracking()
-                .FirstAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == id);
             return entity;
         }
         

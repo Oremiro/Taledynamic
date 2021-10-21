@@ -90,6 +90,10 @@ namespace Taledynamic.Core.Services
             }
 
             var newRefreshToken = _userHelper.GenerateRefreshToken(ipAddress);
+            if (newRefreshToken == null)
+            {
+                throw new InternalServerErrorException("New jwt token is not generated properly");
+            }
             refreshToken.Revoked = DateTime.UtcNow;
             refreshToken.RevokedByIp = ipAddress;
             refreshToken.ReplacedByToken = newRefreshToken.Token;
@@ -105,7 +109,7 @@ namespace Taledynamic.Core.Services
                 Id = user.Id,
                 Email = user.Email,
                 JwtToken = jwtToken,
-                RefreshToken = refreshToken.Token,
+                RefreshToken = newRefreshToken.Token,
                 Message = "Refresh proccess ended with success.",
                 StatusCode = HttpStatusCode.OK
             };

@@ -2,7 +2,7 @@ using System.Net;
 
 namespace Taledynamic.Core.Exceptions
 {
-    public class UnauthorizedException: BaseHttpException
+    public sealed class UnauthorizedException: BaseHttpException
     { 
         private const HttpStatusCode Code = HttpStatusCode.Unauthorized;
 

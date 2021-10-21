@@ -2,7 +2,7 @@ using System.Net;
 
 namespace Taledynamic.Core.Exceptions
 {
-    public class BadRequestException : BaseHttpException
+    public sealed class BadRequestException : BaseHttpException
     {
         private const HttpStatusCode Code = HttpStatusCode.BadRequest;
 

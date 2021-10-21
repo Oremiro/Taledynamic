@@ -70,6 +70,7 @@ namespace Taledynamic.Api
 
             #region Middlewares
 
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseMiddleware<JwtMiddleware>();
 
             # endregion
