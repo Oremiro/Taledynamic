@@ -56,18 +56,22 @@ interface IRevokeTokenResponse extends IBaseResponse {
 
 
 export class ApiHelper {
-	private static baseUrl: string = process.env.VUE_APP_API_BASEURL;
+	private static readonly baseUrl: string = process.env.VUE_APP_API_BASEURL;
+	private static readonly axiosInstance = axios.create({
+		baseURL: ApiHelper.baseUrl,
+		withCredentials: true
+	})
 
 	static userAuthenticate(userData: IAuthenticateUserRequest): Promise<AxiosResponse<IAuthenticateUserResponse>> {
-		return axios.post<IAuthenticateUserRequest, AxiosResponse<IAuthenticateUserResponse>>(
-			`${this.baseUrl}/auth/user/authenticate`, 
-			{ email: userData.email, password: userData.password }
+		return this.axiosInstance.post<IAuthenticateUserRequest, AxiosResponse<IAuthenticateUserResponse>>(
+			'/auth/user/authenticate', 
+			{ email: userData.email, password: userData.password },
 		)
 	}
 
 	static userCreate(userData: ICreateUserRequest): Promise<AxiosResponse<ICreateUserResponse>> {
-		return axios.post<ICreateUserRequest, AxiosResponse<ICreateUserResponse>>(
-			`${this.baseUrl}/auth/user/create`, {
+		return this.axiosInstance.post<ICreateUserRequest, AxiosResponse<ICreateUserResponse>>(
+			'/auth/user/create', {
 			email: userData.email,
 			password: userData.password,
 			confirmPassword: userData.confirmPassword
@@ -75,8 +79,8 @@ export class ApiHelper {
 	}
 
 	static userDelete(userId: number): Promise<AxiosResponse<IDeleteUserResponse>> {
-		return axios.delete<IDeleteUserResponse>(
-			`${this.baseUrl}/auth/user/delete`,
+		return this.axiosInstance.delete<IDeleteUserResponse>(
+			'/auth/user/delete',
 			{
 				params: { 
 					userId: userId 
@@ -86,8 +90,8 @@ export class ApiHelper {
 	}
 
 	static userGet(userId: number): Promise<AxiosResponse<IGetUserResponse>> {
-		return axios.get<IGetUserResponse>(
-			`${this.baseUrl}/auth/user/get`, 
+		return this.axiosInstance.get<IGetUserResponse>(
+			'/auth/user/get', 
 			{
 				params: {
 					id: userId
@@ -97,8 +101,8 @@ export class ApiHelper {
 	}
 
 	static userUpdate(userData: IUpdateUserRequest): Promise<AxiosResponse<IUpdateUserResponse>> {
-		return axios.put<IUpdateUserRequest, AxiosResponse<IUpdateUserResponse>>(
-			`${this.baseUrl}/auth/user/update`,
+		return this.axiosInstance.put<IUpdateUserRequest, AxiosResponse<IUpdateUserResponse>>(
+			'/auth/user/update',
 			{ 
 				id: userData.id, 
 				email: userData.email, 
@@ -109,14 +113,14 @@ export class ApiHelper {
 	}
 
 	static userRefreshToken(): Promise<AxiosResponse<IRefreshTokenResponse>> {
-		return axios.post<IRefreshTokenResponse>(
-			`${this.baseUrl}/auth/user/refresh-token`
+		return this.axiosInstance.post<IRefreshTokenResponse>(
+			'/auth/user/refresh-token',
 		)
 	}
 
 	static userRevokeToken(token: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
-		return axios.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
-			`${this.baseUrl}/auth/user/revoke-token`,
+		return this.axiosInstance.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
+			'/auth/user/revoke-token',
 			{ token: token }
 		);
 	}

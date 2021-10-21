@@ -85,8 +85,6 @@ export const store = createStore<IState>({
 							token: response.data.jwtToken
 						});
 						localStorage.setItem('user', JSON.stringify(user))
-						console.log(response);
-						console.log(document.cookie);
 						resolve();
 					} else if (response.data.statusCode == 404) {
 						reject(new Error('Пользователь с такими данными не найден'));
@@ -134,11 +132,13 @@ export const store = createStore<IState>({
 							});
 							resolve();
 						} else {
-							reject('Пользователь не найден в локальном хранилище');
+							reject(new Error('Пользователь не найден в локальном хранилище'));
 						}
 					} else if (response.data.statusCode == 404) {
+						console.log(response)
 						reject(new Error('Сессия устарела'));
 					} else {
+						console.log(response)
 						reject(new Error('Непредвиденная ошибка'));
 					}
 				})
