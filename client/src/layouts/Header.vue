@@ -8,7 +8,7 @@
 			</n-gi>
 			<n-gi span="6" offset="1">
 				<div class="nav-menu">
-					<n-menu :value="$route.path" :options="menuOptions" mode="horizontal" />
+					<n-menu :value="route.path" :options="menuOptions" mode="horizontal" />
 				</div>
 			</n-gi>
 			<n-gi span="2" offset="1">
@@ -59,9 +59,9 @@
 
 
 <script lang="ts">
-import { defineComponent, h } from 'vue'
-import { RouterLink } from 'vue-router'
-import { darkTheme, MenuOption } from 'naive-ui'
+import { computed, ComputedRef, defineComponent, h, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { darkTheme, MenuOption, useLoadingBar, useMessage } from 'naive-ui'
 import { useStore } from '@/store'
 
 export default defineComponent({
@@ -70,41 +70,31 @@ export default defineComponent({
 		currentTheme: Object
 	},
 	setup(props, context) {
-		const menuOptions: MenuOption[] = [
-			{
-				label: () =>
-					h(
-						RouterLink,
-						{
-							to: '/'
-						},
-						{ default: () => 'О проекте' }
-					),
-				key: '/',
-			}
-		]
+		const loadingBar = useLoadingBar()
+		loadingBar.start();
+		const message = useMessage();
 		const store = useStore();
-		if (store.getters.isLoggedIn) {
-			menuOptions.push({
-				label: () =>
-					h(
-						RouterLink,
-						{ to: '/profile' },
-						{ default: () => 'Профиль' }
-					),
-				key: '/profile'
-			})
-		} else {
-			menuOptions.push({
-				label: () =>
-					h(
-						RouterLink,
-						{ to: '/auth' },
-						{ default: () => 'Вход' }
-					),
-				key: '/auth'
-			})
-		}
+		const menuOptions: ComputedRef<MenuOption[]> = computed((): MenuOption[] => {
+			const baseMenuOptions = [
+				{
+					label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
+					key: '/',
+				}
+			];
+			
+			if (store.getters.isLoggedIn) {
+				baseMenuOptions.push({
+					label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
+					key: '/profile'
+				})
+			} else {
+				baseMenuOptions.push({
+					label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),
+					key: '/auth'
+				})
+			}
+			return baseMenuOptions;
+		})
 		
 
 		const changeTheme = (): void => {
@@ -114,9 +104,18 @@ export default defineComponent({
 				context.emit('changeTheme', null)
 			}
 		}
+		watch(() => store.state.pageStatus, () => {
+			if (store.state.pageStatus == 'ready') {
+				loadingBar.finish();
+			} else {
+				loadingBar.error();
+				message.error('Ваша сессия устарела')
+			}
+		});
 		return {
+			route: useRoute(),
 			menuOptions,
-			changeTheme,
+			changeTheme
 		}
 	},
 })

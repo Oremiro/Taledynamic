@@ -20,6 +20,7 @@
     <n-form-item>
 			<n-button-group>
 				<n-button
+					attr-type="submit"
 					type="primary"
 					ghost
 					:loading="submitLoading"
@@ -89,16 +90,15 @@ export default defineComponent({
     const submitLoading = ref<boolean>(false);
 		const submitDisabled = ref<number>(0);
 		const store = useStore();
+		const router = useRouter();
 
 		// methods
     const submitForm = (): void => {
 			submitLoading.value = true;
       formRef.value?.validate((errors) => {
-        if (!errors) {
-					console.log(formData);					
+        if (!errors) {		
 					store.dispatch('login', formData)
 					.then(() => {
-						const router = useRouter();
 						message.success('Вы успешно вошли!');
 						router.push('/profile');
 					})
