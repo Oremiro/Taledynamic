@@ -59,9 +59,9 @@
 
 
 <script lang="ts">
-import { computed, ComputedRef, defineComponent, h } from 'vue'
+import { computed, ComputedRef, defineComponent, h, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { darkTheme, MenuOption } from 'naive-ui'
+import { darkTheme, MenuOption, useLoadingBar, useMessage } from 'naive-ui'
 import { useStore } from '@/store'
 
 export default defineComponent({
@@ -70,6 +70,10 @@ export default defineComponent({
 		currentTheme: Object
 	},
 	setup(props, context) {
+		const loadingBar = useLoadingBar()
+		loadingBar.start();
+		const message = useMessage();
+		const store = useStore();
 		const menuOptions: ComputedRef<MenuOption[]> = computed((): MenuOption[] => {
 			const baseMenuOptions = [
 				{
@@ -91,7 +95,7 @@ export default defineComponent({
 			}
 			return baseMenuOptions;
 		})
-		const store = useStore();
+		
 
 		const changeTheme = (): void => {
 			if (props.currentTheme === null) {
@@ -100,6 +104,14 @@ export default defineComponent({
 				context.emit('changeTheme', null)
 			}
 		}
+		watch(() => store.state.pageStatus, () => {
+			if (store.state.pageStatus == 'ready') {
+				loadingBar.finish();
+			} else {
+				loadingBar.error();
+				message.error('Ваша сессия устарела')
+			}
+		});
 		return {
 			route: useRoute(),
 			menuOptions,

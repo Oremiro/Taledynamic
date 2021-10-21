@@ -13,6 +13,7 @@ interface IUser {
 export interface IState {
 	user: IUser,
 	accessTokenInMemory: string,
+	pageStatus: 'loading' | 'ready' | 'error'
 }
 
 interface ILoginPayload {
@@ -29,6 +30,7 @@ export const store = createStore<IState>({
 			email: ''
 		},
 		accessTokenInMemory: '',
+		pageStatus: 'loading'
   },
 	getters: {
 		isLoggedIn(state): boolean {
@@ -43,6 +45,12 @@ export const store = createStore<IState>({
 		logout(state: IState) {
 			state.user = { id: null, email: '' };
 			state.accessTokenInMemory = '';
+		},
+		pageReady(state: IState) {
+			state.pageStatus = 'ready';
+		},
+		pageError(state: IState) {
+			state.pageStatus = 'error';
 		}
   },
   actions: {

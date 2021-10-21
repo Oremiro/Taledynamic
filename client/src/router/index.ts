@@ -51,17 +51,19 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach(async (to) => {
+router.beforeResolve(async to => {
 	let isLoggedIn: boolean = store.getters.isLoggedIn;
 	if (!isLoggedIn) {
 		isLoggedIn = await store.dispatch('init');
 	}
   if (to.meta.requiresAuth && !isLoggedIn) {
+		store.commit('pageError');
 		return {
 			name: 'Auth',
 			query: { redirect: to.fullPath },
 		};
 	}
+	store.commit('pageReady');
 })
 
 export default router
