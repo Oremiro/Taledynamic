@@ -51,7 +51,7 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
-        public async Task<GetWorkspaceByIdResponse> GetWorkspaceByIdAsync(GetWorkspaceByIdRequest request, User user)
+        public async Task<GetWorkspaceByIdResponse> GetUserWorkspaceByIdAsync(GetWorkspaceByIdRequest request, User user)
         {
             if (user == null)
             {
@@ -68,7 +68,7 @@ namespace Taledynamic.Core.Services
                 .Workspaces
                 .AsNoTracking()
                 .FirstOrDefaultAsync(w => w.IsActive && w.User.Equals(user) && w.User.Equals(user));
-
+            
             return new GetWorkspaceByIdResponse
             {
                 StatusCode = (HttpStatusCode) 200,
@@ -122,14 +122,19 @@ namespace Taledynamic.Core.Services
 
         public async Task<DeleteWorkspaceResponse> DeleteWorkspaceAsync(DeleteWorkspaceRequest request)
         {
-            try
+            var validator = request.IsValid();
+            if (!validator.Status)
             {
-                throw new NotImplementedException();
+                throw new BadRequestException(validator.Message);
             }
-            catch (Exception exception)
+
+            await DeleteAsync(request.Id);
+            
+            return new DeleteWorkspaceResponse()
             {
-                throw new NotImplementedException();
-            }
+                StatusCode = (HttpStatusCode) 200,
+                Message = "Success.",
+            };
         }
     }
 }

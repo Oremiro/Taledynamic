@@ -23,34 +23,35 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpGet("get-filtered-by-user")]
-        public async Task<GetWorkspacesByUserResponse> GetFilteredByUserAsync([FromQuery] GetWorkspacesByUserRequest request)
+        public async Task<GetWorkspacesByUserResponse> GetFilteredByUfer([FromQuery] GetWorkspacesByUserRequest request)
         {
             var response = await _workspaceService.GetFilteredByUserIdAsync(request, CustomUser);
             return response;
         }
         
         [HttpGet("get")]
-        public async Task<GetWorkspaceByIdResponse> GetWorkspaceByIdAsync([FromQuery] GetWorkspaceByIdRequest request)
+        public async Task<GetWorkspaceByIdResponse> Get([FromQuery] GetWorkspaceByIdRequest request)
         {
-            var response = await _workspaceService.GetWorkspaceByIdAsync(request, CustomUser);
+            var response = await _workspaceService.GetUserWorkspaceByIdAsync(request, CustomUser);
             return response;
         }
         
         [HttpPost("create")]
-        public async Task<CreateWorkspaceResponse> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
+        public async Task<CreateWorkspaceResponse> Create([FromBody] CreateWorkspaceRequest request)
         {
             var response = await _workspaceService.CreateWorkspaceAsync(request, CustomUser);
             return response;
         }
         [HttpPut("update")]
-        public async Task UpdateAsync()
+        public async Task Update()
         {
             throw new NotImplementedException();
         }
         [HttpDelete("delete")]
-        public async Task DeleteAsync()
+        public async Task<DeleteWorkspaceResponse> Delete([FromQuery] DeleteWorkspaceRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.DeleteWorkspaceAsync(request);
+            return response;
         }
     }
 }
