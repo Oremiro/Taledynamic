@@ -104,7 +104,7 @@ namespace Taledynamic.Api.Controllers
 
         }
         
-        [JwtAuthorize]
+        //[JwtAuthorize]
         [HttpPost("create")]
         public async Task<CreateUserResponse> Create([FromBody] CreateUserRequest request)
         {
