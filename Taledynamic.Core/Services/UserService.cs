@@ -238,17 +238,21 @@ namespace Taledynamic.Core.Services
             // Нет смысла хранить рефреши, историчность не нужна
             oldUser.RefreshTokens.RemoveRange(0, oldUser.RefreshTokens.Count);
             await _context.SaveChangesAsync();
-            _context.ChangeTracker.Clear();
-            await DeleteAsync(userId);
 
             User newUser = new User
             {
                 IsActive = true,
-                Email = request.Email,
-                Password = request.Password,
+                Email = oldUser.Email,
+                Password = oldUser.Password,
                 RefreshTokens = linkedRefreshTokens
             };
 
+            _context.ChangeTracker.Clear();
+            await DeleteAsync(userId);
+
+            newUser.Email = request.Email ?? newUser.Email;
+            newUser.Password = request.Password ?? newUser.Password;
+            
             await this.CreateAsync(newUser);
             await transation.CommitAsync();
             var response = new UpdateUserResponse()

@@ -43,9 +43,10 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         [HttpPut("update")]
-        public async Task Update()
+        public async Task<UpdateWorkspaceResponse> Update([FromBody] UpdateWorkspaceRequest request)
         {
-            throw new NotImplementedException();
+            var response = await _workspaceService.UpdateWorkspaceAsync(request);
+            return response;
         }
         [HttpDelete("delete")]
         public async Task<DeleteWorkspaceResponse> Delete([FromQuery] DeleteWorkspaceRequest request)

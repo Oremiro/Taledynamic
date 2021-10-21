@@ -128,6 +128,7 @@ namespace Taledynamic.Api.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
             Response.Cookies.Append("refreshToken", response.RefreshToken, cookieOptions);

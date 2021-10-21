@@ -67,7 +67,7 @@ namespace Taledynamic.Core.Services
             var workspace = await _context
                 .Workspaces
                 .AsNoTracking()
-                .FirstOrDefaultAsync(w => w.IsActive && w.User.Equals(user) && w.User.Equals(user));
+                .FirstOrDefaultAsync(w => w.IsActive && w.Id == request.Id && w.User.Equals(user));
             
             return new GetWorkspaceByIdResponse
             {
@@ -110,14 +110,45 @@ namespace Taledynamic.Core.Services
 
         public async Task<UpdateWorkspaceResponse> UpdateWorkspaceAsync(UpdateWorkspaceRequest request)
         {
-            try
+
+            var validator = request.IsValid();
+            if (!validator.Status)
             {
-                throw new NotImplementedException();
+                throw new BadRequestException(validator.Message);
             }
-            catch (Exception exception)
+
+            await using var transation = await _context.Database.BeginTransactionAsync();
+            
+            var oldWorkspace = await _context
+                .Workspaces
+                .Include(w => w.User)
+                .FirstOrDefaultAsync(w => w.IsActive && w.Id == request.Id);
+
+            var user = oldWorkspace.User; 
+            _context.ChangeTracker.Clear();
+            await DeleteAsync(oldWorkspace.Id);
+
+            var newWorkspace = new Workspace
             {
-                throw new NotImplementedException();
-            }
+                IsActive = true,
+                Name = oldWorkspace.Name,
+                Created = oldWorkspace.Created,
+                Modified = DateTime.Now,
+                User = user
+            };
+
+            newWorkspace.Name = request.Name ?? newWorkspace.Name;
+            await this.CreateAsync(newWorkspace);
+
+            await transation.CommitAsync();
+            
+            var response = new UpdateWorkspaceResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "Success."
+            };
+
+            return response;
         }
 
         public async Task<DeleteWorkspaceResponse> DeleteWorkspaceAsync(DeleteWorkspaceRequest request)
