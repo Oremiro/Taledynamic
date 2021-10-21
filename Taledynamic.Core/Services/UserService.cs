@@ -216,20 +216,20 @@ namespace Taledynamic.Core.Services
             }
 
             var userId = request.Id;
+            
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             var oldUser = await _context
                 .Users
-                .AsNoTracking()
                 .Include(u => u.RefreshTokens)
+                .AsNoTracking()
                 .SingleOrDefaultAsync(u => u.Id == userId);
-
+            await transaction.CommitAsync();
             if (!oldUser.IsActive)
             {
                 throw new BadRequestException("Nothing to update by this id.");
             }
-
-            await DeleteAsync(userId);
-
             var refreshTokens = oldUser.RefreshTokens;
+            _context.RefreshTokens.RemoveRange(refreshTokens);
             User newUser = new User
             {
                 IsActive = true,
@@ -237,8 +237,11 @@ namespace Taledynamic.Core.Services
                 Password = request.Password,
                 RefreshTokens = refreshTokens
             };
-
+            
             await this.CreateAsync(newUser);
+            _context.ChangeTracker.Clear();
+            await DeleteAsync(userId);
+            
             var response = new UpdateUserResponse()
             {
                 StatusCode = (HttpStatusCode) 200,

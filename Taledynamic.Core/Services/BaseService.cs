@@ -24,8 +24,11 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
             } 
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             _context.Update(entity);
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
         }
         
         protected virtual async Task CreateAsync(TEntity entity)
@@ -34,8 +37,11 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
             }
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             await _context.Set<TEntity>().AddAsync(entity);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();            
+            await transaction.CommitAsync();
+
         }
         
         protected virtual async Task DeleteAsync(int? id)
@@ -49,6 +55,7 @@ namespace Taledynamic.Core.Services
             entity.IsActive = false; 
             _context.Update(entity);
             await _context.SaveChangesAsync();
+
         }
         
         protected virtual async Task<TEntity> GetByIdAsync(int? id)
@@ -57,16 +64,21 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"[{MethodBase.GetCurrentMethod()?.Name}] {typeof(TEntity)} id is null.");
             }
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             var entity = await _context
                 .Set<TEntity>()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
+            await transaction.CommitAsync();
+
             return entity;
         }
         
         protected virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             var entities = await _context.Set<TEntity>().AsNoTracking().ToListAsync();
+            await transaction.CommitAsync();
             return entities;
         }
     }
