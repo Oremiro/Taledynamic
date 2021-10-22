@@ -3,6 +3,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
 import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
+import { AxiosError } from 'axios'
 
 interface IUser {
 	id: number | null,
@@ -12,6 +13,7 @@ interface IUser {
 export interface IState {
 	user: IUser,
 	accessTokenInMemory: string,
+	pageStatus: 'loading' | 'ready' | 'error'
 }
 
 interface ILoginPayload {
@@ -28,6 +30,7 @@ export const store = createStore<IState>({
 			email: ''
 		},
 		accessTokenInMemory: '',
+		pageStatus: 'loading'
   },
 	getters: {
 		isLoggedIn(state): boolean {
@@ -42,9 +45,29 @@ export const store = createStore<IState>({
 		logout(state: IState) {
 			state.user = { id: null, email: '' };
 			state.accessTokenInMemory = '';
+		},
+		pageReady(state: IState) {
+			state.pageStatus = 'ready';
+		},
+		pageError(state: IState) {
+			state.pageStatus = 'error';
 		}
   },
   actions: {
+		async init() {
+			const isRemembered: string | null = VueCookieNext.getCookie('remembered');
+			const localStorageUser: string | null = localStorage.getItem('user');
+			if (isRemembered === '1' && localStorageUser) {
+				try {
+					await store.dispatch('refresh');
+					return true;
+				} catch (e) {
+					VueCookieNext.removeCookie('remembered');
+					localStorage.removeItem('user');
+				}
+			}
+			return false;
+		},
 		register(_context, formData: SignUpFormData) {
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userCreate({
@@ -75,17 +98,22 @@ export const store = createStore<IState>({
 					password: formData.password.value
 				})
 				.then((response) => {
-					console.log(response);
-					const user: IUser = {
-						id: response.data.id ?? null, 
-						email: response.data.email ?? formData.email.value, 
+					if (response.data.statusCode == 200) {
+						const user: IUser = {
+							id: response.data.id ?? null, 
+							email: response.data.email ?? formData.email.value, 
+						}
+						commit('login', {
+							user: user,
+							token: response.data.jwtToken
+						});
+						localStorage.setItem('user', JSON.stringify(user))
+						resolve();
+					} else if (response.data.statusCode == 404) {
+						reject(new Error('Пользователь с такими данными не найден'));
+					} else {
+						reject(new Error('Ошибка авторизации'));
 					}
-					commit('login', {
-						user: user,
-						token: response.data.jwtToken
-					});
-					localStorage.setItem('user', JSON.stringify(user))
-					resolve();
 				})
 				.catch((error) => {
 					console.log(error.message);
@@ -116,22 +144,25 @@ export const store = createStore<IState>({
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userRefreshToken()
 				.then((response) => {
-					console.log(response.data);
-					const localStorageUser = localStorage.getItem('user');
-					if (localStorageUser) {
-						const user: IUser = JSON.parse(localStorageUser);
+					console.log(response);
+					if (response.data.id && response.data.email && response.data.jwtToken) {
+						const user: IUser = { id: response.data.id, email: response.data.email };
+						const token: string = response.data.jwtToken
 						commit('login', {
 							user: user,
-							token: response.data.jwtToken
+							token: token
 						});
 						resolve();
 					} else {
-						reject('User is none');
+						reject(new Error('Непредвиденная ошибка'))
 					}
 				})
-				.catch((error) => {
-					console.log(error.response);
-					reject('Ошибка обновления токена');
+				.catch((error: AxiosError) => {
+					if(error.response?.status == 404) {
+						reject(new Error('Сессия устарела'));
+					} else {
+						reject(new Error('Ошибка обновления токена'));
+					}
 				});
 			});
 		}
