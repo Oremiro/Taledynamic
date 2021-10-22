@@ -3,8 +3,7 @@
 	<n-text code>Тут что-то будет</n-text>
 	<n-h4><n-text type="primary">Изменение данных</n-text></n-h4>
 	<n-space vertical>
-		<n-button @click="router.push('/profile/email')">Изменить email</n-button>
-		<n-button @click="router.push('/profile/password')">Изменить пароль</n-button>
+		<n-button @click="router.push('/profile/edit')">Изменить данные</n-button>
 	</n-space>
 	
 </template>

@@ -54,6 +54,17 @@ export default defineComponent({
 					),
 				key: "/profile",
 			},
+						{
+				label: () =>
+					h(
+						RouterLink,
+						{
+							to: "/profile/edit",
+						},
+						{ default: () => "Данные" }
+					),
+				key: "/profile/edit",
+			},
 			{
 				label: () =>
 					h(
@@ -72,7 +83,7 @@ export default defineComponent({
 						message.success(response);
 					})
 					.catch((error) => {
-						message.error(error.response);
+						message.error(error.message);
 					})
 				},
 				label: 'Выйти',

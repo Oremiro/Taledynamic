@@ -54,6 +54,10 @@ interface IRevokeTokenResponse extends IBaseResponse {
 	isSuccess?: boolean
 }
 
+interface IIsEmailUsedResponse extends IBaseResponse {
+	isEmailUsed: boolean
+}
+
 
 export class ApiHelper {
 	private static readonly baseUrl: string = process.env.VUE_APP_API_BASEURL;
@@ -122,7 +126,7 @@ export class ApiHelper {
 		)
 	}
 
-	static userRevokeToken(data: { token?: string } = {}, accessToken: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
+	static userRevokeToken(data: { token?: string }, accessToken: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
 		return this.axiosInstance.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
 			'/auth/user/revoke-token',
 			data,
@@ -132,5 +136,16 @@ export class ApiHelper {
 				}
 			}
 		);
+	}
+
+	static isEmailUsed(data: { email: string }): Promise<AxiosResponse<IIsEmailUsedResponse>> {
+		return this.axiosInstance.get<IIsEmailUsedResponse>(
+			'/auth/User/is-email-used',
+			{
+				params: {
+					email: data.email
+				}
+			}
+		)
 	}
 }

@@ -135,11 +135,15 @@ export const store = createStore<IState>({
 						localStorage.removeItem('user');
 						resolve();
 					} else {
-						reject('Ошибка отмены токена');
+						reject(new Error('Ошибка выхода из аккаунта'));
 					}
 				})
-				.catch((error) => {
-					reject(error.message);
+				.catch((error: AxiosError) => {
+					if (error.response?.status == 404) {
+						reject(new Error('Пользователь с таким токеном не найден'))	
+					} else {
+						reject(new Error('Ошибка обнуления токена'));
+					}
 				});
 			});
 		},
@@ -147,7 +151,6 @@ export const store = createStore<IState>({
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userRefreshToken()
 				.then((response) => {
-					console.log(response);
 					if (response.data.id && response.data.email && response.data.jwtToken) {
 						const user: IUser = { id: response.data.id, email: response.data.email };
 						const token: string = response.data.jwtToken
