@@ -62,23 +62,21 @@ export class ApiHelper {
 		withCredentials: true
 	})
 
-	static userAuthenticate(userData: IAuthenticateUserRequest): Promise<AxiosResponse<IAuthenticateUserResponse>> {
+	static userAuthenticate(data: { user: IAuthenticateUserRequest }): Promise<AxiosResponse<IAuthenticateUserResponse>> {
 		return this.axiosInstance.post<IAuthenticateUserRequest, AxiosResponse<IAuthenticateUserResponse>>(
 			'/auth/user/authenticate', 
-			{ email: userData.email, password: userData.password },
+			data.user,
 		)
 	}
 
-	static userCreate(userData: ICreateUserRequest): Promise<AxiosResponse<ICreateUserResponse>> {
+	static userCreate(data: { user: ICreateUserRequest }): Promise<AxiosResponse<ICreateUserResponse>> {
 		return this.axiosInstance.post<ICreateUserRequest, AxiosResponse<ICreateUserResponse>>(
-			'/auth/user/create', {
-			email: userData.email,
-			password: userData.password,
-			confirmPassword: userData.confirmPassword
-		})
+			'/auth/user/create', 
+			data.user
+		)
 	}
 
-	static userDelete(userId: number, accessToken: string): Promise<AxiosResponse<IDeleteUserResponse>> {
+	static userDelete(data: { userId: number }, accessToken: string): Promise<AxiosResponse<IDeleteUserResponse>> {
 		return this.axiosInstance.delete<IDeleteUserResponse>(
 			'/auth/user/delete',
 			{
@@ -86,35 +84,30 @@ export class ApiHelper {
 					'Authorization': `Bearer ${accessToken}`
 				},
 				params: { 
-					userId: userId 
+					userId: data.userId 
 				}
 			}
 		)
 	}
 
-	static userGet(userId: number, accessToken: string): Promise<AxiosResponse<IGetUserResponse>> {
+	static userGet(data: { userId: number }, accessToken: string): Promise<AxiosResponse<IGetUserResponse>> {
 		return this.axiosInstance.get<IGetUserResponse>(
 			'/auth/user/get', 
 			{
+				params: {
+					id: data.userId
+				},
 				headers: {
 					'Authorization': `Bearer ${accessToken}`
-				},
-				params: {
-					id: userId
 				}
 			}
 		);
 	}
 
-	static userUpdate(userData: IUpdateUserRequest, accessToken: string): Promise<AxiosResponse<IUpdateUserResponse>> {
+	static userUpdate(data: { user: IUpdateUserRequest }, accessToken: string): Promise<AxiosResponse<IUpdateUserResponse>> {
 		return this.axiosInstance.put<IUpdateUserRequest, AxiosResponse<IUpdateUserResponse>>(
 			'/auth/user/update',
-			{ 
-				id: userData.id, 
-				email: userData.email, 
-				password: userData.password, 
-				confirmPassword: userData.confirmPassword 
-			},
+			data.user,
 			{
 				headers: {
 					'Authorization': `Bearer ${accessToken}`
@@ -129,10 +122,10 @@ export class ApiHelper {
 		)
 	}
 
-	static userRevokeToken(accessToken: string, token?: string, ): Promise<AxiosResponse<IRevokeTokenResponse>> {
+	static userRevokeToken(data: { token?: string } = {}, accessToken: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
 		return this.axiosInstance.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
 			'/auth/user/revoke-token',
-			token ? { token: token } : {},
+			data,
 			{
 				headers: {
 					'Authorization': `Bearer ${accessToken}`

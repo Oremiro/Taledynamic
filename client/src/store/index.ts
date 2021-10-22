@@ -70,11 +70,12 @@ export const store = createStore<IState>({
 		},
 		register(_context, formData: SignUpFormData) {
 			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userCreate({
+				const newUser = {
 					email: formData.email.value, 
 					password: formData.password.value, 
 					confirmPassword: formData.confirmedPassword.value
-				})
+				}
+				ApiHelper.userCreate({ user: newUser })
 				.then((response) => {
 					if (response.data.statusCode == 200) {
 						resolve();
@@ -94,10 +95,11 @@ export const store = createStore<IState>({
 			return new Promise<void>((resolve, reject) => {
 				const expireValue: string = formData.remembered.value ? '7d' : '0';
 				VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
-				ApiHelper.userAuthenticate({
+				const user = {
 					email: formData.email.value, 
 					password: formData.password.value
-				})
+				}
+				ApiHelper.userAuthenticate({ user: user })
 				.then((response) => {
 					if (response.data.statusCode == 200) {
 						const user: IUser = {
@@ -124,8 +126,7 @@ export const store = createStore<IState>({
 		},
 		logout({ commit, state }) {
 			return new Promise<void>((resolve, reject) => {
-				// TODO
-				ApiHelper.userRevokeToken(state.accessTokenInMemory)
+				ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
 				.then((response) => {
 					console.log(response.data);
 					if (response.data.isSuccess) {
