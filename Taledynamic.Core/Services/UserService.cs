@@ -234,17 +234,17 @@ namespace Taledynamic.Core.Services
             }
 
             var linkedRefreshTokens = oldUser.RefreshTokens.ToList();
-
-            // Нет смысла хранить рефреши, историчность не нужна
             oldUser.RefreshTokens.RemoveRange(0, oldUser.RefreshTokens.Count);
+            await UpdateWorkspacesForUser(oldUser);
             await _context.SaveChangesAsync();
 
+            
             User newUser = new User
             {
                 IsActive = true,
                 Email = oldUser.Email,
                 Password = oldUser.Password,
-                RefreshTokens = linkedRefreshTokens
+                RefreshTokens = linkedRefreshTokens,
             };
 
             _context.ChangeTracker.Clear();
@@ -264,6 +264,23 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
+        private async Task UpdateWorkspacesForUser(User user)
+        {
+            if (user == null)
+            {
+                throw new BadRequestException("User is not set");
+            }
+            
+            var workspaces = _context.Workspaces.Where(w => w.User.Equals(user));
+
+            foreach (var workspace in workspaces)
+            {
+                workspace.User = user;
+                _context.Update(workspace);
+            }
+
+            await _context.SaveChangesAsync();
+        }
         public async Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request)
         {
             var validator = request.IsValid();
