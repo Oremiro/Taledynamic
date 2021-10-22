@@ -32,13 +32,16 @@
 </style>
 
 <script lang="ts">
-import { MenuOption } from "naive-ui";
+import { useStore } from "@/store";
+import { MenuOption, useMessage } from "naive-ui";
 import { defineComponent, h } from "vue";
 import { RouterLink } from "vue-router";
 
 export default defineComponent({
 	name: "Profile",
 	setup() {
+		const store = useStore();
+		const message = useMessage();
 		const menuOptions: MenuOption[] = [
 			{
 				label: () =>
@@ -62,6 +65,19 @@ export default defineComponent({
 					),
 				key: "/profile/settings",
 			},
+			{
+				onClick: () => {
+					store.dispatch('logout')
+					.then((response) => {
+						message.success(response);
+					})
+					.catch((error) => {
+						message.error(error.response);
+					})
+				},
+				label: 'Выйти',
+				key: '/profile/quit',
+			}
 		];
 		return { menuOptions };
 	},

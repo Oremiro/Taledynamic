@@ -78,14 +78,15 @@ export const store = createStore<IState>({
 				.then((response) => {
 					if (response.data.statusCode == 200) {
 						resolve();
-					} else if (response.data.statusCode == 400) {
-						reject(new Error('Пользователь с таким почтовым адресом уже существует'))
 					} else {
 						reject(new Error('Ошибка регистрации'))
 					}
-				}).catch((error) => {
-					console.log(error.response);
-					reject(new Error('Ошибка регистрации'));
+				}).catch((error: AxiosError) => {
+					if (error.response?.status == 400) {
+						reject(new Error('Пользователь с таким почтовым адресом уже существует'))
+					} else {
+						reject(new Error('Ошибка регистрации'));
+					}
 				});
 			});
 		},
@@ -123,20 +124,21 @@ export const store = createStore<IState>({
 		},
 		logout({ commit, state }) {
 			return new Promise<void>((resolve, reject) => {
+				// TODO
 				ApiHelper.userRevokeToken(state.accessTokenInMemory)
 				.then((response) => {
 					console.log(response.data);
 					if (response.data.isSuccess) {
 						commit('logout');
+						VueCookieNext.removeCookie('remembered');
 						localStorage.removeItem('user');
 						resolve();
 					} else {
-						reject();
+						reject('Ошибка отмены токена');
 					}
 				})
 				.catch((error) => {
-					console.log(error);
-					reject('Ошибка выхода');
+					reject(error.message);
 				});
 			});
 		},

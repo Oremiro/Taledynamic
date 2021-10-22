@@ -78,10 +78,13 @@ export class ApiHelper {
 		})
 	}
 
-	static userDelete(userId: number): Promise<AxiosResponse<IDeleteUserResponse>> {
+	static userDelete(userId: number, accessToken: string): Promise<AxiosResponse<IDeleteUserResponse>> {
 		return this.axiosInstance.delete<IDeleteUserResponse>(
 			'/auth/user/delete',
 			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				},
 				params: { 
 					userId: userId 
 				}
@@ -89,10 +92,13 @@ export class ApiHelper {
 		)
 	}
 
-	static userGet(userId: number): Promise<AxiosResponse<IGetUserResponse>> {
+	static userGet(userId: number, accessToken: string): Promise<AxiosResponse<IGetUserResponse>> {
 		return this.axiosInstance.get<IGetUserResponse>(
 			'/auth/user/get', 
 			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				},
 				params: {
 					id: userId
 				}
@@ -100,7 +106,7 @@ export class ApiHelper {
 		);
 	}
 
-	static userUpdate(userData: IUpdateUserRequest): Promise<AxiosResponse<IUpdateUserResponse>> {
+	static userUpdate(userData: IUpdateUserRequest, accessToken: string): Promise<AxiosResponse<IUpdateUserResponse>> {
 		return this.axiosInstance.put<IUpdateUserRequest, AxiosResponse<IUpdateUserResponse>>(
 			'/auth/user/update',
 			{ 
@@ -108,20 +114,30 @@ export class ApiHelper {
 				email: userData.email, 
 				password: userData.password, 
 				confirmPassword: userData.confirmPassword 
+			},
+			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				},
 			}
 		);
 	}
 
 	static userRefreshToken(): Promise<AxiosResponse<IRefreshTokenResponse>> {
 		return this.axiosInstance.post<IRefreshTokenResponse>(
-			'/auth/user/refresh-token',
+			'/auth/user/refresh-token'
 		)
 	}
 
-	static userRevokeToken(token: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
+	static userRevokeToken(accessToken: string, token?: string, ): Promise<AxiosResponse<IRevokeTokenResponse>> {
 		return this.axiosInstance.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
 			'/auth/user/revoke-token',
-			{ token: token }
+			token ? { token: token } : {},
+			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			}
 		);
 	}
 }
