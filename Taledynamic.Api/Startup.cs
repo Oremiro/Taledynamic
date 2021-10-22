@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Taledynamic.Api.Middlewares;
 using Taledynamic.Core;
+using Taledynamic.Core.Entities;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.Core.Services;
@@ -40,6 +41,7 @@ namespace Taledynamic.Api
             });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IWorkspaceService, WorkspaceService>();
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo {Title = "Taledynamic", Version = "v1"});
