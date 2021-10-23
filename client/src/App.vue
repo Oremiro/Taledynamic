@@ -3,7 +3,9 @@
 		<n-global-style />
 		<n-message-provider>
 			<n-layout position="absolute" style="min-height: 100vh">
-				<Header @changeTheme="setTheme" :currentTheme="currentTheme" />
+				<n-loading-bar-provider>
+					<Header @changeTheme="setTheme" :currentTheme="currentTheme" />
+				</n-loading-bar-provider>
 				<n-layout-content position="absolute" embedded>
 					<router-view />
 				</n-layout-content>

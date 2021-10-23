@@ -2,19 +2,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Taledynamic.Core.Models.Internal;
 
-namespace Taledynamic.Core.Models.Requests.UserRequests
+namespace Taledynamic.Core.Models.Requests.TableRequests
 {
-    public class IsEmailUsedRequest: BaseRequest
+    public class DeleteTableRequest: BaseRequest
     {
         [Required]
-        public string Email { get; set; }
-
+        public int Id { get; set; }
         public override ValidateState IsValid()
         {
             StringBuilder sb = new StringBuilder();
-            if (Email == null)
+            
+            if (Id == default)
             {
-                sb.Append("Email is default.");
+                sb.AppendLine("Id is default.");
             }
 
             if (sb.Length != 0)
@@ -22,7 +22,7 @@ namespace Taledynamic.Core.Models.Requests.UserRequests
                 return new ValidateState(false, sb.ToString());
             }
 
-            return new ValidateState(true, "Success");
+            return new ValidateState(true, sb.ToString());
         }
     }
 }

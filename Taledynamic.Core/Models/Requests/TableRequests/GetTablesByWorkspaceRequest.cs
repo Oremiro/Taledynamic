@@ -2,19 +2,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Taledynamic.Core.Models.Internal;
 
-namespace Taledynamic.Core.Models.Requests.UserRequests
+namespace Taledynamic.Core.Models.Requests.TableRequests
 {
-    public class IsEmailUsedRequest: BaseRequest
+    public class GetTablesByWorkspaceRequest: BaseRequest
     {
         [Required]
-        public string Email { get; set; }
+        public int WorkspaceId { get; set; }
 
         public override ValidateState IsValid()
         {
-            StringBuilder sb = new StringBuilder();
-            if (Email == null)
+            var sb = new StringBuilder();
+            if (WorkspaceId == default)
             {
-                sb.Append("Email is default.");
+                sb.AppendLine("WorkspaceId contains default value");
             }
 
             if (sb.Length != 0)

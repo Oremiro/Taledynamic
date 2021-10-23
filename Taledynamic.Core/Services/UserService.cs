@@ -10,6 +10,7 @@ using Taledynamic.Core.Entities;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Models.DTOs;
+using Taledynamic.Core.Models.Internal;
 using Taledynamic.Core.Models.Requests.UserRequests;
 using Taledynamic.Core.Models.Responses.UserResponses;
 
@@ -223,6 +224,7 @@ namespace Taledynamic.Core.Services
                 .Include(u => u.RefreshTokens)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
+            //TODO 
             if (oldUser == null)
             {
                 throw new NotFoundException("User with this id is not found.");
@@ -234,17 +236,16 @@ namespace Taledynamic.Core.Services
             }
 
             var linkedRefreshTokens = oldUser.RefreshTokens.ToList();
-
-            // Нет смысла хранить рефреши, историчность не нужна
             oldUser.RefreshTokens.RemoveRange(0, oldUser.RefreshTokens.Count);
             await _context.SaveChangesAsync();
 
+            
             User newUser = new User
             {
                 IsActive = true,
                 Email = oldUser.Email,
                 Password = oldUser.Password,
-                RefreshTokens = linkedRefreshTokens
+                RefreshTokens = linkedRefreshTokens,
             };
 
             _context.ChangeTracker.Clear();
@@ -254,7 +255,9 @@ namespace Taledynamic.Core.Services
             newUser.Password = request.Password ?? newUser.Password;
             
             await this.CreateAsync(newUser);
+            await UpdateWorkspacesForUser(oldUser, newUser);
             await transation.CommitAsync();
+            
             var response = new UpdateUserResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
@@ -264,6 +267,23 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
+        private async Task UpdateWorkspacesForUser(User oldUser, User newUser)
+        {
+            if (oldUser == null || newUser == null)
+            {
+                throw new BadRequestException("User is not set");
+            }
+            
+            var workspaces = _context.Workspaces.Where(w => w.User.Equals(oldUser));
+
+            foreach (var workspace in workspaces)
+            {
+                workspace.User = newUser;
+                _context.Update(workspace);
+            }
+
+            await _context.SaveChangesAsync();
+        }
         public async Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request)
         {
             var validator = request.IsValid();
@@ -275,6 +295,7 @@ namespace Taledynamic.Core.Services
             var userId = request.Id;
             var user = await this.GetByIdAsync(userId);
 
+            //TODO move in validate for query method
             if (user == null || !user.IsActive)
             {
                 throw new NotFoundException("User is not found.");
@@ -326,7 +347,7 @@ namespace Taledynamic.Core.Services
             var user = await _context
                 .Users
                 .AsQueryable()
-                .SingleOrDefaultAsync(u => u.Email == request.Email && u.IsActive);
+                .FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive);
 
             var response = new IsEmailUsedResponse()
             {

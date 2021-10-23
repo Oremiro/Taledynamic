@@ -52,7 +52,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
 
-        [JwtAuthorize]
+        //TODO:[JwtAuthorize]
         [HttpGet("is-email-used")]
         public async Task<IsEmailUsedResponse> IsEmailUsed([FromQuery] IsEmailUsedRequest request)
         {

@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Taledynamic.Core.Entities
 {
-    public class Workspace: BaseEntity
+    public class Table: BaseEntity
     {
         public string Name { get; set; }
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
-        [ForeignKey("UserId")]
-        public virtual User User { get; set; }
+        [ForeignKey("WorkspaceId")]
+        public virtual Workspace Workspace { get; set; }
         [Required]
-        public int UserId { get; set; }
+        public int WorkspaceId { get; set; }
     }
 }
