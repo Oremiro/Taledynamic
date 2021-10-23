@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Taledynamic.Core.Entities;
+using Taledynamic.DAL.Entities;
 
 namespace Taledynamic.Core
 {

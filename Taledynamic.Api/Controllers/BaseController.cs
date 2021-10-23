@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Taledynamic.Core.Entities;
+using Taledynamic.DAL.Entities;
 
 namespace Taledynamic.Api.Controllers
 {

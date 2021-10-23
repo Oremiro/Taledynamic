@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Taledynamic.Core.Entities;
 using Taledynamic.Core.Interfaces;
+using Taledynamic.DAL.Entities;
 
 namespace Taledynamic.Core.Services
 {
