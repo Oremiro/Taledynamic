@@ -47,6 +47,11 @@ namespace Taledynamic.Core.Services
             };
         }
 
+        public Task<GetTableResponse> GetTableAsync(GetTableRequest request)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task<DeleteTableResponse> DeleteTableAsync(DeleteTableRequest request)
         {
             throw new System.NotImplementedException();

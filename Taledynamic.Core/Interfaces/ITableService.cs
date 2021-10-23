@@ -11,6 +11,8 @@ namespace Taledynamic.Core.Interfaces
     {
         public Task<CreateTableResponse> CreateTableAsync(CreateTableRequest request);
         public Task<GetTablesByWorkspaceResponse> GetTablesByWorkspaceAsync(GetTablesByWorkspaceRequest request);
+        public Task<GetTableResponse> GetTableAsync(GetTableRequest request);
+
         public Task<DeleteTableResponse> DeleteTableAsync(DeleteTableRequest request);
         public Task<UpdateTableResponse> UpdateTableAsync(UpdateTableRequest request);
     }
