@@ -14,3 +14,13 @@ export interface SignInFormData {
 	password: FormItemData<string>,
 	remembered: FormItemData<boolean>
 }
+
+export interface EmailEditFormData {
+	email: FormItemData<string>
+}
+
+export interface PasswordEditFormData {
+	currentPassword: FormItemData<string>,
+	newPassword: FormItemData<string>,
+	confirmedPassword: FormItemData<string>
+}
