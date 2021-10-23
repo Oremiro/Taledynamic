@@ -176,8 +176,7 @@ export const store = createStore<State>({
 			return new Promise<void>((resolve, reject) => {
 				if (state.user.id) {
 					ApiHelper.userUpdate({ user: { id: state.user.id, email: email}}, state.accessTokenInMemory)
-					.then((response) => {
-						console.log(response);
+					.then(() => {
 						commit('updateEmail', { email: email });
 						const user: User = {
 							id: state.user.id, 

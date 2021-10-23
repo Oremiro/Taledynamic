@@ -54,8 +54,11 @@ interface RevokeTokenResponse extends BaseResponse {
 	isSuccess?: boolean
 }
 
-interface IsEmailUsedResponse extends BaseResponse {
-	isEmailUsed: boolean
+interface GetByEmailResponse extends BaseResponse {
+	user: {
+		id: number,
+		email: string
+	}
 }
 
 
@@ -138,9 +141,9 @@ export class ApiHelper {
 		);
 	}
 
-	static isEmailUsed(data: { email: string }): Promise<AxiosResponse<IsEmailUsedResponse>> {
-		return this.axiosInstance.get<IsEmailUsedResponse>(
-			'/auth/User/is-email-used',
+	static userGetByEmail(data: { email: string }): Promise<AxiosResponse<GetByEmailResponse>> {
+		return this.axiosInstance.get<GetByEmailResponse>(
+			'/auth/user/get-by-email',
 			{
 				params: {
 					email: data.email

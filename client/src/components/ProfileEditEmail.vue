@@ -14,18 +14,20 @@
 				</n-input>
 			</n-auto-complete>
 		</n-form-item>
-		<n-button 
-			attr-type="submit"
-			ghost
-			@click="submitForm"
-			:loading="isSubmitLoading"
-			:disabled="isSubmitLoading || (isSubmitDisabled != 0)"
-			v-if="isSubmitButtonShown && formData.email.isValid" 
-			type="success" 
-			style="margin-right: 1rem"
-		>
-			Сохранить
-		</n-button>
+		<n-button-group style="margin-right: 1rem">
+			<n-button
+				attr-type="submit"
+				ghost
+				@click="submitForm"
+				:loading="isSubmitLoading"
+				:disabled="isSubmitLoading || (isSubmitDisabled != 0)"
+				v-if="isSubmitButtonShown && formData.email.isValid"
+				type="success"
+			>
+				Сохранить
+			</n-button>
+			<n-button v-if="isSubmitDisabled" disabled type="primary" ghost>{{ isSubmitDisabled }}</n-button>
+		</n-button-group>
 		<n-button ghost v-if="isSubmitButtonShown" type="error" @click="undoChanges">Отменить</n-button>
 	</n-form>
 </template>
@@ -100,27 +102,25 @@ export default defineComponent({
 			isSubmitLoading.value = true;
       formRef.value?.validate((errors) => {
         if (!errors) {
-					ApiHelper.isEmailUsed({ email: formData.email.value })
+					ApiHelper.userGetByEmail({ email: formData.email.value })
 						.then((response) => {
 							if (response.data.statusCode == 200) {
-								if (response.data.isEmailUsed) {
-									message.warning('Данный email занят другим пользователем');
-								} else {
-									store.dispatch('updateEmail', formData.email.value)
-									.then(() => {
-										message.success('Вы успешно изменили email');
-									})
-									.catch((error) => {
-										message.error(error.message);
-									})
-								}
-							} else {
-								message.success('status != 200')
+								message.warning('Данный email занят другим пользователем');
 							}
 						})
 						.catch((error: AxiosError) => {
-							console.log(error.response?.statusText);
-							message.warning('Проверка адреса не завершена');
+							if (error.response?.status === 404) {
+								store.dispatch('updateEmail', formData.email.value)
+								.then(() => {
+									message.success('Вы успешно изменили email');
+								})
+								.catch((error) => {
+									message.error(error.message);
+								})
+							} else {
+								console.log(error.response);
+								message.warning('Проверка адреса не завершена');
+							}
 						})
 						.finally(() => {
 							isSubmitLoading.value = false;
