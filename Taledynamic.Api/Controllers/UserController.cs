@@ -60,7 +60,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         
-        [JwtAuthorize]
+        //TODO :[JwtAuthorize]
         [HttpGet("get-by-email")]
         public async Task<GetUserResponse> GetActiveUserByEmail([FromQuery] GetActiveUserByEmailRequest request)
         {
