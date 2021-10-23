@@ -130,9 +130,14 @@ namespace Taledynamic.Core.Services
             
             var table = await _context
                 .Tables
-                .Include(w => w.Workspace)
-                .FirstOrDefaultAsync(w => w.IsActive && w.Id == request.Id);
+                .Include(t => t.Workspace)
+                .FirstOrDefaultAsync(t => t.IsActive && t.Id == request.Id);
 
+            if (table == null)
+            {
+                throw new NotFoundException("Table is not found");
+            }
+            
             table.Modified = DateTime.Now;
             table.Name = request.Name ?? table.Name;
             await UpdateAsync(table);
