@@ -21,7 +21,7 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpGet("get-filtered-by-workspace")]
-        public async Task<GetTablesByWorkspaceResponse> GetFilteredByUfer([FromQuery] GetTablesByWorkspaceRequest request)
+        public async Task<GetTablesByWorkspaceResponse> GetFilteredByWorkspace([FromQuery] GetTablesByWorkspaceRequest request)
         {
             var response = await _tableService.GetTablesByWorkspaceAsync(request);
             return response;

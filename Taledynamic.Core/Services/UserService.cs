@@ -255,7 +255,7 @@ namespace Taledynamic.Core.Services
             newUser.Password = request.Password ?? newUser.Password;
             
             await this.CreateAsync(newUser);
-            await UpdateWorkspacesForUser(newUser);
+            await UpdateWorkspacesForUser(oldUser, newUser);
             await transation.CommitAsync();
             
             var response = new UpdateUserResponse()
@@ -267,18 +267,18 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
-        private async Task UpdateWorkspacesForUser(User user)
+        private async Task UpdateWorkspacesForUser(User oldUser, User newUser)
         {
-            if (user == null)
+            if (oldUser == null || newUser == null)
             {
                 throw new BadRequestException("User is not set");
             }
             
-            var workspaces = _context.Workspaces.Where(w => w.User.Equals(user));
+            var workspaces = _context.Workspaces.Where(w => w.User.Equals(oldUser));
 
             foreach (var workspace in workspaces)
             {
-                workspace.User = user;
+                workspace.User = newUser;
                 _context.Update(workspace);
             }
 
