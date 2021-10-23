@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,9 +21,30 @@ namespace Taledynamic.Core.Services
             _context = context;
         }
 
-        public Task<CreateTableResponse> CreateTableAsync(CreateTableRequest request)
+        public async Task<CreateTableResponse> CreateTableAsync(CreateTableRequest request)
         {
-            throw new System.NotImplementedException();
+            var validator = request.IsValid();
+            if (!validator.Status)
+            {
+                throw new BadRequestException(validator.Message);
+            }
+
+            var table = new Table
+            {
+                IsActive = true,
+                Name = request.Name,
+                Created = DateTime.Now,
+                Modified = DateTime.Now,
+                WorkspaceId = request.WorkspaceId
+            };
+
+            await this.CreateAsync(table);
+
+            return new CreateTableResponse
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "Success."
+            };
         }
 
         public async Task<GetTablesByWorkspaceResponse> GetTablesByWorkspaceAsync(GetTablesByWorkspaceRequest request)
@@ -70,11 +92,8 @@ namespace Taledynamic.Core.Services
                 throw new NotFoundException("Table with requested ids is not found");
             }
 
-            var tableDto = new TableDto
-            {
-                Id = table.Id,
-                Name = table.Name
-            };
+            var tableDto = new TableDto(table);
+            
             return new GetTableResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
@@ -83,14 +102,46 @@ namespace Taledynamic.Core.Services
             };
         }
 
-        public Task<DeleteTableResponse> DeleteTableAsync(DeleteTableRequest request)
+        public async Task<DeleteTableResponse> DeleteTableAsync(DeleteTableRequest request)
         {
-            throw new System.NotImplementedException();
+            var validator = request.IsValid();
+            if (!validator.Status)
+            {
+                throw new BadRequestException(validator.Message);
+            }
+
+            await DeleteAsync(request.Id);
+            
+            return new DeleteTableResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "Success.",
+            };
         }
 
-        public Task<UpdateTableResponse> UpdateTableAsync(UpdateTableRequest request)
+        public async Task<UpdateTableResponse> UpdateTableAsync(UpdateTableRequest request)
         {
-            throw new System.NotImplementedException();
+            // не уверен что изменяемость нужна в этой таблице, сделаю через дефолтный update
+            var validator = request.IsValid();
+            if (!validator.Status)
+            {
+                throw new BadRequestException(validator.Message);
+            }
+            
+            var table = await _context
+                .Tables
+                .Include(w => w.Workspace)
+                .FirstOrDefaultAsync(w => w.IsActive && w.Id == request.Id);
+
+            table.Modified = DateTime.Now;
+            table.Name = request.Name ?? table.Name;
+            await UpdateAsync(table);
+            
+            return new UpdateTableResponse()
+            {
+                StatusCode = (HttpStatusCode) 200,
+                Message = "Success.",
+            };
         }
     }
 }

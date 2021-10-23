@@ -8,6 +8,8 @@ namespace Taledynamic.Core.Models.Requests.TableRequests
     {
         [Required]
         public string Name { get; set;}
+        [Required]
+        public int WorkspaceId { get; set; }
         public override ValidateState IsValid()
         {
             StringBuilder sb = new StringBuilder();
@@ -15,6 +17,11 @@ namespace Taledynamic.Core.Models.Requests.TableRequests
             if (Name == null)
             {
                 sb.AppendLine("Name for table is not set.");
+            }
+            
+            if (WorkspaceId == default)
+            {
+                sb.AppendLine("WorkspaceId is default.");
             }
 
             if (sb.Length != 0)
