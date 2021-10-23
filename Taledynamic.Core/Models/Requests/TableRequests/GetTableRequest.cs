@@ -8,12 +8,18 @@ namespace Taledynamic.Core.Models.Requests.TableRequests
     {
         [Required]
         public int Id { get; set; }
+        [Required]
+        public int WorkspaceId { get; set; }
         public override ValidateState IsValid()
         {
             var sb = new StringBuilder();
             if (Id == default)
             {
                 sb.Append("Id contains default value");
+            }
+            if (WorkspaceId == default)
+            {
+                sb.Append("WorkspaceId contains default value");
             }
 
             if (sb.Length != 0)

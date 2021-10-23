@@ -143,6 +143,7 @@ namespace Taledynamic.Core.Services
 
             newWorkspace.Name = request.Name ?? newWorkspace.Name;
             await this.CreateAsync(newWorkspace);
+            await UpdateTablesForWorkspace(newWorkspace);
             await transation.CommitAsync();
             
             var response = new UpdateWorkspaceResponse()
@@ -152,6 +153,24 @@ namespace Taledynamic.Core.Services
             };
 
             return response;
+        }
+        
+        private async Task UpdateTablesForWorkspace(Workspace workspace)
+        {
+            if (workspace == null)
+            {
+                throw new BadRequestException("Workspace is not set");
+            }
+            
+            var tables = _context.Tables.Where(w => w.Workspace.Equals(workspace));
+
+            foreach (var table in tables)
+            {
+                table.Workspace = workspace;
+                _context.Update(table);
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<DeleteWorkspaceResponse> DeleteWorkspaceAsync(DeleteWorkspaceRequest request)
