@@ -52,7 +52,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
 
-        [JwtAuthorize]
+        //TODO:[JwtAuthorize]
         [HttpGet("is-email-used")]
         public async Task<IsEmailUsedResponse> IsEmailUsed([FromQuery] IsEmailUsedRequest request)
         {
@@ -60,7 +60,7 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         
-        //TODO :[JwtAuthorize]
+        [JwtAuthorize]
         [HttpGet("get-by-email")]
         public async Task<GetUserResponse> GetActiveUserByEmail([FromQuery] GetActiveUserByEmailRequest request)
         {
