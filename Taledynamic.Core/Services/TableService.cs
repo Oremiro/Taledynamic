@@ -3,13 +3,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Taledynamic.Core.Entities;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.Core.Interfaces;
-using Taledynamic.Core.Models.DTOs;
-using Taledynamic.Core.Models.Requests.TableRequests;
-using Taledynamic.Core.Models.Responses.TableResponses;
-using Taledynamic.Core.Models.Responses.WorkspaceResponses;
+using Taledynamic.DAL.Entities;
+using Taledynamic.DAL.Models.DTOs;
+using Taledynamic.DAL.Models.Requests.TableRequests;
+using Taledynamic.DAL.Models.Responses.TableResponses;
 
 namespace Taledynamic.Core.Services
 {

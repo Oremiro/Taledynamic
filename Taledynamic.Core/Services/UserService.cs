@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Taledynamic.Core.Interfaces;
-using Taledynamic.Core.Entities;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.Core.Helpers;
-using Taledynamic.Core.Models.DTOs;
-using Taledynamic.Core.Models.Internal;
-using Taledynamic.Core.Models.Requests.UserRequests;
-using Taledynamic.Core.Models.Responses.UserResponses;
+using Taledynamic.DAL.Entities;
+using Taledynamic.DAL.Models.DTOs;
+using Taledynamic.DAL.Models.Requests.UserRequests;
+using Taledynamic.DAL.Models.Responses.UserResponses;
 
 namespace Taledynamic.Core.Services
 {
