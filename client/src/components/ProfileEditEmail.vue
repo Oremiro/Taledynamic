@@ -14,18 +14,31 @@
 				</n-input>
 			</n-auto-complete>
 		</n-form-item>
-		<n-button ghost v-if="submitButtonShown && formData.email.isValid" type="success" style="margin-right: 1rem">Сохранить</n-button>
-		<n-button ghost v-if="submitButtonShown" type="error" @click="undoChanges">Отменить</n-button>
+		<n-button 
+			attr-type="submit"
+			ghost
+			@click="submitForm"
+			:loading="isSubmitLoading"
+			:disabled="isSubmitLoading || (isSubmitDisabled != 0)"
+			v-if="isSubmitButtonShown && formData.email.isValid" 
+			type="success" 
+			style="margin-right: 1rem"
+		>
+			Сохранить
+		</n-button>
+		<n-button ghost v-if="isSubmitButtonShown" type="error" @click="undoChanges">Отменить</n-button>
 	</n-form>
 </template>
 
 <script lang="ts">
-import { emailRegex } from '@/helpers';
-import { FormRules, NForm, NFormItem } from 'naive-ui';
+import { emailRegex, holdSubmitDisabled } from '@/helpers';
+import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { defineComponent, reactive, ref } from 'vue'
 import { useStore } from '@/store';
 import { EmailEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
+import { ApiHelper } from '@/helpers/api';
+import { AxiosError } from 'axios';
 
 export default defineComponent({
 	name: 'ProfileEditEmail',
@@ -33,6 +46,7 @@ export default defineComponent({
 		QuestionTooltip
 	},
 	setup() {
+		// data
 		const store = useStore();
 		const formRef = ref<InstanceType<typeof NForm>>();
 		const defaultEmailValue: string = store.state.user.email;
@@ -67,26 +81,71 @@ export default defineComponent({
 				],
 			},
 		}
-		const submitButtonShown = ref<boolean>(false);
 		const emailInputRef = ref<InstanceType<typeof NFormItem>>();
+		const message = useMessage();
+		const isSubmitButtonShown = ref<boolean>(false);
+		const isSubmitLoading = ref<boolean>(false);
+		const isSubmitDisabled = ref<number>(0);
+
+		// methods
 		const handleEmailInput = (value: string | null): void => {
-				submitButtonShown.value = !(value === defaultEmailValue);
+			isSubmitButtonShown.value = !(value === defaultEmailValue);
 		}
 		const undoChanges = (): void => {
 			formData.email.value = defaultEmailValue;
 			handleEmailInput(formData.email.value);
 			emailInputRef.value?.restoreValidation();
 		}
+		const submitForm = (): void => {
+			isSubmitLoading.value = true;
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+					ApiHelper.isEmailUsed({ email: formData.email.value })
+						.then((response) => {
+							if (response.data.statusCode == 200) {
+								if (response.data.isEmailUsed) {
+									message.warning('Данный email занят другим пользователем');
+								} else {
+									store.dispatch('updateEmail', formData.email.value)
+									.then(() => {
+										message.success('Вы успешно изменили email');
+									})
+									.catch((error) => {
+										message.error(error.message);
+									})
+								}
+							} else {
+								message.success('status != 200')
+							}
+						})
+						.catch((error: AxiosError) => {
+							console.log(error.response?.statusText);
+							message.warning('Проверка адреса не завершена');
+						})
+						.finally(() => {
+							isSubmitLoading.value = false;
+							holdSubmitDisabled(isSubmitDisabled);
+						});
+        } else {
+          message.error('Данные не являются корректными');
+					isSubmitLoading.value = false;
+					holdSubmitDisabled(isSubmitDisabled);
+        }
+      });
+    };
 		return {
 			store,
 			formRef,
 			formData,
 			defaultEmailValue,
 			rules,
-			submitButtonShown,
+			isSubmitButtonShown,
 			emailInputRef,
+			isSubmitLoading,
+			isSubmitDisabled,
 			handleEmailInput,
-			undoChanges
+			undoChanges,
+			submitForm
 		}
 	},
 })

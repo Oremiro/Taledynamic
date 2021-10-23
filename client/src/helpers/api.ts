@@ -1,60 +1,60 @@
 import axios, { AxiosResponse } from "axios";
 
-interface IBaseResponse {
+interface BaseResponse {
 	statusCode?: number,
 	message?: string
 }
 
-interface IAuthenticateUserRequest {
+interface AuthenticateUserRequest {
 	email: string,
 	password: string
 }
 
-interface IAuthenticateUserResponse extends IBaseResponse{
+interface AuthenticateUserResponse extends BaseResponse{
 	id?: number,
 	email?: string,
 	jwtToken?: string
 }
 
-interface ICreateUserRequest extends IAuthenticateUserRequest {
+interface CreateUserRequest extends AuthenticateUserRequest {
 	confirmPassword: string
 }
 
-interface ICreateUserResponse extends IBaseResponse {}
+interface CreateUserResponse extends BaseResponse {}
 
-interface IGetUserResponse extends IBaseResponse {
+interface GetUserResponse extends BaseResponse {
 	userDto?: {
 		id: number,
 		email: string
 	}
 }
 
-interface IUpdateUserRequest {
+interface UpdateUserRequest {
 	id: number,
 	email?: string,
 	password?: string,
 	confirmPassword?: string
 }
 
-interface IUpdateUserResponse extends IBaseResponse {}
+interface UpdateUserResponse extends BaseResponse {}
 
-interface IDeleteUserResponse extends IBaseResponse {}
+interface DeleteUserResponse extends BaseResponse {}
 
-interface IRefreshTokenResponse extends IBaseResponse {
+interface RefreshTokenResponse extends BaseResponse {
 	id?: number,
 	email?: string,
 	jwtToken?: string
 }
 
-interface IRevokeTokenRequest {
+interface RevokeTokenRequest {
 	token?: string
 }
 
-interface IRevokeTokenResponse extends IBaseResponse {
+interface RevokeTokenResponse extends BaseResponse {
 	isSuccess?: boolean
 }
 
-interface IIsEmailUsedResponse extends IBaseResponse {
+interface IsEmailUsedResponse extends BaseResponse {
 	isEmailUsed: boolean
 }
 
@@ -66,22 +66,22 @@ export class ApiHelper {
 		withCredentials: true
 	})
 
-	static userAuthenticate(data: { user: IAuthenticateUserRequest }): Promise<AxiosResponse<IAuthenticateUserResponse>> {
-		return this.axiosInstance.post<IAuthenticateUserRequest, AxiosResponse<IAuthenticateUserResponse>>(
+	static userAuthenticate(data: { user: AuthenticateUserRequest }): Promise<AxiosResponse<AuthenticateUserResponse>> {
+		return this.axiosInstance.post<AuthenticateUserRequest, AxiosResponse<AuthenticateUserResponse>>(
 			'/auth/user/authenticate', 
-			data.user,
-		)
+			data.user
+		);
 	}
 
-	static userCreate(data: { user: ICreateUserRequest }): Promise<AxiosResponse<ICreateUserResponse>> {
-		return this.axiosInstance.post<ICreateUserRequest, AxiosResponse<ICreateUserResponse>>(
+	static userCreate(data: { user: CreateUserRequest }): Promise<AxiosResponse<CreateUserResponse>> {
+		return this.axiosInstance.post<CreateUserRequest, AxiosResponse<CreateUserResponse>>(
 			'/auth/user/create', 
 			data.user
 		)
 	}
 
-	static userDelete(data: { userId: number }, accessToken: string): Promise<AxiosResponse<IDeleteUserResponse>> {
-		return this.axiosInstance.delete<IDeleteUserResponse>(
+	static userDelete(data: { userId: number }, accessToken: string): Promise<AxiosResponse<DeleteUserResponse>> {
+		return this.axiosInstance.delete<DeleteUserResponse>(
 			'/auth/user/delete',
 			{
 				headers: {
@@ -94,8 +94,8 @@ export class ApiHelper {
 		)
 	}
 
-	static userGet(data: { userId: number }, accessToken: string): Promise<AxiosResponse<IGetUserResponse>> {
-		return this.axiosInstance.get<IGetUserResponse>(
+	static userGet(data: { userId: number }, accessToken: string): Promise<AxiosResponse<GetUserResponse>> {
+		return this.axiosInstance.get<GetUserResponse>(
 			'/auth/user/get', 
 			{
 				params: {
@@ -108,8 +108,8 @@ export class ApiHelper {
 		);
 	}
 
-	static userUpdate(data: { user: IUpdateUserRequest }, accessToken: string): Promise<AxiosResponse<IUpdateUserResponse>> {
-		return this.axiosInstance.put<IUpdateUserRequest, AxiosResponse<IUpdateUserResponse>>(
+	static userUpdate(data: { user: UpdateUserRequest }, accessToken: string): Promise<AxiosResponse<UpdateUserResponse>> {
+		return this.axiosInstance.put<UpdateUserRequest, AxiosResponse<UpdateUserResponse>>(
 			'/auth/user/update',
 			data.user,
 			{
@@ -120,14 +120,14 @@ export class ApiHelper {
 		);
 	}
 
-	static userRefreshToken(): Promise<AxiosResponse<IRefreshTokenResponse>> {
-		return this.axiosInstance.post<IRefreshTokenResponse>(
+	static userRefreshToken(): Promise<AxiosResponse<RefreshTokenResponse>> {
+		return this.axiosInstance.post<RefreshTokenResponse>(
 			'/auth/user/refresh-token'
 		)
 	}
 
-	static userRevokeToken(data: { token?: string }, accessToken: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
-		return this.axiosInstance.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
+	static userRevokeToken(data: { token?: string }, accessToken: string): Promise<AxiosResponse<RevokeTokenResponse>> {
+		return this.axiosInstance.post<RevokeTokenRequest, AxiosResponse<RevokeTokenResponse>>(
 			'/auth/user/revoke-token',
 			data,
 			{
@@ -138,13 +138,13 @@ export class ApiHelper {
 		);
 	}
 
-	static isEmailUsed(data: { email: string }): Promise<AxiosResponse<IIsEmailUsedResponse>> {
-		return this.axiosInstance.get<IIsEmailUsedResponse>(
+	static isEmailUsed(data: { email: string }): Promise<AxiosResponse<IsEmailUsedResponse>> {
+		return this.axiosInstance.get<IsEmailUsedResponse>(
 			'/auth/User/is-email-used',
 			{
 				params: {
 					email: data.email
-				}
+				},
 			}
 		)
 	}

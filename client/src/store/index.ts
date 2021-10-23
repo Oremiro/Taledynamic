@@ -5,25 +5,21 @@ import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
 import { AxiosError } from 'axios'
 
-interface IUser {
+interface User {
 	id: number | null,
 	email: string
 }
 
-export interface IState {
-	user: IUser,
+export interface State {
+	user: User,
 	accessTokenInMemory: string,
 	pageStatus: 'loading' | 'ready' | 'error'
 }
 
-interface ILoginPayload {
-	user: IUser,
-	token: string
-}
 
-export const key: InjectionKey<Store<IState>> = Symbol()
+export const key: InjectionKey<Store<State>> = Symbol()
 
-export const store = createStore<IState>({
+export const store = createStore<State>({
   state: {
     user: {
 			id: null,
@@ -38,23 +34,26 @@ export const store = createStore<IState>({
 		}
 	},
 	mutations: {
-		login(state: IState, payload: ILoginPayload) {
+		login(state: State, payload: { user: User, accessToken: string }) {
 			state.user = payload.user;
-			state.accessTokenInMemory = payload.token;
+			state.accessTokenInMemory = payload.accessToken;
 		},
-		logout(state: IState) {
+		logout(state: State) {
 			state.user = { id: null, email: '' };
 			state.accessTokenInMemory = '';
 		},
-		pageReady(state: IState) {
+		pageReady(state: State) {
 			state.pageStatus = 'ready';
 		},
-		pageError(state: IState) {
+		pageError(state: State) {
 			state.pageStatus = 'error';
+		},
+		updateEmail(state: State, payload: { email: string }) {
+			state.user.email = payload.email;
 		}
   },
   actions: {
-		async init() {
+		async init(): Promise<boolean> {
 			const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 			const localStorageUser: string | null = localStorage.getItem('user');
 			if (isRemembered === '1' && localStorageUser) {
@@ -68,7 +67,7 @@ export const store = createStore<IState>({
 			}
 			return false;
 		},
-		register(_context, formData: SignUpFormData) {
+		register(_context, formData: SignUpFormData): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
 				const newUser = {
 					email: formData.email.value, 
@@ -91,7 +90,7 @@ export const store = createStore<IState>({
 				});
 			});
 		},
-		login({ commit }, formData: SignInFormData) {
+		login({ commit }, formData: SignInFormData): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
 				const expireValue: string = formData.remembered.value ? '7d' : '0';
 				VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
@@ -102,29 +101,30 @@ export const store = createStore<IState>({
 				ApiHelper.userAuthenticate({ user: user })
 				.then((response) => {
 					if (response.data.statusCode == 200) {
-						const user: IUser = {
+						const user: User = {
 							id: response.data.id ?? null, 
 							email: response.data.email ?? formData.email.value, 
 						}
 						commit('login', {
 							user: user,
-							token: response.data.jwtToken
+							accessToken: response.data.jwtToken
 						});
 						localStorage.setItem('user', JSON.stringify(user))
 						resolve();
-					} else if (response.data.statusCode == 404) {
-						reject(new Error('Пользователь с такими данными не найден'));
 					} else {
 						reject(new Error('Ошибка авторизации'));
 					}
 				})
-				.catch((error) => {
-					console.log(error.message);
-					reject(new Error('Ошибка авторизации'));
+				.catch(error => {
+					if (error.response.status === 404) {
+						reject(new Error('Пользователь с такими данными не найден'));
+					} else {
+						reject(new Error('Ошибка авторизации'));
+					}
 				});
 			});
 		},
-		logout({ commit, state }) {
+		logout({ commit, state }): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
 				.then((response) => {
@@ -147,16 +147,16 @@ export const store = createStore<IState>({
 				});
 			});
 		},
-		refresh({ commit }) {			
+		refresh({ commit }): Promise<void> {			
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userRefreshToken()
 				.then((response) => {
 					if (response.data.id && response.data.email && response.data.jwtToken) {
-						const user: IUser = { id: response.data.id, email: response.data.email };
+						const user: User = { id: response.data.id, email: response.data.email };
 						const token: string = response.data.jwtToken
 						commit('login', {
 							user: user,
-							token: token
+							accessToken: token
 						});
 						resolve();
 					} else {
@@ -171,10 +171,57 @@ export const store = createStore<IState>({
 					}
 				});
 			});
+		},
+		updateEmail({ commit, state }, email: string ): Promise<void> {
+			return new Promise<void>((resolve, reject) => {
+				if (state.user.id) {
+					ApiHelper.userUpdate({ user: { id: state.user.id, email: email}}, state.accessTokenInMemory)
+					.then((response) => {
+						console.log(response);
+						commit('updateEmail', { email: email });
+						const user: User = {
+							id: state.user.id, 
+							email: email, 
+						}
+						localStorage.setItem('user', JSON.stringify(user))
+						resolve();
+					})
+					.catch((error: AxiosError) => {
+						console.log(error.message)
+						console.log(error.response?.statusText);
+						reject(new Error(error.message))
+					})
+				} else {
+					reject(new Error('User id is null'));
+				}
+			})
+		},
+		updatePassword({ state }, data: { newPassword: string, confirmedPassword: string }): Promise<void> {
+			return new Promise<void>((resolve, reject) => {
+				if (state.user.id) {
+					ApiHelper.userUpdate({ 
+						user: { 
+							id: state.user.id, 
+							password: data.newPassword, 
+							confirmPassword: data.confirmedPassword
+						}
+					}, state.accessTokenInMemory)
+					.then(() => {
+						resolve();
+					})
+					.catch((error: AxiosError) => {
+						console.log(error.message)
+						console.log(error.response?.statusText);
+						reject(new Error(error.message))
+					})
+				} else {
+					reject(new Error('User id is null'));
+				}
+			})
 		}
   },
 })
 
-export function useStore(): Store<IState> {
+export function useStore(): Store<State> {
   return baseUseStore(key);
 }
