@@ -59,6 +59,7 @@ export const store = createStore<State>({
 			if (isRemembered === '1' && localStorageUser) {
 				try {
 					await store.dispatch('refresh');
+					console.log(store.state);
 					return true;
 				} catch (e) {
 					VueCookieNext.removeCookie('remembered');
@@ -158,6 +159,7 @@ export const store = createStore<State>({
 							user: user,
 							accessToken: token
 						});
+						localStorage.setItem('user', JSON.stringify(user));
 						resolve();
 					} else {
 						reject(new Error('Непредвиденная ошибка'))
@@ -174,12 +176,14 @@ export const store = createStore<State>({
 		},
 		updateEmail({ commit, state }, email: string ): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
+				console.log(state.user.id)
 				if (state.user.id) {
 					ApiHelper.userUpdate({ user: { id: state.user.id, email: email}}, state.accessTokenInMemory)
-					.then(() => {
+					.then((response) => {
 						commit('updateEmail', { email: email });
+						console.log(state.user.id)
 						const user: User = {
-							id: state.user.id, 
+							id: response.data.id, 
 							email: email, 
 						}
 						localStorage.setItem('user', JSON.stringify(user))
@@ -205,12 +209,13 @@ export const store = createStore<State>({
 							confirmPassword: data.confirmedPassword
 						}
 					}, state.accessTokenInMemory)
-					.then(() => {
+					.then((response) => {
+						console.log(response);
 						resolve();
 					})
 					.catch((error: AxiosError) => {
+						console.log(error.response)
 						console.log(error.message)
-						console.log(error.response?.statusText);
 						reject(new Error(error.message))
 					})
 				} else {

@@ -25,14 +25,22 @@
 		<n-form-item first ref="confirmedPasswordRef" label="Повторите новый пароль" path="confirmedPassword.value">
 			<n-input type="password" show-password-on="click" placeholder="" v-model:value="formData.confirmedPassword.value" />
 		</n-form-item>
-		<n-button
-			ghost
-			type="success" 
-			v-if="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid"
+		<n-button-group 
 			style="margin-right: 1rem"
+			v-if="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid"
 		>
-			Сохранить
-		</n-button>
+			<n-button
+				attr-type="submit"
+				ghost
+				type="success"
+				@click="submitForm"
+				:loading="isSubmitButtonLoading"
+				:disabled="isSubmitButtonLoading || (isSubmitButtonDisabled != 0)"
+			>
+				Сохранить
+			</n-button>
+			<n-button v-if="isSubmitButtonDisabled" disabled type="primary" ghost>{{ isSubmitButtonDisabled }}</n-button>
+		</n-button-group>
 		<n-button 
 			ghost 
 			type="error" 
@@ -45,11 +53,12 @@
 </template>
 
 <script lang="ts">
-import { passwordRegex } from '@/helpers';
+import { holdSubmitDisabled, passwordRegex } from '@/helpers';
 import { PasswordEditFormData } from '@/interfaces';
-import { FormRules, NForm, NFormItem } from 'naive-ui';
+import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { defineComponent, reactive, ref } from 'vue'
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
+import { useStore } from '@/store';
 
 export default defineComponent({
 	name: 'ProfileEditPassword',
@@ -57,6 +66,7 @@ export default defineComponent({
 		QuestionTooltip
 	},
 	setup() {
+		// data
 		const formRef = ref<InstanceType<typeof NForm>>();
 		const formData = reactive<PasswordEditFormData>({
 			currentPassword: {
@@ -131,25 +141,64 @@ export default defineComponent({
 				],
 			},
 		};
+		const store = useStore();
+		const message = useMessage();
 		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
+
+		// const isSubmitButtonShown = ref<boolean>(false);
+		const isSubmitButtonLoading = ref<boolean>(false);
+		const isSubmitButtonDisabled = ref<number>(0);
+
+		// methods
 		const handlePasswordInput = (): void => {
 			if (formData.confirmedPassword.value != '') {
 				confirmedPasswordRef.value?.validate({ trigger: 'password-input'}).catch(() => true);
 			}
 		}
+
 		const undoChanges = (): void => {
 			formData.currentPassword.value = '';
 			formData.newPassword.value = '';
 			formData.confirmedPassword.value = '';
 			formRef.value?.restoreValidation();
 		}
+
+		const submitForm = (): void => {
+			isSubmitButtonLoading.value = true;
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+					store.dispatch('updatePassword', { 
+						newPassword: formData.newPassword.value, confirmedPassword: formData.confirmedPassword.value 
+					})
+					.then(() => {
+						undoChanges();
+						message.success('Вы успешно изменили пароль');
+					})
+					.catch((error) => {
+						message.error(error.message);
+					})
+					.finally(() => {
+						isSubmitButtonLoading.value = false;
+						holdSubmitDisabled(isSubmitButtonDisabled);
+					});
+        } else {
+          message.error('Данные не являются корректными');
+					isSubmitButtonLoading.value = false;
+					holdSubmitDisabled(isSubmitButtonDisabled);
+        }
+      });
+    };
+
 		return {
 			formRef,
 			formData,
 			rules,
 			confirmedPasswordRef,
+			isSubmitButtonLoading,
+			isSubmitButtonDisabled,
 			handlePasswordInput,
-			undoChanges
+			undoChanges,
+			submitForm
 		}
 	},
 })

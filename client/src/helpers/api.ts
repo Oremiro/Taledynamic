@@ -36,7 +36,9 @@ interface UpdateUserRequest {
 	confirmPassword?: string
 }
 
-interface UpdateUserResponse extends BaseResponse {}
+interface UpdateUserResponse extends BaseResponse {
+	id: number
+}
 
 interface DeleteUserResponse extends BaseResponse {}
 
