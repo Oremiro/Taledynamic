@@ -124,22 +124,25 @@ namespace Taledynamic.Core.Services
                 .Include(w => w.User)
                 .FirstOrDefaultAsync(w => w.IsActive && w.Id == request.Id);
 
-            var user = oldWorkspace.User; 
-            _context.ChangeTracker.Clear();
-            await DeleteAsync(oldWorkspace.Id);
-
+            if (oldWorkspace == null)
+            {
+                throw new NotFoundException("Workspace is not found");
+            }
+            
+            
             var newWorkspace = new Workspace
             {
                 IsActive = true,
                 Name = oldWorkspace.Name,
                 Created = oldWorkspace.Created,
                 Modified = DateTime.Now,
-                User = user
+                User = oldWorkspace.User
             };
+            
+            await DeleteAsync(oldWorkspace.Id);
 
             newWorkspace.Name = request.Name ?? newWorkspace.Name;
             await this.CreateAsync(newWorkspace);
-
             await transation.CommitAsync();
             
             var response = new UpdateWorkspaceResponse()

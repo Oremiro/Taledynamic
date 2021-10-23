@@ -25,7 +25,7 @@ namespace Taledynamic.Core.Services
                 throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
             } 
             
-            _context.Update(entity);
+            _context.Set<TEntity>().Update(entity);
             await _context.SaveChangesAsync();
         
 
@@ -50,8 +50,12 @@ namespace Taledynamic.Core.Services
             }
 
             var entity = await GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new ArgumentNullException($"[{MethodBase.GetCurrentMethod()?.Name}] {typeof(TEntity)} entity is null.");
+            }
             entity.IsActive = false; 
-            _context.Update(entity);
+            _context.Set<TEntity>().Update(entity);
             await _context.SaveChangesAsync();
 
         }
@@ -64,7 +68,6 @@ namespace Taledynamic.Core.Services
             }
             var entity = await _context
                 .Set<TEntity>()
-                .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             return entity;
