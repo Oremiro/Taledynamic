@@ -1,6 +1,6 @@
 namespace Taledynamic.Core.Models.Responses.TableResponses
 {
-    public class CreateTableResponse
+    public class CreateTableResponse: BaseResponse
     {
         
     }

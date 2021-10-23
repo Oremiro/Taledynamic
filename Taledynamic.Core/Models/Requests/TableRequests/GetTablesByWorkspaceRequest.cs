@@ -14,7 +14,7 @@ namespace Taledynamic.Core.Models.Requests.TableRequests
             var sb = new StringBuilder();
             if (WorkspaceId == default)
             {
-                sb.Append("WorkspaceId contains default value");
+                sb.AppendLine("WorkspaceId contains default value");
             }
 
             if (sb.Length != 0)

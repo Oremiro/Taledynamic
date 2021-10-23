@@ -26,7 +26,6 @@ namespace Taledynamic.Core.Services
 
         public async Task<GetTablesByWorkspaceResponse> GetTablesByWorkspaceAsync(GetTablesByWorkspaceRequest request)
         {
-          
             var validator = request.IsValid();
             if (!validator.Status)
             {

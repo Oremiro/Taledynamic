@@ -14,7 +14,7 @@ namespace Taledynamic.Core.Models.Requests.WorkspaceRequests
 
             if (Name == null)
             {
-                sb.Append("Name for project is not set.");
+                sb.AppendLine("Name for workspace is not set.");
             }
 
             if (sb.Length != 0)

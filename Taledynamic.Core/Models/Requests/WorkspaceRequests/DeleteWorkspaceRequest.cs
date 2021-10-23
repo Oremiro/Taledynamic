@@ -14,7 +14,7 @@ namespace Taledynamic.Core.Models.Requests.WorkspaceRequests
             
             if (Id == default)
             {
-                sb.Append("Id is default.\n");
+                sb.AppendLine("Id is default.");
             }
 
             if (sb.Length != 0)
