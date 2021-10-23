@@ -14,10 +14,10 @@ namespace Taledynamic.Core.Models.Requests.UserRequests
             StringBuilder sb = new StringBuilder();
             if (Email == null)
             {
-                sb.Append("UserId is default.");
+                sb.Append("Email is default.");
             }
 
-            if (sb.Length == 0)
+            if (sb.Length != 0)
             {
                 return new ValidateState(false, sb.ToString());
             }
