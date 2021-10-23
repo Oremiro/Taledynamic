@@ -2,19 +2,26 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Taledynamic.Core.Models.Internal;
 
-namespace Taledynamic.Core.Models.Requests.WorkspaceRequests
+namespace Taledynamic.Core.Models.Requests.TableRequests
 {
-    public class CreateWorkspaceRequest: BaseRequest
+    public class CreateTableRequest: BaseRequest
     {
         [Required]
         public string Name { get; set;}
+        [Required]
+        public int WorkspaceId { get; set; }
         public override ValidateState IsValid()
         {
             StringBuilder sb = new StringBuilder();
 
             if (Name == null)
             {
-                sb.AppendLine("Name for workspace is not set.");
+                sb.AppendLine("Name for table is not set.");
+            }
+            
+            if (WorkspaceId == default)
+            {
+                sb.AppendLine("WorkspaceId is default.");
             }
 
             if (sb.Length != 0)

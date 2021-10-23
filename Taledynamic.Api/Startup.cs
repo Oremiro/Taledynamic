@@ -40,8 +40,14 @@ namespace Taledynamic.Api
                     });
             });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            
+            # region dal services
+            
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWorkspaceService, WorkspaceService>();
+            services.AddScoped<ITableService, TableService>();
+            
+            # endregion
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo {Title = "Taledynamic", Version = "v1"});

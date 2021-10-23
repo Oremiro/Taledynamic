@@ -8,6 +8,7 @@ namespace Taledynamic.Core
         public DbSet<User> Users { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Workspace> Workspaces { get; set; }
+        public DbSet<Table> Tables { get; set; }
         public TaledynamicContext(DbContextOptions<TaledynamicContext> options) : base(options)
         {
         }
@@ -16,6 +17,8 @@ namespace Taledynamic.Core
         {
             modelBuilder.Entity<Workspace>()
                 .HasIndex(p => p.UserId);
+            modelBuilder.Entity<Table>()
+                .HasIndex(p => p.WorkspaceId);
         }
     }
 }

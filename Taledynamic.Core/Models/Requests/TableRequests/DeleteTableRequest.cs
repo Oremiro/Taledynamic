@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Taledynamic.Core.Models.Internal;
 
-namespace Taledynamic.Core.Models.Requests.WorkspaceRequests
+namespace Taledynamic.Core.Models.Requests.TableRequests
 {
-    public class DeleteWorkspaceRequest: BaseRequest
+    public class DeleteTableRequest: BaseRequest
     {
         [Required]
         public int Id { get; set; }
@@ -24,6 +24,5 @@ namespace Taledynamic.Core.Models.Requests.WorkspaceRequests
 
             return new ValidateState(true, sb.ToString());
         }
-        
     }
 }

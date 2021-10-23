@@ -23,7 +23,7 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpGet("get-filtered-by-user")]
-        public async Task<GetWorkspacesByUserResponse> GetFilteredByUfer([FromQuery] GetWorkspacesByUserRequest request)
+        public async Task<GetWorkspacesByUserResponse> GetFilteredByUser([FromQuery] GetWorkspacesByUserRequest request)
         {
             var response = await _workspaceService.GetFilteredByUserIdAsync(request, CustomUser);
             return response;

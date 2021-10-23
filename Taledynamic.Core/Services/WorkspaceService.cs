@@ -68,6 +68,11 @@ namespace Taledynamic.Core.Services
                 .Workspaces
                 .AsNoTracking()
                 .FirstOrDefaultAsync(w => w.IsActive && w.Id == request.Id && w.User.Equals(user));
+
+            if (workspace == null)
+            {
+                throw new NotFoundException("Workspace is not found");
+            }
             
             return new GetWorkspaceByIdResponse
             {
@@ -143,6 +148,7 @@ namespace Taledynamic.Core.Services
 
             newWorkspace.Name = request.Name ?? newWorkspace.Name;
             await this.CreateAsync(newWorkspace);
+            await UpdateTablesForWorkspace(oldWorkspace, newWorkspace);
             await transation.CommitAsync();
             
             var response = new UpdateWorkspaceResponse()
@@ -152,6 +158,24 @@ namespace Taledynamic.Core.Services
             };
 
             return response;
+        }
+        
+        private async Task UpdateTablesForWorkspace(Workspace oldWorkspace, Workspace newWorkspace)
+        {
+            if (oldWorkspace == null || newWorkspace == null)
+            {
+                throw new BadRequestException("Workspace is not set");
+            }
+            
+            var tables = _context.Tables.Where(w => w.Workspace.Equals(oldWorkspace));
+
+            foreach (var table in tables)
+            {
+                table.Workspace = newWorkspace;
+                _context.Update(table);
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<DeleteWorkspaceResponse> DeleteWorkspaceAsync(DeleteWorkspaceRequest request)
