@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Taledynamic.Core.Entities;
+using Taledynamic.Core.Models.DTOs;
 
 namespace Taledynamic.Core.Models.Responses.TableResponses
 {
     public class GetTablesByWorkspaceResponse: BaseResponse
     {
-        public List<Table> Tables { get; set; }
+        public List<TableDto> Tables { get; set; }
     }
 }
