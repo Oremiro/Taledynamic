@@ -27,9 +27,4 @@
       </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\Requests\TableRequests" />
-      <Folder Include="Models\Responses\TableResponses" />
-    </ItemGroup>
-
 </Project>
