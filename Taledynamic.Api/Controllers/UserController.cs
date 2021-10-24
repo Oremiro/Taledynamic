@@ -45,7 +45,9 @@ namespace Taledynamic.Api.Controllers
         [HttpPost("revoke-token")]
         public async Task<RevokeTokenResponse> RevokeToken([FromBody] RevokeTokenRequest request)
         {
-            RevokeTokenResponse response = await _userService.RevokeTokenAsync(request.RefreshToken, GetIpAddress());
+            var token = GetRefreshTokenFromCookie();
+            token = request.RefreshToken ?? token;
+            RevokeTokenResponse response = await _userService.RevokeTokenAsync(token, GetIpAddress());
             return response;
         }
 
