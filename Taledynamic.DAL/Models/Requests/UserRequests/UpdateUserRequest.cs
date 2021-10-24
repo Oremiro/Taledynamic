@@ -8,23 +8,31 @@ namespace Taledynamic.DAL.Models.Requests.UserRequests
     {
         [Required]
         public int Id { get; set; }
+        [Required]
+        public string Password { get; set; }
         
         [EmailAddress]
         public string Email { get; set; }
 
         [MinLength(6)]
-        public string Password { get; set; }
+        public string NewPassword { get; set; }
 
-        [Compare("Password")]
-        public string ConfirmPassword { get; set; }
+        [Compare("NewPassword")]
+        public string ConfirmNewPassword { get; set; }
 
         public override ValidateState IsValid()
         {
             StringBuilder sb = new StringBuilder();
 
+            if (string.IsNullOrEmpty(
+                Password))
+            {
+                sb.AppendLine("Password is null or empty");
+            }
+            
             if (Id == default)
             {
-                sb.Append("Id is default.");
+                sb.AppendLine("Id is default.");
             }
 
             if (sb.Length != 0)

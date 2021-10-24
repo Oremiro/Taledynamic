@@ -38,15 +38,7 @@ namespace Taledynamic.Core.Services
                 throw new BadRequestException(validator.Message);
             }
 
-            User user = await _context
-                .Users
-                .AsQueryable()
-                .FirstOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password && u.IsActive);
-
-            if (user == null)
-            {
-                throw new NotFoundException("User is not found.");
-            }
+            User user = await GetUserByEmailAndPassword(request.Email, request.Password);
 
             var jwtToken = _userHelper.GenerateJwtToken(user);
             var refreshToken = _userHelper.GenerateRefreshToken(ipAddress);
@@ -213,6 +205,46 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
+        private async Task<User> GetUserByEmailAndPassword(string email, string password)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                throw new BadRequestException(
+                    $"These parameters: email: {email}; passwordHash: {password} is not set properly");
+            }
+            
+            var user = await _context
+                .Users
+                .FirstOrDefaultAsync(u => u.Email == email && u.Password == password && u.IsActive);
+
+            if (user == null)
+            {
+                throw new NotFoundException("Active user with this email is not found.");
+            }
+
+            return user;
+        }
+
+        private async Task<User> GetUserByIdAndPassword(int id, string password)
+        {
+            if (id == default || string.IsNullOrEmpty(password))
+            {
+                throw new BadRequestException(
+                    $"These parameters: id: {id}; passwordHash: {password} is not set properly");
+            }
+            
+            var user = await _context
+                .Users
+                .Include(u => u.RefreshTokens)
+                .FirstOrDefaultAsync(u => u.Id == id && u.Password == password && u.IsActive);
+
+            if (user == null)
+            {
+                throw new NotFoundException("Active user with this id is not found.");
+            }
+
+            return user;
+        }
         public async Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request)
         {
             var validator = request.IsValid();
@@ -231,21 +263,7 @@ namespace Taledynamic.Core.Services
             await using var transation = await _context.Database.BeginTransactionAsync();
             var userId = request.Id;
 
-            var oldUser = await _context
-                .Users
-                .Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-            //TODO 
-            if (oldUser == null)
-            {
-                throw new NotFoundException("User with this id is not found.");
-            }
-
-            if (!oldUser.IsActive)
-            {
-                throw new BadRequestException("Nothing to update by this id.");
-            }
+            var oldUser =await GetUserByIdAndPassword(request.Id, request.Password);
 
             var linkedRefreshTokens = oldUser.RefreshTokens.ToList();
             oldUser.RefreshTokens.RemoveRange(0, oldUser.RefreshTokens.Count);
@@ -264,7 +282,7 @@ namespace Taledynamic.Core.Services
             await DeleteAsync(userId);
 
             newUser.Email = request.Email ?? newUser.Email;
-            newUser.Password = request.Password ?? newUser.Password;
+            newUser.Password = request.NewPassword ?? newUser.Password;
             
             await this.CreateAsync(newUser);
             await UpdateWorkspacesForUser(oldUser, newUser);
@@ -273,7 +291,8 @@ namespace Taledynamic.Core.Services
             var response = new UpdateUserResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
-                Message = "Success."
+                Message = "Success.",
+                User = new UserDto(newUser) 
             };
 
             return response;
