@@ -158,10 +158,7 @@ namespace Taledynamic.Core.Services
                 throw new BadRequestException(validator.Message);
             }
 
-            var isExist = await _context
-                .Users
-                .AsQueryable()
-                .AnyAsync(u => u.Email == request.Email && u.IsActive);
+            var isExist = await IsUserEmailExistAsync(request.Email);
 
             if (isExist)
             {
@@ -188,6 +185,15 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
+        private async Task<bool> IsUserEmailExistAsync(string email)
+        {
+            var isExist = await _context
+                .Users
+                .AsQueryable()
+                .AnyAsync(u => u.Email == email && u.IsActive);
+
+            return isExist;
+        }
         public async Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request)
         {
             var validator = request.IsValid();
@@ -215,6 +221,13 @@ namespace Taledynamic.Core.Services
                 throw new BadRequestException(validator.Message);
             }
 
+            var isExist = await IsUserEmailExistAsync(request.Email);
+
+            if (isExist)
+            {
+                throw new BadRequestException("User with the same email already exist.");
+            }
+            
             await using var transation = await _context.Database.BeginTransactionAsync();
             var userId = request.Id;
 
