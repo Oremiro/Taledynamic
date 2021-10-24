@@ -15,12 +15,15 @@ export interface SignInFormData {
 	remembered: FormItemData<boolean>
 }
 
-export interface EmailEditFormData {
+export interface UserFieldEditFormData {
+	currentPassword: FormItemData<string>
+}
+
+export interface EmailEditFormData extends UserFieldEditFormData {
 	email: FormItemData<string>
 }
 
-export interface PasswordEditFormData {
-	currentPassword: FormItemData<string>,
+export interface PasswordEditFormData extends UserFieldEditFormData {
 	newPassword: FormItemData<string>,
 	confirmedPassword: FormItemData<string>
 }

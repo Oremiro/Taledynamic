@@ -1,7 +1,7 @@
 <template>
 	<n-h4><n-text type="primary">Изменение email</n-text></n-h4>
 	<n-form ref="formRef" :rules="rules" :model="formData">
-		<n-form-item ref="emailInputRef" first :show-label="false" path="email.value">
+		<n-form-item ref="emailInputRef" first label="Email" path="email.value">
 			<n-auto-complete 
 			v-model:value="formData.email.value" 
 			@update:value="handleEmailInput"
@@ -14,16 +14,26 @@
 				</n-input>
 			</n-auto-complete>
 		</n-form-item>
-		<n-button-group style="margin-right: 1rem">
+		<n-collapse-transition :collapsed="isSubmitButtonShown">
+			<n-form-item label="Текущий пароль" path="currentPassword.value">
+				<n-input
+					type="password"
+					show-password-on="click"
+					placeholder=""
+					v-model:value="formData.currentPassword.value"
+				/>
+			</n-form-item>
+		</n-collapse-transition>
+		<n-button-group 
+			v-if="isSubmitButtonShown && formData.email.isValid && formData.currentPassword.value" 
+			style="margin-right: 1rem">
 			<n-button
 				attr-type="submit"
 				ghost
 				@click="submitForm"
 				:loading="isSubmitLoading"
 				:disabled="isSubmitLoading || (isSubmitDisabled != 0)"
-				v-if="isSubmitButtonShown && formData.email.isValid"
-				type="success"
-			>
+				type="success">
 				Сохранить
 			</n-button>
 			<n-button v-if="isSubmitDisabled" disabled type="primary" ghost>{{ isSubmitDisabled }}</n-button>
@@ -56,6 +66,10 @@ export default defineComponent({
 			email: {
 				value: defaultEmailValue,
 				isValid: true,
+			},
+			currentPassword: {
+				value: '',
+				isValid: false
 			}
 		});
 		const rules: FormRules = {
@@ -67,8 +81,8 @@ export default defineComponent({
 						trigger: ['blur', 'input']
 					},
 					{
-						asyncValidator: (rule, value) => {
-							return new Promise<void>((resolve, reject) => {
+						asyncValidator: (rule, value) => 
+							new Promise<void>((resolve, reject) => {
 								formData.email.isValid = false;
 								if (!emailRegex.test(value)) {
 									reject(new Error('Введите корректный email'));
@@ -76,11 +90,40 @@ export default defineComponent({
 									formData.email.isValid = true;
 									resolve();
 								}
-							});
-						},
+							}),
 						trigger: ['blur', 'input'],
 					},
+					{
+						asyncValidator: (rule, value) => 
+							new Promise<void>((resolve, reject) => {
+								if (value === defaultEmailValue) {
+									resolve()
+								} else {
+									ApiHelper.userIsEmailUsed({ email: value })
+									.then((response) => {
+										if(response.data.isEmailUsed) {
+											reject(new Error('Данный email занят другим пользователем'));
+										} else {
+											resolve();
+										}
+									})
+									.catch((error: AxiosError) => {
+										reject(new Error(error.message));
+									});
+								}
+							}),
+						trigger: 'blur'
+					}
 				],
+			},
+			currentPassword: {
+				value: [
+					{
+						required: true,
+						message: 'Пожалуйста, введите текущий пароль',
+						trigger: 'blur'
+					}
+				]
 			},
 		}
 		const emailInputRef = ref<InstanceType<typeof NFormItem>>();
@@ -100,32 +143,22 @@ export default defineComponent({
 		}
 		const submitForm = (): void => {
 			isSubmitLoading.value = true;
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
-					ApiHelper.userGetByEmail({ email: formData.email.value })
-						.then((response) => {
-							if (response.data.statusCode == 200) {
-								message.warning('Данный email занят другим пользователем');
-							}
-						})
-						.catch((error: AxiosError) => {
-							if (error.response?.status === 404) {
-								store.dispatch('updateEmail', formData.email.value)
-								.then(() => {
-									message.success('Вы успешно изменили email');
-								})
-								.catch((error) => {
-									message.error(error.message);
-								})
-							} else {
-								console.log(error.response);
-								message.warning('Проверка адреса не завершена');
-							}
-						})
-						.finally(() => {
-							isSubmitLoading.value = false;
-							holdSubmitDisabled(isSubmitDisabled);
+					try {
+						await store.dispatch('updateEmail', { 
+							currentPassword: formData.currentPassword.value, 
+							newEmail: formData.email.value 
 						});
+						message.success('Вы успешно изменили email');
+					} catch (error) {
+						if (error instanceof Error) {
+							message.error(error.message);
+						}
+					} finally {
+						isSubmitLoading.value = false;
+						holdSubmitDisabled(isSubmitDisabled);
+					}
         } else {
           message.error('Данные не являются корректными');
 					isSubmitLoading.value = false;

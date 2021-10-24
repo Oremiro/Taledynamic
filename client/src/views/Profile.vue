@@ -8,7 +8,7 @@
 					size="small"
 					content-style="padding-left: 0; padding-right: 0"
 				>
-					<n-menu :options="menuOptions" :value="$route.path" />
+					<n-menu :options="menuOptions" :value="route.path.name" />
 				</n-card>
 			</n-gi>
 			<n-gi :span="1" />
@@ -35,13 +35,14 @@
 import { useStore } from "@/store";
 import { MenuOption, useMessage } from "naive-ui";
 import { defineComponent, h } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
 	name: "Profile",
 	setup() {
 		const store = useStore();
 		const router = useRouter();
+		const route = useRoute();
 		const message = useMessage();
 		const menuOptions: MenuOption[] = [
 			{
@@ -53,29 +54,25 @@ export default defineComponent({
 						},
 						{ default: () => "Профиль" }
 					),
-				key: "/profile",
+				key: '/profile',
 			},
 						{
 				label: () =>
 					h(
 						RouterLink,
-						{
-							to: "/profile/edit",
-						},
-						{ default: () => "Данные" }
+						{ to: '/profile/edit' },
+						{ default: () => 'Данные' }
 					),
-				key: "/profile/edit",
+				key: '/profile/edit',
 			},
 			{
 				label: () =>
 					h(
 						RouterLink,
-						{
-							to: "/profile/settings",
-						},
-						{ default: () => "Настройки" }
+						{ to: '/profile/settings' },
+						{ default: () => 'Настройки' }
 					),
-				key: "/profile/settings",
+				key: '/profile/settings',
 			},
 			{
 				onClick: () => {
@@ -92,7 +89,10 @@ export default defineComponent({
 				key: '/profile/quit',
 			}
 		];
-		return { menuOptions };
+		return { 
+			menuOptions,
+			route 
+		};
 	},
 });
 </script>

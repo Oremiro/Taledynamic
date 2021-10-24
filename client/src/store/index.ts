@@ -3,7 +3,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
 import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
-import { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 
 interface User {
 	id: number | null,
@@ -173,39 +173,46 @@ export const store = createStore<State>({
 				});
 			});
 		},
-		updateEmail({ commit, state }, email: string ): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				console.log(state.user.id)
-				if (state.user.id) {
-					ApiHelper.userUpdate({ user: { id: state.user.id, email: email}}, state.accessTokenInMemory)
-					.then((response) => {
-						commit('updateEmail', { email: email });
-						console.log(state.user.id)
-						const user: User = {
-							id: response.data.id, 
-							email: email, 
+		async updateEmail({ commit, state }, data: { currentPassword: string, newEmail: string } ): Promise<void> {
+			if (state.user.id) {
+				try {
+					const { data: responseData } = await ApiHelper.userUpdate({ 
+						user: { 
+							id: state.user.id, 
+							password: data.currentPassword, 
+							email: data.newEmail
 						}
-						localStorage.setItem('user', JSON.stringify(user))
-						resolve();
-					})
-					.catch((error: AxiosError) => {
-						console.log(error.message)
-						console.log(error.response?.statusText);
-						reject(new Error(error.message))
-					})
-				} else {
-					reject(new Error('User id is null'));
+					}, state.accessTokenInMemory);
+					commit('updateEmail', { email: data.newEmail });
+					const user: User = {
+						id: responseData.user.id, 
+						email: responseData.user.email, 
+					}
+					localStorage.setItem('user', JSON.stringify(user))
+					return;
+				} catch (error) {
+					if (axios.isAxiosError(error)) {
+						if (error.response?.status === 404) {
+							throw new Error('Неправильный текущий пароль')
+						} else if (error.response?.status === 400) {
+							throw new Error('Данный email занят другим пользователем');
+						} else {
+							throw new Error(error.message);
+						}
+					}
 				}
-			})
+			} else {
+				throw new Error('User id is null');
+			}
 		},
-		updatePassword({ state }, data: { newPassword: string, confirmedPassword: string }): Promise<void> {
+		updatePassword({ state }, data: { currentPassword: string, newPassword: string, confirmedPassword: string }): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
 				if (state.user.id) {
 					ApiHelper.userUpdate({ 
 						user: { 
 							id: state.user.id, 
 							password: data.newPassword, 
-							confirmPassword: data.confirmedPassword
+							confirmNewPassword: data.confirmedPassword
 						}
 					}, state.accessTokenInMemory)
 					.then((response) => {

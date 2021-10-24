@@ -1,5 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 
+interface User {
+	id: number,
+	email: string
+}
+
 interface BaseResponse {
 	statusCode?: number,
 	message?: string
@@ -23,21 +28,19 @@ interface CreateUserRequest extends AuthenticateUserRequest {
 interface CreateUserResponse extends BaseResponse {}
 
 interface GetUserResponse extends BaseResponse {
-	userDto?: {
-		id: number,
-		email: string
-	}
+	userDto?: User
 }
 
 interface UpdateUserRequest {
 	id: number,
+	password: string,
 	email?: string,
-	password?: string,
-	confirmPassword?: string
+	newPassword?: string,
+	confirmNewPassword?: string
 }
 
 interface UpdateUserResponse extends BaseResponse {
-	id: number
+	user: User
 }
 
 interface DeleteUserResponse extends BaseResponse {}
@@ -57,10 +60,11 @@ interface RevokeTokenResponse extends BaseResponse {
 }
 
 interface GetByEmailResponse extends BaseResponse {
-	user: {
-		id: number,
-		email: string
-	}
+	user: User
+}
+
+interface IsEmailUsedResponse extends BaseResponse {
+	isEmailUsed: boolean
 }
 
 
@@ -149,7 +153,18 @@ export class ApiHelper {
 			{
 				params: {
 					email: data.email
-				},
+				}
+			}
+		)
+	}
+
+	static userIsEmailUsed(data: { email: string }): Promise<AxiosResponse<IsEmailUsedResponse>> {
+		return this.axiosInstance.get<IsEmailUsedResponse>(
+			'/auth/user/is-email-used',
+			{
+				params: {
+					email: data.email
+				}
 			}
 		)
 	}
