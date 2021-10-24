@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Taledynamic.Core.Exceptions;
-using Taledynamic.Core.Models.Responses;
+using Taledynamic.DAL.Models.Responses;
 
 namespace Taledynamic.Api.Middlewares
 {

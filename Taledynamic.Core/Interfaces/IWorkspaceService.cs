@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Taledynamic.Core.Entities;
-using Taledynamic.Core.Models.Requests.WorkspaceRequests;
-using Taledynamic.Core.Models.Responses.WorkspaceResponses;
+using Taledynamic.DAL.Entities;
+using Taledynamic.DAL.Models.Requests.WorkspaceRequests;
+using Taledynamic.DAL.Models.Responses.WorkspaceResponses;
 
 namespace Taledynamic.Core.Interfaces
 {

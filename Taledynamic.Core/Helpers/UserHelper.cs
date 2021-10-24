@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Taledynamic.Core.Entities;
+using Taledynamic.DAL.Entities;
 
 namespace Taledynamic.Core.Helpers
 {
