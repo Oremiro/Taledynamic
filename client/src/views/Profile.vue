@@ -35,12 +35,13 @@
 import { useStore } from "@/store";
 import { MenuOption, useMessage } from "naive-ui";
 import { defineComponent, h } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 
 export default defineComponent({
 	name: "Profile",
 	setup() {
 		const store = useStore();
+		const router = useRouter();
 		const message = useMessage();
 		const menuOptions: MenuOption[] = [
 			{
@@ -79,8 +80,9 @@ export default defineComponent({
 			{
 				onClick: () => {
 					store.dispatch('logout')
-					.then((response) => {
-						message.success(response);
+					.then(() => {
+						router.push({ name: 'Auth'});
+						message.info('Вы вышли из аккаунта');
 					})
 					.catch((error) => {
 						message.error(error.message);

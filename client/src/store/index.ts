@@ -129,7 +129,6 @@ export const store = createStore<State>({
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
 				.then((response) => {
-					console.log(response.data);
 					if (response.data.isSuccess) {
 						commit('logout');
 						VueCookieNext.removeCookie('remembered');
@@ -140,7 +139,7 @@ export const store = createStore<State>({
 					}
 				})
 				.catch((error: AxiosError) => {
-					if (error.response?.status == 404) {
+					if (error.response?.status === 404) {
 						reject(new Error('Пользователь с таким токеном не найден'))	
 					} else {
 						reject(new Error('Ошибка обнуления токена'));
