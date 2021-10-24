@@ -273,7 +273,8 @@ namespace Taledynamic.Core.Services
             var response = new UpdateUserResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
-                Message = "Success."
+                Message = "Success.",
+                User = new UserDto(newUser) 
             };
 
             return response;
