@@ -10,6 +10,19 @@ interface User {
 	email: string
 }
 
+interface UpdatedBaseData {
+	currentPassword: string
+} 
+
+interface UpdatedEmailData extends UpdatedBaseData  {
+	newEmail: string
+}
+
+interface UpdatedPasswordData extends UpdatedBaseData {
+	newPassword: string,
+	confirmedNewPassword: string
+}
+
 export interface State {
 	user: User,
 	accessTokenInMemory: string,
@@ -34,6 +47,9 @@ export const store = createStore<State>({
 		}
 	},
 	mutations: {
+		setUser(state: State, payload: { user: User }) {
+			state.user = payload.user;
+		},
 		login(state: State, payload: { user: User, accessToken: string }) {
 			state.user = payload.user;
 			state.accessTokenInMemory = payload.accessToken;
@@ -47,9 +63,6 @@ export const store = createStore<State>({
 		},
 		pageError(state: State) {
 			state.pageStatus = 'error';
-		},
-		updateEmail(state: State, payload: { email: string }) {
-			state.user.email = payload.email;
 		}
   },
   actions: {
@@ -173,7 +186,7 @@ export const store = createStore<State>({
 				});
 			});
 		},
-		async updateEmail({ commit, state }, data: { currentPassword: string, newEmail: string } ): Promise<void> {
+		async updateEmail({ commit, state }, data: UpdatedEmailData): Promise<void> {
 			if (state.user.id) {
 				try {
 					const { data: responseData } = await ApiHelper.userUpdate({ 
@@ -183,11 +196,11 @@ export const store = createStore<State>({
 							email: data.newEmail
 						}
 					}, state.accessTokenInMemory);
-					commit('updateEmail', { email: data.newEmail });
 					const user: User = {
 						id: responseData.user.id, 
 						email: responseData.user.email, 
 					}
+					commit('setUser', { user });
 					localStorage.setItem('user', JSON.stringify(user))
 					return;
 				} catch (error) {
@@ -205,29 +218,38 @@ export const store = createStore<State>({
 				throw new Error('User id is null');
 			}
 		},
-		updatePassword({ state }, data: { currentPassword: string, newPassword: string, confirmedPassword: string }): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				if (state.user.id) {
-					ApiHelper.userUpdate({ 
+		async updatePassword({ commit, state }, data: UpdatedPasswordData): Promise<void> {
+			if (state.user.id) {
+				try {
+					const { data: responseData } = await ApiHelper.userUpdate({ 
 						user: { 
 							id: state.user.id, 
-							password: data.newPassword, 
-							confirmNewPassword: data.confirmedPassword
+							password: data.currentPassword,
+							newPassword: data.newPassword, 
+							confirmNewPassword: data.confirmedNewPassword
 						}
 					}, state.accessTokenInMemory)
-					.then((response) => {
-						console.log(response);
-						resolve();
-					})
-					.catch((error: AxiosError) => {
-						console.log(error.response)
-						console.log(error.message)
-						reject(new Error(error.message))
-					})
-				} else {
-					reject(new Error('User id is null'));
+					const user: User = {
+						id: responseData.user.id, 
+						email: responseData.user.email, 
+					}
+					commit('setUser', { user });
+					localStorage.setItem('user', JSON.stringify(user))
+					return;
+				} catch (error) {
+					if (axios.isAxiosError(error)) {
+						if (error.response?.status === 404) {
+							throw new Error('Неправильный текущий пароль')
+						} else if (error.response?.status === 400) {
+							throw new Error('Пароли не совпадают');
+						} else {
+							throw new Error(error.message);
+						}
+					}
 				}
-			})
+			} else {
+				throw new Error('User id is null');
+			}
 		}
   },
 })

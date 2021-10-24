@@ -1,14 +1,6 @@
 <template>
 	<n-h4><n-text type="primary">Изменение пароля</n-text></n-h4>
 	<n-form ref="formRef" :model="formData" :rules="rules">
-		<n-form-item first label="Текущий пароль" path="currentPassword.value">
-			<n-input
-				type="password"
-				show-password-on="click"
-				placeholder=""
-				v-model:value="formData.currentPassword.value"
-			/>
-		</n-form-item>
 		<n-form-item first label="Новый пароль" path="newPassword.value">
 			<n-input 
 				type="password" 
@@ -25,6 +17,16 @@
 		<n-form-item first ref="confirmedPasswordRef" label="Повторите новый пароль" path="confirmedPassword.value">
 			<n-input type="password" show-password-on="click" placeholder="" v-model:value="formData.confirmedPassword.value" />
 		</n-form-item>
+		<n-collapse-transition :collapsed="formData.newPassword.value !== '' || formData.confirmedPassword.value !== ''">
+			<n-form-item first label="Текущий пароль" path="currentPassword.value">
+				<n-input
+					type="password"
+					show-password-on="click"
+					placeholder=""
+					v-model:value="formData.currentPassword.value"
+				/>
+			</n-form-item>
+		</n-collapse-transition>
 		<n-button-group 
 			style="margin-right: 1rem"
 			v-if="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid"
@@ -145,7 +147,6 @@ export default defineComponent({
 		const message = useMessage();
 		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
 
-		// const isSubmitButtonShown = ref<boolean>(false);
 		const isSubmitButtonLoading = ref<boolean>(false);
 		const isSubmitButtonDisabled = ref<number>(0);
 
@@ -165,22 +166,24 @@ export default defineComponent({
 
 		const submitForm = (): void => {
 			isSubmitButtonLoading.value = true;
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
-					store.dispatch('updatePassword', { 
-						newPassword: formData.newPassword.value, confirmedPassword: formData.confirmedPassword.value 
-					})
-					.then(() => {
+					try {
+						await store.dispatch('updatePassword', {
+							currentPassword: formData.currentPassword.value, 
+							newPassword: formData.newPassword.value, 
+							confirmedNewPassword: formData.confirmedPassword.value 
+						})
 						undoChanges();
 						message.success('Вы успешно изменили пароль');
-					})
-					.catch((error) => {
-						message.error(error.message);
-					})
-					.finally(() => {
+					} catch (error) {
+						if (error instanceof Error) {
+							message.error(error.message);
+						}
+					} finally {
 						isSubmitButtonLoading.value = false;
 						holdSubmitDisabled(isSubmitButtonDisabled);
-					});
+					}
         } else {
           message.error('Данные не являются корректными');
 					isSubmitButtonLoading.value = false;
