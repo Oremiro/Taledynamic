@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Taledynamic.Api.Middlewares;
 using Taledynamic.Core;
-using Taledynamic.Core.Entities;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.Core.Services;

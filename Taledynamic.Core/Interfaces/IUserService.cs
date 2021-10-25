@@ -1,9 +1,6 @@
 using System.Threading.Tasks;
-using Taledynamic.Core.Entities;
-using Taledynamic.Core.Models.Requests;
-using Taledynamic.Core.Models.Requests.UserRequests;
-using Taledynamic.Core.Models.Responses;
-using Taledynamic.Core.Models.Responses.UserResponses;
+using Taledynamic.DAL.Models.Requests.UserRequests;
+using Taledynamic.DAL.Models.Responses.UserResponses;
 
 namespace Taledynamic.Core.Interfaces
 {

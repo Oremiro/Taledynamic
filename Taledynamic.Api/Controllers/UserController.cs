@@ -8,12 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Taledynamic.Api.Attributes;
 using Taledynamic.Core;
-using Taledynamic.Core.Entities;
 using Taledynamic.Core.Interfaces;
-using Taledynamic.Core.Models.Requests;
-using Taledynamic.Core.Models.Requests.UserRequests;
-using Taledynamic.Core.Models.Responses;
-using Taledynamic.Core.Models.Responses.UserResponses;
+using Taledynamic.DAL.Models.Requests.UserRequests;
+using Taledynamic.DAL.Models.Responses.UserResponses;
 
 namespace Taledynamic.Api.Controllers
 {
@@ -48,7 +45,9 @@ namespace Taledynamic.Api.Controllers
         [HttpPost("revoke-token")]
         public async Task<RevokeTokenResponse> RevokeToken([FromBody] RevokeTokenRequest request)
         {
-            RevokeTokenResponse response = await _userService.RevokeTokenAsync(request.RefreshToken, GetIpAddress());
+            var token = GetRefreshTokenFromCookie();
+            token = request.RefreshToken ?? token;
+            RevokeTokenResponse response = await _userService.RevokeTokenAsync(token, GetIpAddress());
             return response;
         }
 

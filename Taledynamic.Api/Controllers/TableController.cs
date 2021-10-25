@@ -2,10 +2,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Taledynamic.Api.Attributes;
 using Taledynamic.Core.Interfaces;
-using Taledynamic.Core.Models.Requests.TableRequests;
-using Taledynamic.Core.Models.Requests.WorkspaceRequests;
-using Taledynamic.Core.Models.Responses.TableResponses;
-using Taledynamic.Core.Models.Responses.WorkspaceResponses;
+using Taledynamic.DAL.Models.Requests.TableRequests;
+using Taledynamic.DAL.Models.Responses.TableResponses;
 
 namespace Taledynamic.Api.Controllers
 {
