@@ -1,57 +1,70 @@
 import axios, { AxiosResponse } from "axios";
 
-interface IBaseResponse {
+interface User {
+	id: number,
+	email: string
+}
+
+interface BaseResponse {
 	statusCode?: number,
 	message?: string
 }
 
-interface IAuthenticateUserRequest {
+interface AuthenticateUserRequest {
 	email: string,
 	password: string
 }
 
-interface IAuthenticateUserResponse extends IBaseResponse{
+interface AuthenticateUserResponse extends BaseResponse{
 	id?: number,
 	email?: string,
 	jwtToken?: string
 }
 
-interface ICreateUserRequest extends IAuthenticateUserRequest {
+interface CreateUserRequest extends AuthenticateUserRequest {
 	confirmPassword: string
 }
 
-interface ICreateUserResponse extends IBaseResponse {}
+interface CreateUserResponse extends BaseResponse {}
 
-interface IGetUserResponse extends IBaseResponse {
-	userDto?: {
-		id: number,
-		email: string
-	}
+interface GetUserResponse extends BaseResponse {
+	userDto?: User
 }
 
-interface IUpdateUserRequest {
+interface UpdateUserRequest {
 	id: number,
+	password: string,
 	email?: string,
-	password?: string,
-	confirmPassword?: string
+	newPassword?: string,
+	confirmNewPassword?: string
 }
 
-interface IUpdateUserResponse extends IBaseResponse {}
+interface UpdateUserResponse extends BaseResponse {
+	user: User
+}
 
-interface IDeleteUserResponse extends IBaseResponse {}
+interface DeleteUserResponse extends BaseResponse {}
 
-interface IRefreshTokenResponse extends IBaseResponse {
+interface RefreshTokenResponse extends BaseResponse {
 	id?: number,
 	email?: string,
 	jwtToken?: string
 }
 
-interface IRevokeTokenRequest {
+interface RevokeTokenRequest {
 	token?: string
 }
 
-interface IRevokeTokenResponse extends IBaseResponse {
+interface RevokeTokenResponse extends BaseResponse {
 	isSuccess?: boolean
+}
+
+interface GetByEmailResponse extends BaseResponse {
+	user: User
+}
+
+interface IsEmailUsedResponse extends BaseResponse {
+	isEmailUsed: boolean
 }
 
 
@@ -62,66 +75,97 @@ export class ApiHelper {
 		withCredentials: true
 	})
 
-	static userAuthenticate(userData: IAuthenticateUserRequest): Promise<AxiosResponse<IAuthenticateUserResponse>> {
-		return this.axiosInstance.post<IAuthenticateUserRequest, AxiosResponse<IAuthenticateUserResponse>>(
+	static userAuthenticate(data: { user: AuthenticateUserRequest }): Promise<AxiosResponse<AuthenticateUserResponse>> {
+		return this.axiosInstance.post<AuthenticateUserRequest, AxiosResponse<AuthenticateUserResponse>>(
 			'/auth/user/authenticate', 
-			{ email: userData.email, password: userData.password },
+			data.user
+		);
+	}
+
+	static userCreate(data: { user: CreateUserRequest }): Promise<AxiosResponse<CreateUserResponse>> {
+		return this.axiosInstance.post<CreateUserRequest, AxiosResponse<CreateUserResponse>>(
+			'/auth/user/create', 
+			data.user
 		)
 	}
 
-	static userCreate(userData: ICreateUserRequest): Promise<AxiosResponse<ICreateUserResponse>> {
-		return this.axiosInstance.post<ICreateUserRequest, AxiosResponse<ICreateUserResponse>>(
-			'/auth/user/create', {
-			email: userData.email,
-			password: userData.password,
-			confirmPassword: userData.confirmPassword
-		})
-	}
-
-	static userDelete(userId: number): Promise<AxiosResponse<IDeleteUserResponse>> {
-		return this.axiosInstance.delete<IDeleteUserResponse>(
+	static userDelete(data: { userId: number }, accessToken: string): Promise<AxiosResponse<DeleteUserResponse>> {
+		return this.axiosInstance.delete<DeleteUserResponse>(
 			'/auth/user/delete',
 			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				},
 				params: { 
-					userId: userId 
+					userId: data.userId 
 				}
 			}
 		)
 	}
 
-	static userGet(userId: number): Promise<AxiosResponse<IGetUserResponse>> {
-		return this.axiosInstance.get<IGetUserResponse>(
+	static userGet(data: { userId: number }, accessToken: string): Promise<AxiosResponse<GetUserResponse>> {
+		return this.axiosInstance.get<GetUserResponse>(
 			'/auth/user/get', 
 			{
 				params: {
-					id: userId
+					id: data.userId
+				},
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
 				}
 			}
 		);
 	}
 
-	static userUpdate(userData: IUpdateUserRequest): Promise<AxiosResponse<IUpdateUserResponse>> {
-		return this.axiosInstance.put<IUpdateUserRequest, AxiosResponse<IUpdateUserResponse>>(
+	static userUpdate(data: { user: UpdateUserRequest }, accessToken: string): Promise<AxiosResponse<UpdateUserResponse>> {
+		return this.axiosInstance.put<UpdateUserRequest, AxiosResponse<UpdateUserResponse>>(
 			'/auth/user/update',
-			{ 
-				id: userData.id, 
-				email: userData.email, 
-				password: userData.password, 
-				confirmPassword: userData.confirmPassword 
+			data.user,
+			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				},
 			}
 		);
 	}
 
-	static userRefreshToken(): Promise<AxiosResponse<IRefreshTokenResponse>> {
-		return this.axiosInstance.post<IRefreshTokenResponse>(
-			'/auth/user/refresh-token',
+	static userRefreshToken(): Promise<AxiosResponse<RefreshTokenResponse>> {
+		return this.axiosInstance.post<RefreshTokenResponse>(
+			'/auth/user/refresh-token'
 		)
 	}
 
-	static userRevokeToken(token: string): Promise<AxiosResponse<IRevokeTokenResponse>> {
-		return this.axiosInstance.post<IRevokeTokenRequest, AxiosResponse<IRevokeTokenResponse>>(
+	static userRevokeToken(data: { token?: string }, accessToken: string): Promise<AxiosResponse<RevokeTokenResponse>> {
+		return this.axiosInstance.post<RevokeTokenRequest, AxiosResponse<RevokeTokenResponse>>(
 			'/auth/user/revoke-token',
-			{ token: token }
+			data,
+			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			}
 		);
+	}
+
+	static userGetByEmail(data: { email: string }): Promise<AxiosResponse<GetByEmailResponse>> {
+		return this.axiosInstance.get<GetByEmailResponse>(
+			'/auth/user/get-by-email',
+			{
+				params: {
+					email: data.email
+				}
+			}
+		)
+	}
+
+	static userIsEmailUsed(data: { email: string }): Promise<AxiosResponse<IsEmailUsedResponse>> {
+		return this.axiosInstance.get<IsEmailUsedResponse>(
+			'/auth/user/is-email-used',
+			{
+				params: {
+					email: data.email
+				}
+			}
+		)
 	}
 }

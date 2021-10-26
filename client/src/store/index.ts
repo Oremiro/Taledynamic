@@ -3,27 +3,36 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
 import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
-import { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 
-interface IUser {
+interface User {
 	id: number | null,
 	email: string
 }
 
-export interface IState {
-	user: IUser,
+interface UpdatedBaseData {
+	currentPassword: string
+} 
+
+interface UpdatedEmailData extends UpdatedBaseData  {
+	newEmail: string
+}
+
+interface UpdatedPasswordData extends UpdatedBaseData {
+	newPassword: string,
+	confirmedNewPassword: string
+}
+
+export interface State {
+	user: User,
 	accessTokenInMemory: string,
 	pageStatus: 'loading' | 'ready' | 'error'
 }
 
-interface ILoginPayload {
-	user: IUser,
-	token: string
-}
 
-export const key: InjectionKey<Store<IState>> = Symbol()
+export const key: InjectionKey<Store<State>> = Symbol()
 
-export const store = createStore<IState>({
+export const store = createStore<State>({
   state: {
     user: {
 			id: null,
@@ -38,28 +47,32 @@ export const store = createStore<IState>({
 		}
 	},
 	mutations: {
-		login(state: IState, payload: ILoginPayload) {
+		setUser(state: State, payload: { user: User }) {
 			state.user = payload.user;
-			state.accessTokenInMemory = payload.token;
 		},
-		logout(state: IState) {
+		login(state: State, payload: { user: User, accessToken: string }) {
+			state.user = payload.user;
+			state.accessTokenInMemory = payload.accessToken;
+		},
+		logout(state: State) {
 			state.user = { id: null, email: '' };
 			state.accessTokenInMemory = '';
 		},
-		pageReady(state: IState) {
+		pageReady(state: State) {
 			state.pageStatus = 'ready';
 		},
-		pageError(state: IState) {
+		pageError(state: State) {
 			state.pageStatus = 'error';
 		}
   },
   actions: {
-		async init() {
+		async init(): Promise<boolean> {
 			const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 			const localStorageUser: string | null = localStorage.getItem('user');
 			if (isRemembered === '1' && localStorageUser) {
 				try {
 					await store.dispatch('refresh');
+					console.log(store.state);
 					return true;
 				} catch (e) {
 					VueCookieNext.removeCookie('remembered');
@@ -68,90 +81,97 @@ export const store = createStore<IState>({
 			}
 			return false;
 		},
-		register(_context, formData: SignUpFormData) {
+		register(_context, formData: SignUpFormData): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userCreate({
+				const newUser = {
 					email: formData.email.value, 
 					password: formData.password.value, 
 					confirmPassword: formData.confirmedPassword.value
-				})
+				}
+				ApiHelper.userCreate({ user: newUser })
 				.then((response) => {
 					if (response.data.statusCode == 200) {
 						resolve();
-					} else if (response.data.statusCode == 400) {
-						reject(new Error('Пользователь с таким почтовым адресом уже существует'))
 					} else {
 						reject(new Error('Ошибка регистрации'))
 					}
-				}).catch((error) => {
-					console.log(error.response);
-					reject(new Error('Ошибка регистрации'));
+				}).catch((error: AxiosError) => {
+					if (error.response?.status == 400) {
+						reject(new Error('Пользователь с таким почтовым адресом уже существует'))
+					} else {
+						reject(new Error('Ошибка регистрации'));
+					}
 				});
 			});
 		},
-		login({ commit }, formData: SignInFormData) {
+		login({ commit }, formData: SignInFormData): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
 				const expireValue: string = formData.remembered.value ? '7d' : '0';
 				VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
-				ApiHelper.userAuthenticate({
+				const user = {
 					email: formData.email.value, 
 					password: formData.password.value
-				})
+				}
+				ApiHelper.userAuthenticate({ user: user })
 				.then((response) => {
 					if (response.data.statusCode == 200) {
-						const user: IUser = {
+						const user: User = {
 							id: response.data.id ?? null, 
 							email: response.data.email ?? formData.email.value, 
 						}
 						commit('login', {
 							user: user,
-							token: response.data.jwtToken
+							accessToken: response.data.jwtToken
 						});
 						localStorage.setItem('user', JSON.stringify(user))
 						resolve();
-					} else if (response.data.statusCode == 404) {
-						reject(new Error('Пользователь с такими данными не найден'));
 					} else {
 						reject(new Error('Ошибка авторизации'));
 					}
 				})
-				.catch((error) => {
-					console.log(error.message);
-					reject(new Error('Ошибка авторизации'));
+				.catch(error => {
+					if (error.response.status === 404) {
+						reject(new Error('Пользователь с такими данными не найден'));
+					} else {
+						reject(new Error('Ошибка авторизации'));
+					}
 				});
 			});
 		},
-		logout({ commit, state }) {
+		logout({ commit, state }): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userRevokeToken(state.accessTokenInMemory)
+				ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
 				.then((response) => {
-					console.log(response.data);
 					if (response.data.isSuccess) {
 						commit('logout');
+						VueCookieNext.removeCookie('remembered');
 						localStorage.removeItem('user');
 						resolve();
 					} else {
-						reject();
+						reject(new Error('Ошибка выхода из аккаунта'));
 					}
 				})
-				.catch((error) => {
-					console.log(error);
-					reject('Ошибка выхода');
+				.catch((error: AxiosError) => {
+					if (error.response?.status === 404) {
+						reject(new Error('Пользователь с таким токеном не найден'))	
+					} else {
+						reject(new Error('Ошибка обнуления токена'));
+					}
 				});
 			});
 		},
-		refresh({ commit }) {			
+		refresh({ commit }): Promise<void> {			
 			return new Promise<void>((resolve, reject) => {
 				ApiHelper.userRefreshToken()
 				.then((response) => {
-					console.log(response);
 					if (response.data.id && response.data.email && response.data.jwtToken) {
-						const user: IUser = { id: response.data.id, email: response.data.email };
+						const user: User = { id: response.data.id, email: response.data.email };
 						const token: string = response.data.jwtToken
 						commit('login', {
 							user: user,
-							token: token
+							accessToken: token
 						});
+						localStorage.setItem('user', JSON.stringify(user));
 						resolve();
 					} else {
 						reject(new Error('Непредвиденная ошибка'))
@@ -165,10 +185,99 @@ export const store = createStore<IState>({
 					}
 				});
 			});
+		},
+		async updateEmail({ commit, state }, data: UpdatedEmailData): Promise<void> {
+			if (state.user.id) {
+				try {
+					const { data: responseData } = await ApiHelper.userUpdate({ 
+						user: { 
+							id: state.user.id, 
+							password: data.currentPassword, 
+							email: data.newEmail
+						}
+					}, state.accessTokenInMemory);
+					const user: User = {
+						id: responseData.user.id, 
+						email: responseData.user.email, 
+					}
+					commit('setUser', { user });
+					localStorage.setItem('user', JSON.stringify(user))
+					return;
+				} catch (error) {
+					if (axios.isAxiosError(error)) {
+						if (error.response?.status === 404) {
+							throw new Error('Неправильный текущий пароль')
+						} else if (error.response?.status === 400) {
+							throw new Error('Данный email занят другим пользователем');
+						} else {
+							throw new Error(error.message);
+						}
+					}
+				}
+			} else {
+				throw new Error('Отсутствует ID пользователя');
+			}
+		},
+		async updatePassword({ commit, state }, data: UpdatedPasswordData): Promise<void> {
+			if (state.user.id) {
+				try {
+					const { data: responseData } = await ApiHelper.userUpdate({ 
+						user: { 
+							id: state.user.id, 
+							password: data.currentPassword,
+							newPassword: data.newPassword, 
+							confirmNewPassword: data.confirmedNewPassword
+						}
+					}, state.accessTokenInMemory)
+					const user: User = {
+						id: responseData.user.id, 
+						email: responseData.user.email, 
+					}
+					commit('setUser', { user });
+					localStorage.setItem('user', JSON.stringify(user))
+					return;
+				} catch (error) {
+					if (axios.isAxiosError(error)) {
+						if (error.response?.status === 404) {
+							throw new Error('Неправильный текущий пароль')
+						} else if (error.response?.status === 400) {
+							throw new Error('Пароли не совпадают');
+						} else {
+							throw new Error(error.message);
+						}
+					}
+				}
+			} else {
+				throw new Error('Отсутствует ID пользователя');
+			}
+		},
+		async delete({ commit, state }): Promise<void> {
+			if (state.user.id) {
+				try {
+					await ApiHelper.userDelete({ userId: state.user.id }, state.accessTokenInMemory);
+					commit('logout');
+					VueCookieNext.removeCookie('remembered');
+					localStorage.removeItem('user');
+					return;
+				} catch (error) {
+					if (axios.isAxiosError(error)) {
+						if (error.response?.status === 404) {
+							throw new Error('?');
+						} else if (error.response?.status === 400) {
+							throw new Error('Неверный ID пользователя')
+						} else {
+							throw new Error(error.message);
+						}
+					}
+				}
+				return;
+			} else {
+				throw new Error('Отсутствует ID пользователя');
+			}
 		}
   },
 })
 
-export function useStore(): Store<IState> {
+export function useStore(): Store<State> {
   return baseUseStore(key);
 }

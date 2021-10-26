@@ -116,7 +116,7 @@ export default defineComponent({
 					{
 						required: true,
 						message: "Пожалуйста, введите пароль",
-						trigger: ["blur", 'some']
+						trigger: ['blur']
 					},
 					{
 						asyncValidator: (rule, value) => {
@@ -168,7 +168,7 @@ export default defineComponent({
 		const store = useStore();
 
 		// methods
-		const handlePasswordInput = () => {
+		const handlePasswordInput = (): void => {
 			if (formData.confirmedPassword.value != '') {
 				confirmedPasswordRef.value?.validate({ trigger: 'password-input'}).catch(() => true);
 			}

@@ -8,7 +8,7 @@
 					size="small"
 					content-style="padding-left: 0; padding-right: 0"
 				>
-					<n-menu :options="menuOptions" :value="$route.path" />
+					<n-menu :options="menuOptions" :value="route.path.name" />
 				</n-card>
 			</n-gi>
 			<n-gi :span="1" />
@@ -32,13 +32,18 @@
 </style>
 
 <script lang="ts">
-import { MenuOption } from "naive-ui";
+import { useStore } from "@/store";
+import { MenuOption, useMessage } from "naive-ui";
 import { defineComponent, h } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
 	name: "Profile",
 	setup() {
+		const store = useStore();
+		const router = useRouter();
+		const route = useRoute();
+		const message = useMessage();
 		const menuOptions: MenuOption[] = [
 			{
 				label: () =>
@@ -49,21 +54,45 @@ export default defineComponent({
 						},
 						{ default: () => "Профиль" }
 					),
-				key: "/profile",
+				key: '/profile',
+			},
+						{
+				label: () =>
+					h(
+						RouterLink,
+						{ to: '/profile/edit' },
+						{ default: () => 'Данные' }
+					),
+				key: '/profile/edit',
 			},
 			{
 				label: () =>
 					h(
 						RouterLink,
-						{
-							to: "/profile/settings",
-						},
-						{ default: () => "Настройки" }
+						{ to: '/profile/settings' },
+						{ default: () => 'Настройки' }
 					),
-				key: "/profile/settings",
+				key: '/profile/settings',
 			},
+			{
+				onClick: () => {
+					store.dispatch('logout')
+					.then(() => {
+						router.push({ name: 'Auth'});
+						message.info('Вы вышли из аккаунта');
+					})
+					.catch((error) => {
+						message.error(error.message);
+					})
+				},
+				label: 'Выйти',
+				key: '/profile/quit',
+			}
 		];
-		return { menuOptions };
+		return { 
+			menuOptions,
+			route 
+		};
 	},
 });
 </script>
