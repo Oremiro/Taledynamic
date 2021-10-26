@@ -72,7 +72,6 @@ export const store = createStore<State>({
 			if (isRemembered === '1' && localStorageUser) {
 				try {
 					await store.dispatch('refresh');
-					console.log(store.state);
 					return true;
 				} catch (e) {
 					VueCookieNext.removeCookie('remembered');
