@@ -103,39 +103,37 @@ export const store = createStore<State>({
 				}
 			}
 		},
-		login({ commit }, formData: SignInFormData): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				const expireValue: string = formData.remembered.value ? '7d' : '0';
-				VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
-				const user = {
-					email: formData.email.value, 
-					password: formData.password.value
+		async login({ commit }, formData: SignInFormData): Promise<void> {
+			const requestedUser = {
+				email: formData.email.value, 
+				password: formData.password.value
+			}
+			try {
+				const { data } = await ApiHelper.userAuthenticate({ user: requestedUser });
+				if (data.statusCode === 200) {
+					const responsedUser: User = {
+						id: data.id ?? null, 
+						email: data.email ?? formData.email.value, 
+					}
+					commit('login', {
+						user: responsedUser,
+						accessToken: data.jwtToken
+					});
+					const expireValue: string = formData.remembered.value ? '7d' : '0';
+					VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
+					localStorage.setItem('user', JSON.stringify(responsedUser))
+				} else {
+					throw new Error('Ошибка авторизации');
 				}
-				ApiHelper.userAuthenticate({ user: user })
-				.then((response) => {
-					if (response.data.statusCode == 200) {
-						const user: User = {
-							id: response.data.id ?? null, 
-							email: response.data.email ?? formData.email.value, 
-						}
-						commit('login', {
-							user: user,
-							accessToken: response.data.jwtToken
-						});
-						localStorage.setItem('user', JSON.stringify(user))
-						resolve();
+			} catch (error) {
+				if(axios.isAxiosError(error)) {
+					if (error.response?.status === 404) {
+						throw new Error('Пользователь с такими данными не найден');
 					} else {
-						reject(new Error('Ошибка авторизации'));
+						throw new Error('Ошибка авторизации');
 					}
-				})
-				.catch(error => {
-					if (error.response.status === 404) {
-						reject(new Error('Пользователь с такими данными не найден'));
-					} else {
-						reject(new Error('Ошибка авторизации'));
-					}
-				});
-			});
+				}
+			}
 		},
 		logout({ commit, state }): Promise<void> {
 			return new Promise<void>((resolve, reject) => {

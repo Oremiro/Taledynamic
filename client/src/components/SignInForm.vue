@@ -95,20 +95,20 @@ export default defineComponent({
 		// methods
     const submitForm = (): void => {
 			submitLoading.value = true;
-      formRef.value?.validate((errors) => {
-        if (!errors) {		
-					store.dispatch('login', formData)
-					.then(() => {
+      formRef.value?.validate(async (errors): Promise<void> => {
+        if (!errors) {
+					try {
+						await store.dispatch('login', formData);
 						message.success('Вы успешно вошли!');
 						router.push('/profile');
-					})
-					.catch((error) => {
-						message.error(error.message);
-					})
-					.finally(() => {
+					} catch (error) {
+						if(error instanceof Error) {
+							message.error(error.message);
+						}
+					} finally {
 						submitLoading.value = false;
 						holdSubmitDisabled(submitDisabled);	
-					});
+					}
         } else {
           message.error('Данные не являются корректными');
 					submitLoading.value = false;
