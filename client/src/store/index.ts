@@ -215,7 +215,7 @@ export const store = createStore<State>({
 					}
 				}
 			} else {
-				throw new Error('User id is null');
+				throw new Error('Отсутствует ID пользователя');
 			}
 		},
 		async updatePassword({ commit, state }, data: UpdatedPasswordData): Promise<void> {
@@ -248,7 +248,31 @@ export const store = createStore<State>({
 					}
 				}
 			} else {
-				throw new Error('User id is null');
+				throw new Error('Отсутствует ID пользователя');
+			}
+		},
+		async delete({ commit, state }): Promise<void> {
+			if (state.user.id) {
+				try {
+					await ApiHelper.userDelete({ userId: state.user.id }, state.accessTokenInMemory);
+					commit('logout');
+					VueCookieNext.removeCookie('remembered');
+					localStorage.removeItem('user');
+					return;
+				} catch (error) {
+					if (axios.isAxiosError(error)) {
+						if (error.response?.status === 404) {
+							throw new Error('?');
+						} else if (error.response?.status === 400) {
+							throw new Error('Неверный ID пользователя')
+						} else {
+							throw new Error(error.message);
+						}
+					}
+				}
+				return;
+			} else {
+				throw new Error('Отсутствует ID пользователя');
 			}
 		}
   },
