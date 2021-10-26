@@ -175,20 +175,20 @@ export default defineComponent({
 		}
     const submitForm = (): void => {
 			submitLoading.value = true;
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors): Promise<void> => {
         if (!errors) {
-					store.dispatch('register', formData)
-					.then(() => {
+					try {
+						await store.dispatch('register', formData)
 						message.success('Вы успешно зарегистрировались');
 						context.emit('setTab', 'signin');
-					})
-					.catch((error) => {
-						message.error(error.message);
-					})
-					.finally(() => {
+					} catch (error) {
+						if (error instanceof Error) {
+							message.error(error.message);
+						}
+					} finally {
 						submitLoading.value = false;
 						holdSubmitDisabled(submitDisabled);
-					});
+					}
         } else {
           message.error('Данные не являются корректными');
 					submitLoading.value = false;

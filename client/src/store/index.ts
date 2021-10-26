@@ -80,28 +80,28 @@ export const store = createStore<State>({
 			}
 			return false;
 		},
-		register(_context, formData: SignUpFormData): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				const newUser = {
-					email: formData.email.value, 
-					password: formData.password.value, 
-					confirmPassword: formData.confirmedPassword.value
+		async register(_context, formData: SignUpFormData): Promise<void> {
+			const newUser = {
+				email: formData.email.value, 
+				password: formData.password.value, 
+				confirmPassword: formData.confirmedPassword.value
+			}
+			try {
+				const { data } = await ApiHelper.userCreate({ user: newUser });
+				if (data.statusCode === 200) {
+					return;
+				} else {
+					throw new Error('Ошибка регистрации')
 				}
-				ApiHelper.userCreate({ user: newUser })
-				.then((response) => {
-					if (response.data.statusCode == 200) {
-						resolve();
-					} else {
-						reject(new Error('Ошибка регистрации'))
-					}
-				}).catch((error: AxiosError) => {
+			} catch (error) {
+				if(axios.isAxiosError(error)) {
 					if (error.response?.status == 400) {
-						reject(new Error('Пользователь с таким почтовым адресом уже существует'))
+						throw new Error('Пользователь с таким почтовым адресом уже существует');
 					} else {
-						reject(new Error('Ошибка регистрации'));
+						throw new Error('Ошибка регистрации');
 					}
-				});
-			});
+				}
+			}
 		},
 		login({ commit }, formData: SignInFormData): Promise<void> {
 			return new Promise<void>((resolve, reject) => {
