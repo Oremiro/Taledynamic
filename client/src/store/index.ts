@@ -135,27 +135,26 @@ export const store = createStore<State>({
 				}
 			}
 		},
-		logout({ commit, state }): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
-				.then((response) => {
-					if (response.data.isSuccess) {
-						commit('logout');
-						VueCookieNext.removeCookie('remembered');
-						localStorage.removeItem('user');
-						resolve();
-					} else {
-						reject(new Error('Ошибка выхода из аккаунта'));
-					}
-				})
-				.catch((error: AxiosError) => {
+		async logout({ commit, state }): Promise<void> {
+			try {
+				const { data } = await ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
+				if (data.isSuccess && data.statusCode === 200) {
+					commit('logout');
+					VueCookieNext.removeCookie('remembered');
+					localStorage.removeItem('user');
+					return;
+				} else {
+					throw new Error('Ошибка при выходе из аккаунта');
+				}
+			} catch (error) {
+				if (axios.isAxiosError(error)) {
 					if (error.response?.status === 404) {
-						reject(new Error('Пользователь с таким токеном не найден'))	
+						throw new Error('Пользователь с таким токеном не найден');	
 					} else {
-						reject(new Error('Ошибка обнуления токена'));
-					}
-				});
-			});
+						throw new Error('Ошибка при обнулении токена');
+					}		
+				}
+			}
 		},
 		refresh({ commit }): Promise<void> {			
 			return new Promise<void>((resolve, reject) => {
