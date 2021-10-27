@@ -3,7 +3,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
 import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 
 interface User {
 	id: number | null,
@@ -156,31 +156,30 @@ export const store = createStore<State>({
 				}
 			}
 		},
-		refresh({ commit }): Promise<void> {			
-			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userRefreshToken()
-				.then((response) => {
-					if (response.data.id && response.data.email && response.data.jwtToken) {
-						const user: User = { id: response.data.id, email: response.data.email };
-						const token: string = response.data.jwtToken
-						commit('login', {
-							user: user,
-							accessToken: token
-						});
-						localStorage.setItem('user', JSON.stringify(user));
-						resolve();
+		async refresh({ commit }): Promise<void> {			
+			try {
+				const { data } = await ApiHelper.userRefreshToken();
+				if (data.id && data.email && data.jwtToken) {
+					const user: User = { id: data.id, email: data.email };
+					const token: string = data.jwtToken
+					commit('login', {
+						user: user,
+						accessToken: token
+					});
+					localStorage.setItem('user', JSON.stringify(user));
+					return;
+				} else {
+					throw new Error('Непредвиденная ошибка');
+				}
+			}	catch (error) {
+				if (axios.isAxiosError(error)) {
+					if (error.response?.status === 404) {
+						throw new Error('Сессия устарела');
 					} else {
-						reject(new Error('Непредвиденная ошибка'))
+						throw new Error('Ошибка обновления токена');
 					}
-				})
-				.catch((error: AxiosError) => {
-					if(error.response?.status == 404) {
-						reject(new Error('Сессия устарела'));
-					} else {
-						reject(new Error('Ошибка обновления токена'));
-					}
-				});
-			});
+				}
+			}
 		},
 		async updateEmail({ commit, state }, data: UpdatedEmailData): Promise<void> {
 			if (state.user.id) {
