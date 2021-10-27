@@ -69,14 +69,16 @@ export const store = createStore<State>({
 		async init(): Promise<boolean> {
 			const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 			const localStorageUser: string | null = localStorage.getItem('user');
-			if (isRemembered === '1' && localStorageUser) {
-				try {
+			try {
+				if (isRemembered === '1' && localStorageUser) {
 					await store.dispatch('refresh');
 					return true;
-				} catch (e) {
-					VueCookieNext.removeCookie('remembered');
-					localStorage.removeItem('user');
+				} else {
+					throw new Error('Empty data to continue session')
 				}
+			} catch (error) {
+				VueCookieNext.removeCookie('remembered');
+				localStorage.removeItem('user');
 			}
 			return false;
 		},
