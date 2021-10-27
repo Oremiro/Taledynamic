@@ -4,7 +4,7 @@ using Telegram.Bot.Types;
 
 namespace TaleDynamicBot.States
 {
-    public class State_Stopped:IState
+    public class StateStopped:State
     {
 
         public override void Auth(ITelegramBotClient botClient, Update update)
@@ -15,17 +15,17 @@ namespace TaleDynamicBot.States
             );
         }
 
-        public override void Sending_Data(ITelegramBotClient botClient, Update update)
+        public override void SendingData(ITelegramBotClient botClient, Update update)
         {
             
              botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 text: "Please,Wait"
             );
-             this._user.Change_State(new State_Auth());
+             this._user.Change_State(new StateAuth());
         }
 
-        public override void Stop_sending_Data(ITelegramBotClient botClient,Update update)
+        public override void StopSendingData(ITelegramBotClient botClient,Update update)
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
