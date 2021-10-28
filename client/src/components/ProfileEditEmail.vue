@@ -14,7 +14,7 @@
 				</n-input>
 			</n-auto-complete>
 		</n-form-item>
-		<n-collapse-transition :collapsed="isSubmitButtonShown">
+		<n-collapse-transition :show="isSubmitButtonShown">
 			<n-form-item label="Текущий пароль" path="currentPassword.value">
 				<n-input
 					type="password"
@@ -24,38 +24,29 @@
 				/>
 			</n-form-item>
 		</n-collapse-transition>
-		<n-button-group 
-			v-if="isSubmitButtonShown && formData.email.isValid && formData.currentPassword.value" 
-			style="margin-right: 1rem">
-			<n-button
-				attr-type="submit"
-				ghost
-				@click="submitForm"
-				:loading="isSubmitLoading"
-				:disabled="isSubmitLoading || (isSubmitDisabled != 0)"
-				type="success">
-				Сохранить
-			</n-button>
-			<n-button v-if="isSubmitDisabled" disabled type="primary" ghost>{{ isSubmitDisabled }}</n-button>
-		</n-button-group>
-		<n-button ghost v-if="isSubmitButtonShown" type="error" @click="undoChanges">Отменить</n-button>
+		<delayed-button ref="submitButtonRef" v-show="isSubmitButtonShown && formData.email.isValid && formData.currentPassword.value" 
+			style="margin-right: 1rem" type="success" attr-type="submit" ghost @click="submitForm" :loading="isSubmitLoading">
+			Сохранить
+		</delayed-button>
+		<n-button ghost v-show="isSubmitButtonShown" type="error" @click="undoChanges">Отменить</n-button>
 	</n-form>
 </template>
 
 <script lang="ts">
-import { emailRegex, holdSubmitDisabled } from '@/helpers';
+import { emailRegex } from '@/helpers';
 import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { defineComponent, reactive, ref } from 'vue'
 import { useStore } from '@/store';
 import { EmailEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
+import DelayedButton from '@/components/DelayedButton.vue'
 import { ApiHelper } from '@/helpers/api';
 import { AxiosError } from 'axios';
 
 export default defineComponent({
 	name: 'ProfileEditEmail',
 	components: {
-		QuestionTooltip
+		QuestionTooltip, DelayedButton
 	},
 	setup() {
 		// data
@@ -127,10 +118,10 @@ export default defineComponent({
 			},
 		}
 		const emailInputRef = ref<InstanceType<typeof NFormItem>>();
+		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const message = useMessage();
 		const isSubmitButtonShown = ref<boolean>(false);
 		const isSubmitLoading = ref<boolean>(false);
-		const isSubmitDisabled = ref<number>(0);
 
 		// methods
 		const handleEmailInput = (value: string | null): void => {
@@ -157,25 +148,23 @@ export default defineComponent({
 						}
 					} finally {
 						isSubmitLoading.value = false;
-						holdSubmitDisabled(isSubmitDisabled);
+						submitButtonRef.value?.holdDisabled();
 					}
         } else {
           message.error('Данные не являются корректными');
 					isSubmitLoading.value = false;
-					holdSubmitDisabled(isSubmitDisabled);
+					submitButtonRef.value?.holdDisabled();
         }
       });
     };
 		return {
-			store,
 			formRef,
 			formData,
-			defaultEmailValue,
 			rules,
 			isSubmitButtonShown,
 			emailInputRef,
+			submitButtonRef,
 			isSubmitLoading,
-			isSubmitDisabled,
 			handleEmailInput,
 			undoChanges,
 			submitForm

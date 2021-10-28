@@ -27,22 +27,18 @@
 				/>
 			</n-form-item>
 		</n-collapse-transition>
-		<n-button-group 
+		<delayed-button 
+			ref="submitButtonRef"
+			attr-type="submit"
+			ghost
+			type="success"
+			@click="submitForm"
+			:loading="isSubmitButtonLoading"
+			:disabled="isSubmitButtonLoading"
 			style="margin-right: 1rem"
-			v-if="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid"
-		>
-			<n-button
-				attr-type="submit"
-				ghost
-				type="success"
-				@click="submitForm"
-				:loading="isSubmitButtonLoading"
-				:disabled="isSubmitButtonLoading || (isSubmitButtonDisabled != 0)"
-			>
-				Сохранить
-			</n-button>
-			<n-button v-if="isSubmitButtonDisabled" disabled type="primary" ghost>{{ isSubmitButtonDisabled }}</n-button>
-		</n-button-group>
+			v-if="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid">
+			Сохранить
+		</delayed-button>
 		<n-button 
 			ghost 
 			type="error" 
@@ -55,17 +51,18 @@
 </template>
 
 <script lang="ts">
-import { holdSubmitDisabled, passwordRegex } from '@/helpers';
+import { passwordRegex } from '@/helpers';
 import { PasswordEditFormData } from '@/interfaces';
 import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { defineComponent, reactive, ref } from 'vue'
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
+import DelayedButton from '@/components/DelayedButton.vue'
 import { useStore } from '@/store';
 
 export default defineComponent({
 	name: 'ProfileEditPassword',
 	components: {
-		QuestionTooltip
+		QuestionTooltip, DelayedButton
 	},
 	setup() {
 		// data
@@ -146,9 +143,8 @@ export default defineComponent({
 		const store = useStore();
 		const message = useMessage();
 		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
-
+		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const isSubmitButtonLoading = ref<boolean>(false);
-		const isSubmitButtonDisabled = ref<number>(0);
 
 		// methods
 		const handlePasswordInput = (): void => {
@@ -182,12 +178,12 @@ export default defineComponent({
 						}
 					} finally {
 						isSubmitButtonLoading.value = false;
-						holdSubmitDisabled(isSubmitButtonDisabled);
+						submitButtonRef.value?.holdDisabled();
 					}
         } else {
           message.error('Данные не являются корректными');
 					isSubmitButtonLoading.value = false;
-					holdSubmitDisabled(isSubmitButtonDisabled);
+					submitButtonRef.value?.holdDisabled();
         }
       });
     };
@@ -198,7 +194,7 @@ export default defineComponent({
 			rules,
 			confirmedPasswordRef,
 			isSubmitButtonLoading,
-			isSubmitButtonDisabled,
+			submitButtonRef,
 			handlePasswordInput,
 			undoChanges,
 			submitForm

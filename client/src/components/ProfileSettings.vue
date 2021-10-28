@@ -67,12 +67,10 @@ export default defineComponent({
 		}
 
 		return { 
-			router,
 			isDeletionConfirmation,
 			submitButtonRef,
 			buttonText,
 			buttonType,
-			deleteUser,
 			showDeletionConfirmation,
 			cancelDeletion
 		};

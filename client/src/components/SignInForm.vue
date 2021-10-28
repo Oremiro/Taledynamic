@@ -18,16 +18,16 @@
     </n-form-item>
     
     <n-form-item>
-			<n-button-group>
-				<n-button
-					attr-type="submit"
-					type="primary"
-					ghost
-					:loading="submitLoading"
-					:disabled="!formData.email.isValid || !formData.password.value || submitLoading || (submitDisabled != 0)"
-					@click="submitForm">Войти</n-button>
-				<n-button v-if="submitDisabled" disabled type="primary" ghost>{{ submitDisabled }}</n-button>
-			</n-button-group>
+			<delayed-button
+				ref="submitButtonRef"
+				attr-type="submit"
+				type="primary"
+				ghost
+				:loading="submitLoading"
+				:disabled="!formData.email.isValid || !formData.password.value || submitLoading"
+				@click="submitForm">
+				Войти
+			</delayed-button>
     </n-form-item>
   </n-form>
 </template>
@@ -38,14 +38,17 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { NForm, useMessage, FormRules } from "naive-ui"
-import { emailRegex, externalOptions, holdSubmitDisabled } from "@/helpers"
-import { SignInFormData } from '@/interfaces'
-import { useStore } from '@/store'
 import { useRouter } from 'vue-router'
+import { useStore } from '@/store'
+import { emailRegex, externalOptions } from "@/helpers"
+import { SignInFormData } from '@/interfaces'
+import DelayedButton from '@/components/DelayedButton.vue'
 
 export default defineComponent({
-  
   name: "SignInForm",
+	components: {
+		DelayedButton
+	},
   setup() {
 		// data
     const formData = reactive<SignInFormData>({
@@ -86,9 +89,9 @@ export default defineComponent({
       },
     };
     const formRef = ref<InstanceType<typeof NForm>>();
+		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
     const message = useMessage();
     const submitLoading = ref<boolean>(false);
-		const submitDisabled = ref<number>(0);
 		const store = useStore();
 		const router = useRouter();
 
@@ -107,12 +110,12 @@ export default defineComponent({
 						}
 					} finally {
 						submitLoading.value = false;
-						holdSubmitDisabled(submitDisabled);	
+						submitButtonRef.value?.holdDisabled();
 					}
         } else {
           message.error('Данные не являются корректными');
 					submitLoading.value = false;
-					holdSubmitDisabled(submitDisabled);
+					submitButtonRef.value?.holdDisabled();
         }
       });
     };
@@ -121,9 +124,9 @@ export default defineComponent({
       formData,
       rules,
       submitLoading,
-			submitDisabled,
-      submitForm,
-      options: computed(() => externalOptions(formData.email.value))
+			submitButtonRef,
+      options: computed(() => externalOptions(formData.email.value)),
+      submitForm
     }
   }
 })
