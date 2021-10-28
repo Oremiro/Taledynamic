@@ -8,8 +8,8 @@
 		ghost
 		@click="showDeletionConfirmation"
 		style="margin-right: 1rem">{{ buttonText }}</delayed-button>
-	<n-button v-show="isDeletionConfirmation" @click="cancelDeletion">Нет, я передумал</n-button>
-	<n-collapse-transition :collapsed="isDeletionConfirmation">
+	<n-button v-show="isDeletionConfirmationShown" @click="cancelDeletion">Нет, я передумал</n-button>
+	<n-collapse-transition :show="isDeletionConfirmationShown">
 		<div style="margin-top: 1rem">Вы уверены, что хотите удалить аккаунт?</div>
 	</n-collapse-transition>
 </template>
@@ -30,7 +30,7 @@ export default defineComponent({
 		const router = useRouter();
 		const store = useStore();
 		const message = useMessage();
-		const isDeletionConfirmation = ref<boolean>(false);
+		const isDeletionConfirmationShown = ref<boolean>(false);
 		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const buttonText = ref<string>('Удалить');
 		const buttonType = ref<string>('default');
@@ -49,10 +49,10 @@ export default defineComponent({
 		}
 
 		const showDeletionConfirmation = async (): Promise<void> => {
-			if (isDeletionConfirmation.value) {
+			if (isDeletionConfirmationShown.value) {
 				await deleteUser();
 			} else {
-				isDeletionConfirmation.value = true;
+				isDeletionConfirmationShown.value = true;
 				buttonText.value = 'Да';
 				buttonType.value = 'error';
 				submitButtonRef.value?.holdDisabled();
@@ -60,14 +60,14 @@ export default defineComponent({
 		}
 
 		const cancelDeletion = () => {
-			isDeletionConfirmation.value = false;
+			isDeletionConfirmationShown.value = false;
 			buttonText.value = 'Удалить';
 			buttonType.value = 'default';
 			submitButtonRef.value?.cancelHolding();
 		}
 
 		return { 
-			isDeletionConfirmation,
+			isDeletionConfirmationShown,
 			submitButtonRef,
 			buttonText,
 			buttonType,
