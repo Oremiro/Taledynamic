@@ -122,7 +122,6 @@ export default defineComponent({
       rules,
       submitLoading,
 			submitDisabled,
-      message,
       submitForm,
       options: computed(() => externalOptions(formData.email.value))
     }

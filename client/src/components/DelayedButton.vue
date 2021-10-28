@@ -7,7 +7,7 @@
 			:loading="loading"
 			:disabled="disabled || loading || (disablingDuration != 0)"
 			:type="type">
-			<slot />
+			<slot></slot>
 		</n-button>
 		<n-button v-if="disablingDuration" disabled :type="type" ghost>{{ disablingDuration }}</n-button>
 	</n-button-group>

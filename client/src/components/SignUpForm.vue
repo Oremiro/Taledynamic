@@ -202,7 +202,7 @@ export default defineComponent({
 					try {
 						await store.dispatch('register', formData)
 						message.success('Вы успешно зарегистрировались');
-						router.push({ name: 'AuthSignIn' })
+						router.push({ name: 'AuthSignIn' });
 					} catch (error) {
 						if (error instanceof Error) {
 							message.error(error.message);
