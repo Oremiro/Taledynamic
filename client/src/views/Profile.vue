@@ -8,7 +8,7 @@
 					size="small"
 					content-style="padding-left: 0; padding-right: 0"
 				>
-					<n-menu :options="menuOptions" :value="route.path.name" />
+					<n-menu :options="menuOptions" :value="route.path" />
 				</n-card>
 			</n-gi>
 			<n-gi :span="1" />

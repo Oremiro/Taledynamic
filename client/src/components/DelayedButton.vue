@@ -2,12 +2,12 @@
 	<n-button-group>
 		<n-button
 			:attr-type="attrType"
-			ghost
+			:ghost="ghost"
 			@click="$emit('click', $event)"
 			:loading="loading"
-			:disabled="loading || (disablingDuration != 0)"
+			:disabled="disabled || loading || (disablingDuration != 0)"
 			:type="type">
-			{{ text }}
+			<slot />
 		</n-button>
 		<n-button v-if="disablingDuration" disabled :type="type" ghost>{{ disablingDuration }}</n-button>
 	</n-button-group>
@@ -25,10 +25,6 @@ export default defineComponent({
 			default: 'button',
 			validator: (value: string) => ['button', 'submit', 'reset'].includes(value)
 		},
-		text: {
-			type: String,
-			required: true
-		},
 		loading: {
 			type: Boolean,
 			default: false
@@ -41,6 +37,14 @@ export default defineComponent({
 		duration: {
 			type: Number,
 			default: 15
+		},
+		ghost: {
+			type: Boolean,
+			default: false
+		},
+		disabled: {
+			type: Boolean,
+			default: false
 		}
 	},
 	setup(props) {

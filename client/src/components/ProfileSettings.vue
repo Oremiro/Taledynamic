@@ -4,10 +4,10 @@
 	<n-h4><n-text type="primary">Удаление аккаунта</n-text></n-h4>
 	<delayed-button 
 		ref="submitButtonRef" 
-		:text="buttonText"
 		:type="buttonType"
+		ghost
 		@click="showDeletionConfirmation"
-		style="margin-right: 1rem" />
+		style="margin-right: 1rem">{{ buttonText }}</delayed-button>
 	<n-button v-show="isDeletionConfirmation" @click="cancelDeletion">Нет, я передумал</n-button>
 	<n-collapse-transition :collapsed="isDeletionConfirmation">
 		<div style="margin-top: 1rem">Вы уверены, что хотите удалить аккаунт?</div>

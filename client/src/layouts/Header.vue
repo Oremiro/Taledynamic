@@ -8,7 +8,7 @@
 			</n-gi>
 			<n-gi span="6" offset="1">
 				<div class="nav-menu">
-					<n-menu :value="route.path" :options="menuOptions" mode="horizontal" />
+					<n-menu :value="currentPath" :options="menuOptions" mode="horizontal" />
 				</div>
 			</n-gi>
 			<n-gi span="2" offset="1">
@@ -70,33 +70,38 @@ export default defineComponent({
 		currentTheme: Object
 	},
 	setup(props, context) {
+		// data
 		const loadingBar = useLoadingBar()
 		loadingBar.start();
 		const message = useMessage();
 		const store = useStore();
+		const route = useRoute();
+
+		// computed
 		const menuOptions: ComputedRef<MenuOption[]> = computed((): MenuOption[] => {
 			const baseMenuOptions = [
 				{
 					label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
-					key: '/',
+					key: '',
 				}
 			];
 			
 			if (store.getters.isLoggedIn) {
 				baseMenuOptions.push({
 					label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
-					key: '/profile'
+					key: 'profile'
 				})
 			} else {
 				baseMenuOptions.push({
 					label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),
-					key: '/auth'
+					key: 'auth'
 				})
 			}
 			return baseMenuOptions;
-		})
-		
+		})		
+		const currentPath = computed(() => route.path.split('/')[1])
 
+		// methods
 		const changeTheme = (): void => {
 			if (props.currentTheme === null) {
 				context.emit('changeTheme', darkTheme)
@@ -104,8 +109,10 @@ export default defineComponent({
 				context.emit('changeTheme', null)
 			}
 		}
+
+		//watchers
 		watch(() => store.state.pageStatus, () => {
-			if (store.state.pageStatus == 'ready') {
+			if (store.state.pageStatus === 'ready') {
 				loadingBar.finish();
 			} else {
 				loadingBar.error();
@@ -113,8 +120,8 @@ export default defineComponent({
 			}
 		});
 		return {
-			route: useRoute(),
 			menuOptions,
+			currentPath,	
 			changeTheme
 		}
 	},
