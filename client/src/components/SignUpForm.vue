@@ -38,16 +38,14 @@
 		</n-form-item>
 
 		<n-form-item>
-			<n-button-group>
-				<n-button
-					attr-type="submit"
-					type="primary"
-					ghost
-					:loading="submitLoading"
-					:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid || submitLoading || (submitDisabled != 0)"
-					@click="submitForm">Зарегистрироваться</n-button>
-					<n-button v-if="submitDisabled" disabled type="primary" ghost>{{ submitDisabled }}</n-button>
-			</n-button-group>
+			<delayed-button 
+				ref="submitButtonRef" 
+				attr-type="submit"
+				type="primary"
+				ghost
+				:loading="submitLoading"
+				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid"
+				@click="submitForm">Зарегистрироваться</delayed-button>
 		</n-form-item>
 	</n-form>
 </template>
@@ -61,17 +59,21 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { useMessage, NForm, FormRules, NFormItem } from "naive-ui";
-import { emailRegex, passwordRegex, externalOptions, holdSubmitDisabled } from "@/helpers";
+import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
+import DelayedButton from "@/components/DelayedButton.vue"
 import { SignUpFormData } from '@/interfaces'
 import { useStore } from '@/store';
+import { ApiHelper } from '@/helpers/api';
+import { AxiosError } from 'axios';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
 	name: 'SignUpForm',
 	components: {
-		QuestionTooltip
+		QuestionTooltip, DelayedButton
 	},
-	setup(props, context) {
+	setup() {
 		// data
 		const formData = reactive<SignUpFormData>({
 			email: {
@@ -92,23 +94,42 @@ export default defineComponent({
 				value: [
 					{
 						required: true,
-						message: "Пожалуйста, введите email",
-						trigger: "blur",
+						message: 'Пожалуйста, введите email',
+						trigger: 'blur',
 					},
 					{
 						asyncValidator: (rule, value) => {
 							return new Promise<void>((resolve, reject) => {
 								formData.email.isValid = false;
 								if (!emailRegex.test(value)) {
-									reject(new Error("Введите корректный email"));
+									reject(new Error('Введите корректный email'));
 								} else {
 									formData.email.isValid = true;
 									resolve();
 								}
 							});
 						},
-						trigger: ["blur", "input"],
+						trigger: ['blur', 'input'],
 					},
+					{
+						asyncValidator: (rule, value) => 
+							new Promise<void>((resolve, reject) => {
+								formData.email.isValid = false;
+								ApiHelper.userIsEmailUsed({ email: value })
+								.then((response) => {
+									if(response.data.isEmailUsed) {
+										reject(new Error('Данный email занят другим пользователем'));
+									} else {
+										formData.email.isValid = true;
+										resolve();
+									}
+								})
+								.catch((error: AxiosError) => {
+									reject(new Error(error.message));
+								});
+							}),
+						trigger: 'blur'
+					}
 				],
 			},
 			password: {
@@ -162,10 +183,11 @@ export default defineComponent({
 		};
 		const formRef = ref<InstanceType<typeof NForm>>();
 		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
+		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const message = useMessage();
 		const submitLoading = ref<boolean>(false);
-		const submitDisabled = ref<number>(0);
 		const store = useStore();
+		const router = useRouter();
 
 		// methods
 		const handlePasswordInput = (): void => {
@@ -175,24 +197,24 @@ export default defineComponent({
 		}
     const submitForm = (): void => {
 			submitLoading.value = true;
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors): Promise<void> => {
         if (!errors) {
-					store.dispatch('register', formData)
-					.then(() => {
+					try {
+						await store.dispatch('register', formData)
 						message.success('Вы успешно зарегистрировались');
-						context.emit('setTab', 'signin');
-					})
-					.catch((error) => {
-						message.error(error.message);
-					})
-					.finally(() => {
+						router.push({ name: 'AuthSignIn' });
+					} catch (error) {
+						if (error instanceof Error) {
+							message.error(error.message);
+						}
+					} finally {
 						submitLoading.value = false;
-						holdSubmitDisabled(submitDisabled);
-					});
+						submitButtonRef.value?.holdDisabled();
+					}
         } else {
           message.error('Данные не являются корректными');
 					submitLoading.value = false;
-					holdSubmitDisabled(submitDisabled);
+					submitButtonRef.value?.holdDisabled();
         }
       });
     };
@@ -201,9 +223,8 @@ export default defineComponent({
 			rules,
 			formRef,
 			confirmedPasswordRef,
-			message,
+			submitButtonRef,
 			submitLoading,
-			submitDisabled,
 			handlePasswordInput,
 			submitForm,
 			options: computed(() => externalOptions(formData.email.value))

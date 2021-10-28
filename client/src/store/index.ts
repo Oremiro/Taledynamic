@@ -3,7 +3,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
 import { VueCookieNext } from 'vue-cookie-next'
 import { ApiHelper } from '@/helpers/api'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 
 interface User {
 	id: number | null,
@@ -69,121 +69,119 @@ export const store = createStore<State>({
 		async init(): Promise<boolean> {
 			const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 			const localStorageUser: string | null = localStorage.getItem('user');
-			if (isRemembered === '1' && localStorageUser) {
-				try {
+			try {
+				if (isRemembered === '1' && localStorageUser) {
 					await store.dispatch('refresh');
 					return true;
-				} catch (e) {
-					VueCookieNext.removeCookie('remembered');
-					localStorage.removeItem('user');
+				} else {
+					throw new Error('Empty data to continue session')
 				}
+			} catch (error) {
+				VueCookieNext.removeCookie('remembered');
+				localStorage.removeItem('user');
 			}
 			return false;
 		},
-		register(_context, formData: SignUpFormData): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				const newUser = {
-					email: formData.email.value, 
-					password: formData.password.value, 
-					confirmPassword: formData.confirmedPassword.value
+		async register(_context, formData: SignUpFormData): Promise<void> {
+			const newUser = {
+				email: formData.email.value, 
+				password: formData.password.value, 
+				confirmPassword: formData.confirmedPassword.value
+			}
+			try {
+				const { data } = await ApiHelper.userCreate({ user: newUser });
+				if (data.statusCode === 200) {
+					return;
+				} else {
+					throw new Error('Ошибка регистрации')
 				}
-				ApiHelper.userCreate({ user: newUser })
-				.then((response) => {
-					if (response.data.statusCode == 200) {
-						resolve();
-					} else {
-						reject(new Error('Ошибка регистрации'))
-					}
-				}).catch((error: AxiosError) => {
+			} catch (error) {
+				if(axios.isAxiosError(error)) {
 					if (error.response?.status == 400) {
-						reject(new Error('Пользователь с таким почтовым адресом уже существует'))
+						throw new Error('Пользователь с таким почтовым адресом уже существует');
 					} else {
-						reject(new Error('Ошибка регистрации'));
+						throw new Error('Ошибка регистрации');
 					}
-				});
-			});
-		},
-		login({ commit }, formData: SignInFormData): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				const expireValue: string = formData.remembered.value ? '7d' : '0';
-				VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
-				const user = {
-					email: formData.email.value, 
-					password: formData.password.value
 				}
-				ApiHelper.userAuthenticate({ user: user })
-				.then((response) => {
-					if (response.data.statusCode == 200) {
-						const user: User = {
-							id: response.data.id ?? null, 
-							email: response.data.email ?? formData.email.value, 
-						}
-						commit('login', {
-							user: user,
-							accessToken: response.data.jwtToken
-						});
-						localStorage.setItem('user', JSON.stringify(user))
-						resolve();
-					} else {
-						reject(new Error('Ошибка авторизации'));
-					}
-				})
-				.catch(error => {
-					if (error.response.status === 404) {
-						reject(new Error('Пользователь с такими данными не найден'));
-					} else {
-						reject(new Error('Ошибка авторизации'));
-					}
-				});
-			});
+			}
 		},
-		logout({ commit, state }): Promise<void> {
-			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
-				.then((response) => {
-					if (response.data.isSuccess) {
-						commit('logout');
-						VueCookieNext.removeCookie('remembered');
-						localStorage.removeItem('user');
-						resolve();
-					} else {
-						reject(new Error('Ошибка выхода из аккаунта'));
+		async login({ commit }, formData: SignInFormData): Promise<void> {
+			const requestedUser = {
+				email: formData.email.value, 
+				password: formData.password.value
+			}
+			try {
+				const { data } = await ApiHelper.userAuthenticate({ user: requestedUser });
+				if (data.statusCode === 200) {
+					const responsedUser: User = {
+						id: data.id ?? null, 
+						email: data.email ?? formData.email.value, 
 					}
-				})
-				.catch((error: AxiosError) => {
+					commit('login', {
+						user: responsedUser,
+						accessToken: data.jwtToken
+					});
+					const expireValue: string = formData.remembered.value ? '7d' : '0';
+					VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
+					localStorage.setItem('user', JSON.stringify(responsedUser))
+				} else {
+					throw new Error('Ошибка авторизации');
+				}
+			} catch (error) {
+				if(axios.isAxiosError(error)) {
 					if (error.response?.status === 404) {
-						reject(new Error('Пользователь с таким токеном не найден'))	
+						throw new Error('Пользователь с такими данными не найден');
 					} else {
-						reject(new Error('Ошибка обнуления токена'));
+						throw new Error('Ошибка авторизации');
 					}
-				});
-			});
+				}
+			}
 		},
-		refresh({ commit }): Promise<void> {			
-			return new Promise<void>((resolve, reject) => {
-				ApiHelper.userRefreshToken()
-				.then((response) => {
-					if (response.data.id && response.data.email && response.data.jwtToken) {
-						const user: User = { id: response.data.id, email: response.data.email };
-						const token: string = response.data.jwtToken
-						commit('login', {
-							user: user,
-							accessToken: token
-						});
-						localStorage.setItem('user', JSON.stringify(user));
-						resolve();
+		async logout({ commit, state }): Promise<void> {
+			try {
+				const { data } = await ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
+				if (data.isSuccess && data.statusCode === 200) {
+					commit('logout');
+					VueCookieNext.removeCookie('remembered');
+					localStorage.removeItem('user');
+					return;
+				} else {
+					throw new Error('Ошибка при выходе из аккаунта');
+				}
+			} catch (error) {
+				if (axios.isAxiosError(error)) {
+					if (error.response?.status === 404) {
+						throw new Error('Пользователь с таким токеном не найден');	
 					} else {
-						reject(new Error('Непредвиденная ошибка'))
-					}
-				})
-				.catch((error: AxiosError) => {
-					if(error.response?.status == 404) {
-						reject(new Error('Сессия устарела'));
+						throw new Error('Ошибка при обнулении токена');
+					}		
+				}
+			}
+		},
+		async refresh({ commit }): Promise<void> {			
+			try {
+				const { data } = await ApiHelper.userRefreshToken();
+				if (data.id && data.email && data.jwtToken) {
+					const user: User = { id: data.id, email: data.email };
+					const token: string = data.jwtToken
+					commit('login', {
+						user: user,
+						accessToken: token
+					});
+					localStorage.setItem('user', JSON.stringify(user));
+					return;
+				} else {
+					throw new Error('Непредвиденная ошибка');
+				}
+			}	catch (error) {
+				if (axios.isAxiosError(error)) {
+					if (error.response?.status === 404) {
+						throw new Error('Сессия устарела');
 					} else {
-						reject(new Error('Ошибка обновления токена'));
+						throw new Error('Ошибка обновления токена');
 					}
-				});
-			});
+				}
+			}
 		},
 		async updateEmail({ commit, state }, data: UpdatedEmailData): Promise<void> {
 			if (state.user.id) {

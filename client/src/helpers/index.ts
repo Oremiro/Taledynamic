@@ -1,5 +1,4 @@
 import { AutoCompleteOption } from "naive-ui";
-import { Ref } from "vue";
 
 export const emailRegex = /^[a-zA-Z0-9][\w.-]*@[a-zA-Z]{2,}(\.[a-zA-Z]{2,})+$/;
 export const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*_(),.+-]).{8,64}$/;
@@ -20,14 +19,4 @@ export function externalOptions(value: string): AutoCompleteOption[] {
             value: `${prefix}@${suffix}`
         }
     })
-}
-
-export function holdSubmitDisabled(submitDisabled: Ref<number>): void {
-	submitDisabled.value = 15;
-	const submitDisabledTimer = setInterval(() => {
-		submitDisabled.value--;
-		if (submitDisabled.value == 0) {
-			clearInterval(submitDisabledTimer);
-		}
-	}, 1000);
 }

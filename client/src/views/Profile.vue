@@ -8,7 +8,7 @@
 					size="small"
 					content-style="padding-left: 0; padding-right: 0"
 				>
-					<n-menu :options="menuOptions" :value="route.path.name" />
+					<n-menu :options="menuOptions" :value="route.path" />
 				</n-card>
 			</n-gi>
 			<n-gi :span="1" />
@@ -75,15 +75,16 @@ export default defineComponent({
 				key: '/profile/settings',
 			},
 			{
-				onClick: () => {
-					store.dispatch('logout')
-					.then(() => {
+				onClick: async (): Promise<void> => {
+					try {
+						await store.dispatch('logout')
 						router.push({ name: 'Auth'});
 						message.info('Вы вышли из аккаунта');
-					})
-					.catch((error) => {
-						message.error(error.message);
-					})
+					} catch (error) {
+						if(error instanceof Error) {
+							message.error(error.message);
+						}
+					}
 				},
 				label: 'Выйти',
 				key: '/profile/quit',

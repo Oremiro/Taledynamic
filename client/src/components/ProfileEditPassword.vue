@@ -17,7 +17,7 @@
 		<n-form-item first ref="confirmedPasswordRef" label="Повторите новый пароль" path="confirmedPassword.value">
 			<n-input type="password" show-password-on="click" placeholder="" v-model:value="formData.confirmedPassword.value" />
 		</n-form-item>
-		<n-collapse-transition :collapsed="formData.newPassword.value !== '' || formData.confirmedPassword.value !== ''">
+		<n-collapse-transition :show="formData.newPassword.value !== '' || formData.confirmedPassword.value !== ''">
 			<n-form-item first label="Текущий пароль" path="currentPassword.value">
 				<n-input
 					type="password"
@@ -26,46 +26,38 @@
 					v-model:value="formData.currentPassword.value"
 				/>
 			</n-form-item>
-		</n-collapse-transition>
-		<n-button-group 
-			style="margin-right: 1rem"
-			v-if="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid"
-		>
-			<n-button
+			<delayed-button 
+				ref="submitButtonRef"
 				attr-type="submit"
-				ghost
 				type="success"
+				ghost
+				style="margin-right: 1rem"
 				@click="submitForm"
 				:loading="isSubmitButtonLoading"
-				:disabled="isSubmitButtonLoading || (isSubmitButtonDisabled != 0)"
-			>
+				:disabled="isSubmitButtonLoading"
+				v-show="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid">
 				Сохранить
+			</delayed-button>
+			<n-button ghost type="error" @click="undoChanges">
+				Отменить
 			</n-button>
-			<n-button v-if="isSubmitButtonDisabled" disabled type="primary" ghost>{{ isSubmitButtonDisabled }}</n-button>
-		</n-button-group>
-		<n-button 
-			ghost 
-			type="error" 
-			@click="undoChanges"
-			v-if="formData.currentPassword.value || formData.newPassword.value || formData.confirmedPassword.value"
-		>
-			Отменить
-		</n-button>
+		</n-collapse-transition>
 	</n-form>
 </template>
 
 <script lang="ts">
-import { holdSubmitDisabled, passwordRegex } from '@/helpers';
+import { passwordRegex } from '@/helpers';
 import { PasswordEditFormData } from '@/interfaces';
 import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { defineComponent, reactive, ref } from 'vue'
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
+import DelayedButton from '@/components/DelayedButton.vue'
 import { useStore } from '@/store';
 
 export default defineComponent({
 	name: 'ProfileEditPassword',
 	components: {
-		QuestionTooltip
+		QuestionTooltip, DelayedButton
 	},
 	setup() {
 		// data
@@ -90,7 +82,7 @@ export default defineComponent({
 					{
 						required: true,
 						message: 'Пожалуйста, введите текущий пароль',
-						trigger: ['blur']
+						trigger: 'blur'
 					}
 				]
 			},
@@ -146,9 +138,8 @@ export default defineComponent({
 		const store = useStore();
 		const message = useMessage();
 		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
-
+		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const isSubmitButtonLoading = ref<boolean>(false);
-		const isSubmitButtonDisabled = ref<number>(0);
 
 		// methods
 		const handlePasswordInput = (): void => {
@@ -182,12 +173,12 @@ export default defineComponent({
 						}
 					} finally {
 						isSubmitButtonLoading.value = false;
-						holdSubmitDisabled(isSubmitButtonDisabled);
+						submitButtonRef.value?.holdDisabled();
 					}
         } else {
           message.error('Данные не являются корректными');
 					isSubmitButtonLoading.value = false;
-					holdSubmitDisabled(isSubmitButtonDisabled);
+					submitButtonRef.value?.holdDisabled();
         }
       });
     };
@@ -198,7 +189,7 @@ export default defineComponent({
 			rules,
 			confirmedPasswordRef,
 			isSubmitButtonLoading,
-			isSubmitButtonDisabled,
+			submitButtonRef,
 			handlePasswordInput,
 			undoChanges,
 			submitForm

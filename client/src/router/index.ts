@@ -10,7 +10,20 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/auth',
 		name: 'Auth',
-    component: () => import('@/views/Auth.vue')
+		redirect: () => ({ name: 'AuthSignIn'}),
+    component: () => import('@/views/Auth.vue'),
+		children: [
+			{
+        path: 'signin',
+				name: 'AuthSignIn',
+        component: () => import('@/components/SignInForm.vue'),
+      },
+      {
+        path: 'signup',
+				name: 'AuthSignUp',
+        component: () => import('@/components/SignUpForm.vue'),
+      },
+		]
   },
   {
     path: '/profile',

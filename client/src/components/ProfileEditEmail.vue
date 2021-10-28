@@ -14,7 +14,7 @@
 				</n-input>
 			</n-auto-complete>
 		</n-form-item>
-		<n-collapse-transition :collapsed="isSubmitButtonShown">
+		<n-collapse-transition :show="isSubmitButtonShown">
 			<n-form-item label="Текущий пароль" path="currentPassword.value">
 				<n-input
 					type="password"
@@ -23,48 +23,47 @@
 					v-model:value="formData.currentPassword.value"
 				/>
 			</n-form-item>
-		</n-collapse-transition>
-		<n-button-group 
-			v-if="isSubmitButtonShown && formData.email.isValid && formData.currentPassword.value" 
-			style="margin-right: 1rem">
-			<n-button
-				attr-type="submit"
-				ghost
-				@click="submitForm"
-				:loading="isSubmitLoading"
-				:disabled="isSubmitLoading || (isSubmitDisabled != 0)"
-				type="success">
+			<delayed-button 
+				ref="submitButtonRef" 
+				attr-type="submit" 
+				type="success" 
+				ghost 
+				style="margin-right: 1rem" 
+				@click="submitForm" 
+				:disabled="isSubmitButtonLoading"
+				:loading="isSubmitButtonLoading"
+				v-show="formData.email.isValid && formData.currentPassword.value">
 				Сохранить
-			</n-button>
-			<n-button v-if="isSubmitDisabled" disabled type="primary" ghost>{{ isSubmitDisabled }}</n-button>
-		</n-button-group>
-		<n-button ghost v-if="isSubmitButtonShown" type="error" @click="undoChanges">Отменить</n-button>
+			</delayed-button>
+			<n-button ghost type="error" @click="undoChanges">Отменить</n-button>
+		</n-collapse-transition>
 	</n-form>
 </template>
 
 <script lang="ts">
-import { emailRegex, holdSubmitDisabled } from '@/helpers';
+import { emailRegex } from '@/helpers';
 import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { defineComponent, reactive, ref } from 'vue'
 import { useStore } from '@/store';
 import { EmailEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
+import DelayedButton from '@/components/DelayedButton.vue'
 import { ApiHelper } from '@/helpers/api';
 import { AxiosError } from 'axios';
 
 export default defineComponent({
 	name: 'ProfileEditEmail',
 	components: {
-		QuestionTooltip
+		QuestionTooltip, DelayedButton
 	},
 	setup() {
 		// data
 		const store = useStore();
 		const formRef = ref<InstanceType<typeof NForm>>();
-		const defaultEmailValue: string = store.state.user.email;
+		const defaultEmailValue = ref<string>(store.state.user.email);
 		const formData = reactive<EmailEditFormData>({
 			email: {
-				value: defaultEmailValue,
+				value: defaultEmailValue.value,
 				isValid: true,
 			},
 			currentPassword: {
@@ -96,7 +95,7 @@ export default defineComponent({
 					{
 						asyncValidator: (rule, value) => 
 							new Promise<void>((resolve, reject) => {
-								if (value === defaultEmailValue) {
+								if (value === defaultEmailValue.value) {
 									resolve()
 								} else {
 									ApiHelper.userIsEmailUsed({ email: value })
@@ -127,22 +126,28 @@ export default defineComponent({
 			},
 		}
 		const emailInputRef = ref<InstanceType<typeof NFormItem>>();
+		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const message = useMessage();
 		const isSubmitButtonShown = ref<boolean>(false);
-		const isSubmitLoading = ref<boolean>(false);
-		const isSubmitDisabled = ref<number>(0);
+		const isSubmitButtonLoading = ref<boolean>(false);
 
 		// methods
 		const handleEmailInput = (value: string | null): void => {
-			isSubmitButtonShown.value = !(value === defaultEmailValue);
+			isSubmitButtonShown.value = !(value === defaultEmailValue.value);
 		}
 		const undoChanges = (): void => {
-			formData.email.value = defaultEmailValue;
-			handleEmailInput(formData.email.value);
+			formData.email.value = defaultEmailValue.value;
+			formData.currentPassword.value = '';
+			isSubmitButtonShown.value = false;
 			emailInputRef.value?.restoreValidation();
 		}
+		const saveChanges = (): void => {
+			formData.currentPassword.value = '';
+			defaultEmailValue.value = store.state.user.email;
+			isSubmitButtonShown.value = false;
+		}
 		const submitForm = (): void => {
-			isSubmitLoading.value = true;
+			isSubmitButtonLoading.value = true;
       formRef.value?.validate(async (errors) => {
         if (!errors) {
 					try {
@@ -150,32 +155,28 @@ export default defineComponent({
 							currentPassword: formData.currentPassword.value, 
 							newEmail: formData.email.value 
 						});
+						saveChanges();
 						message.success('Вы успешно изменили email');
 					} catch (error) {
 						if (error instanceof Error) {
 							message.error(error.message);
 						}
-					} finally {
-						isSubmitLoading.value = false;
-						holdSubmitDisabled(isSubmitDisabled);
 					}
         } else {
           message.error('Данные не являются корректными');
-					isSubmitLoading.value = false;
-					holdSubmitDisabled(isSubmitDisabled);
         }
+				isSubmitButtonLoading.value = false;
+				submitButtonRef.value?.holdDisabled();
       });
     };
 		return {
-			store,
 			formRef,
 			formData,
-			defaultEmailValue,
 			rules,
 			isSubmitButtonShown,
 			emailInputRef,
-			isSubmitLoading,
-			isSubmitDisabled,
+			submitButtonRef,
+			isSubmitButtonLoading,
 			handleEmailInput,
 			undoChanges,
 			submitForm
