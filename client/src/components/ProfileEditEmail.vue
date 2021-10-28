@@ -23,18 +23,19 @@
 					v-model:value="formData.currentPassword.value"
 				/>
 			</n-form-item>
-		<delayed-button 
-			ref="submitButtonRef" 
-			v-show="isSubmitButtonShown && formData.email.isValid && formData.currentPassword.value" 
-			style="margin-right: 1rem" 
-			type="success" 
-			attr-type="submit" 
-			ghost 
-			@click="submitForm" 
-			:loading="isSubmitButtonLoading">
-			Сохранить
-		</delayed-button>
-		<n-button ghost v-show="isSubmitButtonShown" type="error" @click="undoChanges">Отменить</n-button>
+			<delayed-button 
+				ref="submitButtonRef" 
+				attr-type="submit" 
+				type="success" 
+				ghost 
+				style="margin-right: 1rem" 
+				@click="submitForm" 
+				:disabled="isSubmitButtonLoading"
+				:loading="isSubmitButtonLoading"
+				v-show="formData.email.isValid && formData.currentPassword.value">
+				Сохранить
+			</delayed-button>
+			<n-button ghost type="error" @click="undoChanges">Отменить</n-button>
 		</n-collapse-transition>
 	</n-form>
 </template>

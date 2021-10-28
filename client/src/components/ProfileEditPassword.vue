@@ -17,7 +17,7 @@
 		<n-form-item first ref="confirmedPasswordRef" label="Повторите новый пароль" path="confirmedPassword.value">
 			<n-input type="password" show-password-on="click" placeholder="" v-model:value="formData.confirmedPassword.value" />
 		</n-form-item>
-		<n-collapse-transition :collapsed="formData.newPassword.value !== '' || formData.confirmedPassword.value !== ''">
+		<n-collapse-transition :show="formData.newPassword.value !== '' || formData.confirmedPassword.value !== ''">
 			<n-form-item first label="Текущий пароль" path="currentPassword.value">
 				<n-input
 					type="password"
@@ -26,27 +26,22 @@
 					v-model:value="formData.currentPassword.value"
 				/>
 			</n-form-item>
+			<delayed-button 
+				ref="submitButtonRef"
+				attr-type="submit"
+				type="success"
+				ghost
+				style="margin-right: 1rem"
+				@click="submitForm"
+				:loading="isSubmitButtonLoading"
+				:disabled="isSubmitButtonLoading"
+				v-show="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid">
+				Сохранить
+			</delayed-button>
+			<n-button ghost type="error" @click="undoChanges">
+				Отменить
+			</n-button>
 		</n-collapse-transition>
-		<delayed-button 
-			ref="submitButtonRef"
-			attr-type="submit"
-			ghost
-			type="success"
-			@click="submitForm"
-			:loading="isSubmitButtonLoading"
-			:disabled="isSubmitButtonLoading"
-			style="margin-right: 1rem"
-			v-if="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid">
-			Сохранить
-		</delayed-button>
-		<n-button 
-			ghost 
-			type="error" 
-			@click="undoChanges"
-			v-if="formData.currentPassword.value || formData.newPassword.value || formData.confirmedPassword.value"
-		>
-			Отменить
-		</n-button>
 	</n-form>
 </template>
 
@@ -87,7 +82,7 @@ export default defineComponent({
 					{
 						required: true,
 						message: 'Пожалуйста, введите текущий пароль',
-						trigger: ['blur']
+						trigger: 'blur'
 					}
 				]
 			},
