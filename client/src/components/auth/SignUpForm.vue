@@ -59,17 +59,17 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { useMessage, NForm, FormRules, NFormItem } from "naive-ui";
+import { useRouter } from 'vue-router';
+import { AxiosError } from 'axios';
+import { useStore } from '@/store';
 import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
+import { ApiHelper } from '@/helpers/api';
+import { SignUpFormData } from '@/interfaces'
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
 import DelayedButton from "@/components/DelayedButton.vue"
-import { SignUpFormData } from '@/interfaces'
-import { useStore } from '@/store';
-import { ApiHelper } from '@/helpers/api';
-import { AxiosError } from 'axios';
-import { useRouter } from 'vue-router';
 
 export default defineComponent({
-	name: 'SignUpForm',
+	name: 'AuthSignUpForm',
 	components: {
 		QuestionTooltip, DelayedButton
 	},

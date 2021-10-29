@@ -1,5 +1,4 @@
 <template>
-	<n-h4><n-text type="primary">Изменение email</n-text></n-h4>
 	<n-form ref="formRef" :rules="rules" :model="formData">
 		<n-form-item ref="emailInputRef" first label="Email" path="email.value">
 			<n-auto-complete 
@@ -52,7 +51,7 @@ import { ApiHelper } from '@/helpers/api';
 import { AxiosError } from 'axios';
 
 export default defineComponent({
-	name: 'ProfileEditEmail',
+	name: 'ProfileEmailEditingForm',
 	components: {
 		QuestionTooltip, DelayedButton
 	},

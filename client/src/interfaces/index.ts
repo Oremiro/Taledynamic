@@ -1,3 +1,5 @@
+import { GlobalTheme } from "naive-ui";
+
 export interface FormItemData<Type extends string | boolean> {
 	value: Type,
 	isValid?: boolean
@@ -27,3 +29,5 @@ export interface PasswordEditFormData extends UserFieldEditFormData {
 	newPassword: FormItemData<string>,
 	confirmedPassword: FormItemData<string>
 }
+
+export type Theme = GlobalTheme | null;

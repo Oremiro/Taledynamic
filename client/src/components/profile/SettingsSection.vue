@@ -15,14 +15,14 @@
 </template>
 
 <script lang="ts">
-import { useStore } from "@/store";
-import { useMessage } from "naive-ui";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useMessage } from "naive-ui";
+import { useStore } from "@/store";
 import DelayedButton from '@/components/DelayedButton.vue'
 
 export default defineComponent({
-	name: 'ProfileSettings',
+	name: 'ProfileSettingsSection',
 	components: {
 		DelayedButton
 	},

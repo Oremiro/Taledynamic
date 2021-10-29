@@ -1,11 +1,15 @@
 <template>
   <div class="container">
-    <n-card hoverable style="max-width: 30rem">
+    <n-card hoverable style="max-width: 30rem;">
 			<n-tabs size="large" v-model:value="activeTab" @update:value="handleUpdateTab">
 				<n-tab-pane name="signin" tab="Вход"/>
 				<n-tab-pane name="signup" tab="Регистрация"/>
-			</n-tabs>	
-			<router-view style="padding-top: 1rem" />
+			</n-tabs>
+			<router-view v-slot="{ Component }" style="padding-top: 1rem">
+				<transition name="fade" mode="out-in">
+					<component :is="Component" />
+				</transition>
+			</router-view>
     </n-card>
   </div>
 </template>

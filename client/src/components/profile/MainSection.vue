@@ -37,7 +37,7 @@ import { useStore } from '@/store'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'MainProfile',
+  name: 'ProfileMainSection',
 	setup() {
 		return {
 			store: useStore()

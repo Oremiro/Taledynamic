@@ -1,5 +1,4 @@
 <template>
-	<n-h4><n-text type="primary">Изменение пароля</n-text></n-h4>
 	<n-form ref="formRef" :model="formData" :rules="rules">
 		<n-form-item first label="Новый пароль" path="newPassword.value">
 			<n-input 
@@ -46,16 +45,16 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, reactive, ref } from 'vue'
+import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
+import { useStore } from '@/store';
 import { passwordRegex } from '@/helpers';
 import { PasswordEditFormData } from '@/interfaces';
-import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
-import { defineComponent, reactive, ref } from 'vue'
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
 import DelayedButton from '@/components/DelayedButton.vue'
-import { useStore } from '@/store';
 
 export default defineComponent({
-	name: 'ProfileEditPassword',
+	name: 'ProfilePasswordEditingForm',
 	components: {
 		QuestionTooltip, DelayedButton
 	},

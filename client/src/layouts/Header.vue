@@ -59,15 +59,16 @@
 
 
 <script lang="ts">
-import { computed, ComputedRef, defineComponent, h, watch } from 'vue'
+import { computed, ComputedRef, defineComponent, h, watch, PropType } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { darkTheme, MenuOption, useLoadingBar, useMessage } from 'naive-ui'
 import { useStore } from '@/store'
+import { Theme } from '@/interfaces'
 
 export default defineComponent({
 	name: 'Header',
 	props: {
-		currentTheme: Object
+		currentTheme: Object as PropType<Theme>
 	},
 	setup(props, context) {
 		// data
