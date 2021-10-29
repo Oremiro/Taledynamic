@@ -15,7 +15,7 @@ namespace TaleDynamicBot
 {
     public class Handlers
     {
-        public static User user = new User(new State_NonAuth());
+        public static User user = new User(new StateNonAuth());
         public static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
             CancellationToken cancellationToken)
         {
@@ -61,10 +61,10 @@ namespace TaleDynamicBot
                     user.Auth(botClient, update);
                     break;
                 case "/sending":
-                    user.Sending_Data(botClient, update);
+                    user.SendingData(botClient, update);
                     break;
                 case "/stop_sending":
-                    user.Stop_sending_Data(botClient, update);
+                    user.StopSendingData(botClient, update);
                     break;
                 case "/keyboard":
                     await SendReplyKeyboard(botClient,update.Message);
