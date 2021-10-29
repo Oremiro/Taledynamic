@@ -26,7 +26,7 @@ namespace TaleDynamicBot.States
 
         public override void StopSendingData(ITelegramBotClient botClient,Update update)
         {
-            this._user.Change_State(new StateStopped());
+            this._user.ChangeState(new StateStopped());
         }
     }
 }

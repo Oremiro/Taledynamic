@@ -19,7 +19,7 @@ namespace TaleDynamicBot.States
                 text: "You logging...."
             );
             //if auth successed
-            this._user.Change_State(new StateAuth());
+            this._user.ChangeState(new StateAuth());
         }
         
         public override void SendingData(ITelegramBotClient botClient, Update update)

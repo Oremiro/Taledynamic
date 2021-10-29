@@ -7,9 +7,9 @@ namespace TaleDynamicBot
     {
         private State _state = null;
 
-        public User(State state) => this.Change_State(state);
+        public User(State state) => this.ChangeState(state);
 
-        public void Change_State(State state)
+        public void ChangeState(State state)
         {
             this._state = state;
             this._state.SetUser(this);
