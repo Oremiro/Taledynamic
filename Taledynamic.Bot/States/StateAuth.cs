@@ -1,4 +1,6 @@
-﻿using Telegram.Bot;
+﻿using System.Threading.Tasks;
+using Serilog;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace TaleDynamicBot.States
@@ -24,7 +26,7 @@ namespace TaleDynamicBot.States
 
         public override void StopSendingData(ITelegramBotClient botClient,Update update)
         {
-            this._user.ChangeState(new StateStopped());
+            this._user.Change_State(new StateStopped());
         }
     }
 }

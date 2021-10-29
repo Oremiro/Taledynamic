@@ -17,31 +17,35 @@
 				type="password"
 				show-password-on="click"
 				placeholder=""
-				v-model:value="formData.password.value">
+				v-model:value="formData.password.value"
+				@input="handlePasswordInput">
 				<template v-if="!formData.password.isValid" #prefix>
 					<question-tooltip text="Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ."/>
 				</template>
 			</n-input>
 		</n-form-item>
 		<n-form-item
-			ref="pwdRef"
+			ref="confirmedPasswordRef"
 			first
 			label="Повторите пароль"
-			path="repeatedPassword.value">
+			path="confirmedPassword.value">
 			<n-input
 				type="password"
 				show-password-on="click"
 				placeholder=""
-				v-model:value="formData.repeatedPassword.value"/>
+				:disabled="!formData.password.isValid"
+				v-model:value="formData.confirmedPassword.value"/>
 		</n-form-item>
 
 		<n-form-item>
-			<n-button
+			<delayed-button 
+				ref="submitButtonRef" 
+				attr-type="submit"
 				type="primary"
 				ghost
 				:loading="submitLoading"
-				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.repeatedPassword.isValid"
-				@click="submitForm">Зарегистрироваться</n-button>
+				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid"
+				@click="submitForm">Зарегистрироваться</delayed-button>
 		</n-form-item>
 	</n-form>
 </template>
@@ -54,21 +58,23 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
-import { useMessage, NForm, FormRules } from "naive-ui";
-import {
-	emailRegex,
-	passwordRegex,
-	externalOptions
-} from "@/variables/auth-vars";
+import { useMessage, NForm, FormRules, NFormItem } from "naive-ui";
+import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
-import { SignUpFormData } from '@/interfaces/auth-interfaces'
+import DelayedButton from "@/components/DelayedButton.vue"
+import { SignUpFormData } from '@/interfaces'
+import { useStore } from '@/store';
+import { ApiHelper } from '@/helpers/api';
+import { AxiosError } from 'axios';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
 	name: 'SignUpForm',
 	components: {
-		QuestionTooltip
+		QuestionTooltip, DelayedButton
 	},
 	setup() {
+		// data
 		const formData = reactive<SignUpFormData>({
 			email: {
 				value: "",
@@ -78,7 +84,7 @@ export default defineComponent({
 				value: "",
 				isValid: false,
 			},
-			repeatedPassword: {
+			confirmedPassword: {
 				value: "",
 				isValid: false,
 			},
@@ -88,23 +94,42 @@ export default defineComponent({
 				value: [
 					{
 						required: true,
-						message: "Пожалуйста, введите email",
-						trigger: "blur",
+						message: 'Пожалуйста, введите email',
+						trigger: 'blur',
 					},
 					{
 						asyncValidator: (rule, value) => {
 							return new Promise<void>((resolve, reject) => {
 								formData.email.isValid = false;
 								if (!emailRegex.test(value)) {
-									reject(new Error("Введите корректный email"));
+									reject(new Error('Введите корректный email'));
 								} else {
 									formData.email.isValid = true;
 									resolve();
 								}
 							});
 						},
-						trigger: ["blur", "input"],
+						trigger: ['blur', 'input'],
 					},
+					{
+						asyncValidator: (rule, value) => 
+							new Promise<void>((resolve, reject) => {
+								formData.email.isValid = false;
+								ApiHelper.userIsEmailUsed({ email: value })
+								.then((response) => {
+									if(response.data.isEmailUsed) {
+										reject(new Error('Данный email занят другим пользователем'));
+									} else {
+										formData.email.isValid = true;
+										resolve();
+									}
+								})
+								.catch((error: AxiosError) => {
+									reject(new Error(error.message));
+								});
+							}),
+						trigger: 'blur'
+					}
 				],
 			},
 			password: {
@@ -112,7 +137,7 @@ export default defineComponent({
 					{
 						required: true,
 						message: "Пожалуйста, введите пароль",
-						trigger: "blur",
+						trigger: ['blur']
 					},
 					{
 						asyncValidator: (rule, value) => {
@@ -132,50 +157,75 @@ export default defineComponent({
 					},
 				],
 			},
-			repeatedPassword: {
+			confirmedPassword: {
 				value: [
 					{
 						required: true,
-						message: "Пожалуйста, повторите пароль",
-						trigger: "blur",
+						message: 'Пожалуйста, повторите пароль',
+						trigger: 'blur',
 					},
 					{
 						asyncValidator: (rule, value) => {
 							return new Promise<void>((resolve, reject) => {
 								if (value !== formData.password.value) {
-									formData.repeatedPassword.isValid = false;
-									reject(new Error("Пароли не совпадают"));
+									formData.confirmedPassword.isValid = false;
+									reject(new Error('Пароли не совпадают'));
 								} else {
-									formData.repeatedPassword.isValid = true;
+									formData.confirmedPassword.isValid = true;
 									resolve();
 								}
 							});
 						},
-						trigger: ["blur", "input"],
+						trigger: ['blur', 'input', 'password-input'],
 					},
 				],
 			},
 		};
 		const formRef = ref<InstanceType<typeof NForm>>();
+		const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();
+		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const message = useMessage();
 		const submitLoading = ref<boolean>(false);
-		const submitForm = (): void => {
+		const store = useStore();
+		const router = useRouter();
+
+		// methods
+		const handlePasswordInput = (): void => {
+			if (formData.confirmedPassword.value != '') {
+				confirmedPasswordRef.value?.validate({ trigger: 'password-input'}).catch(() => true);
+			}
+		}
+    const submitForm = (): void => {
 			submitLoading.value = true;
-			formRef.value?.validate((errors) => {
-				if (!errors) {
-					message.success("Valid");
-				} else {
-					message.error("Invalid");
-				}
-				submitLoading.value = false;
-			});
-		};
+      formRef.value?.validate(async (errors): Promise<void> => {
+        if (!errors) {
+					try {
+						await store.dispatch('register', formData)
+						message.success('Вы успешно зарегистрировались');
+						router.push({ name: 'AuthSignIn' });
+					} catch (error) {
+						if (error instanceof Error) {
+							message.error(error.message);
+						}
+					} finally {
+						submitLoading.value = false;
+						submitButtonRef.value?.holdDisabled();
+					}
+        } else {
+          message.error('Данные не являются корректными');
+					submitLoading.value = false;
+					submitButtonRef.value?.holdDisabled();
+        }
+      });
+    };
 		return {
 			formData,
 			rules,
 			formRef,
-			message,
+			confirmedPasswordRef,
+			submitButtonRef,
 			submitLoading,
+			handlePasswordInput,
 			submitForm,
 			options: computed(() => externalOptions(formData.email.value))
 		}

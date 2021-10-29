@@ -1,14 +1,11 @@
 <template>
   <div class="container">
     <n-card hoverable style="max-width: 30rem">
-      <n-tabs default-value="signin" size="large">
-        <n-tab-pane name="signin" tab="Вход">
-          <sign-in-form />
-        </n-tab-pane>
-        <n-tab-pane name="signup" tab="Регистрация">
-          <sign-up-form />
-        </n-tab-pane>
-      </n-tabs>
+			<n-tabs size="large" v-model:value="activeTab" @update:value="handleUpdateTab">
+				<n-tab-pane name="signin" tab="Вход"/>
+				<n-tab-pane name="signup" tab="Регистрация"/>
+			</n-tabs>	
+			<router-view style="padding-top: 1rem" />
     </n-card>
   </div>
 </template>
@@ -24,14 +21,25 @@
 </style>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import SignInForm from '@/components/SignInForm.vue'
-import SignUpForm from '@/components/SignUpForm.vue'
+import { defineComponent, ref } from 'vue'
+import { onBeforeRouteUpdate, useRouter } from 'vue-router';
 
 export default defineComponent({
-  name: 'Sign In',
-  components: {
-    SignInForm, SignUpForm
-  }
+  name: 'Auth',
+	setup() {
+		const router = useRouter();
+		const activeTab = ref(router.currentRoute.value.name === 'AuthSignIn' ? 'signin' : 'signup');
+
+		const handleUpdateTab = (value: string) => {
+			router.push({ name: value === 'signin' ? 'AuthSignIn' : 'AuthSignUp' })
+		}
+		onBeforeRouteUpdate(to => {
+			activeTab.value = (to.name === 'AuthSignIn' ? 'signin' : 'signup');
+		})
+		return {
+			activeTab,
+			handleUpdateTab
+		}
+	}
 })
 </script>

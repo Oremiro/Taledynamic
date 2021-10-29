@@ -28,7 +28,7 @@ namespace Taledynamic.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
             var connectionStrings = Configuration.GetSection("ConnectionStrings");
             services.AddDbContext<TaledynamicContext>(options =>
             {
@@ -39,7 +39,14 @@ namespace Taledynamic.Api
                     });
             });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            
+            # region dal services
+            
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IWorkspaceService, WorkspaceService>();
+            services.AddScoped<ITableService, TableService>();
+            
+            # endregion
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo {Title = "Taledynamic", Version = "v1"});
@@ -70,7 +77,8 @@ namespace Taledynamic.Api
 
             #region Middlewares
 
-            // app.UseMiddleware<JwtMiddleware>();
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
+            app.UseMiddleware<JwtMiddleware>();
 
             # endregion
 

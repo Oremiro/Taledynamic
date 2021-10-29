@@ -3,7 +3,9 @@
 		<n-global-style />
 		<n-message-provider>
 			<n-layout position="absolute" style="min-height: 100vh">
-				<Header @changeTheme="setTheme" :currentTheme="currentTheme" />
+				<n-loading-bar-provider>
+					<Header @changeTheme="setTheme" :currentTheme="currentTheme" />
+				</n-loading-bar-provider>
 				<n-layout-content position="absolute" embedded>
 					<router-view />
 				</n-layout-content>
@@ -23,10 +25,9 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import "vfonts/OpenSans.css";
-
 import { darkTheme, GlobalTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
-import Header from "@/components/Header.vue";
+import Header from "@/layouts/Header.vue";
 
 type Theme = GlobalTheme | null;
 

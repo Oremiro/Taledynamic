@@ -1,4 +1,7 @@
-﻿using Serilog;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -16,12 +19,12 @@ namespace TaleDynamicBot.States
                 text: "You logging...."
             );
             //if auth successed
-            this._user.ChangeState(new StateAuth());
+            this._user.Change_State(new StateAuth());
         }
         
         public override void SendingData(ITelegramBotClient botClient, Update update)
         {
-            botClient.SendTextMessageAsync(
+             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 text: "You are not logged in the system"
             );

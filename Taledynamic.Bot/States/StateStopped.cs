@@ -18,11 +18,11 @@ namespace TaleDynamicBot.States
         public override void SendingData(ITelegramBotClient botClient, Update update)
         {
             
-            botClient.SendTextMessageAsync(
+             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 text: "Please,Wait"
             );
-            this._user.ChangeState(new StateAuth());
+             this._user.Change_State(new StateAuth());
         }
 
         public override void StopSendingData(ITelegramBotClient botClient,Update update)

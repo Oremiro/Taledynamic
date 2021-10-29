@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Taledynamic.Core.Entities;
 using Taledynamic.Core.Interfaces;
+using Taledynamic.DAL.Entities;
 
 namespace Taledynamic.Core.Services
 {
@@ -24,8 +24,11 @@ namespace Taledynamic.Core.Services
             {
                 throw new ArgumentNullException($"{typeof(TEntity)} entity is null.");
             } 
-            _context.Update(entity);
+            
+            _context.Set<TEntity>().Update(entity);
             await _context.SaveChangesAsync();
+        
+
         }
         
         protected virtual async Task CreateAsync(TEntity entity)
@@ -36,6 +39,7 @@ namespace Taledynamic.Core.Services
             }
             await _context.Set<TEntity>().AddAsync(entity);
             await _context.SaveChangesAsync();
+
         }
         
         protected virtual async Task DeleteAsync(int? id)
@@ -46,9 +50,14 @@ namespace Taledynamic.Core.Services
             }
 
             var entity = await GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new ArgumentNullException($"[{MethodBase.GetCurrentMethod()?.Name}] {typeof(TEntity)} entity is null.");
+            }
             entity.IsActive = false; 
-            _context.Update(entity);
+            _context.Set<TEntity>().Update(entity);
             await _context.SaveChangesAsync();
+
         }
         
         protected virtual async Task<TEntity> GetByIdAsync(int? id)
@@ -59,8 +68,8 @@ namespace Taledynamic.Core.Services
             }
             var entity = await _context
                 .Set<TEntity>()
-                .AsNoTracking()
-                .FirstAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == id);
+
             return entity;
         }
         

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Taledynamic.Core.Entities;
+using Taledynamic.DAL.Entities;
 
 namespace Taledynamic.Core.Helpers
 {
@@ -26,7 +26,7 @@ namespace Taledynamic.Core.Helpers
             {
                 Subject = new ClaimsIdentity(new Claim[] 
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    new Claim("id", user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -45,7 +45,8 @@ namespace Taledynamic.Core.Helpers
                 Token = Convert.ToBase64String(randomBytes),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Created = DateTime.UtcNow,
-                CreatedByIp = ipAddress
+                CreatedByIp = ipAddress,
+                IsActive = true
             };
         }
     }
