@@ -1,6 +1,6 @@
-import { AuthenticateUserRequest, CreateUserRequest, UpdateUserRequest, RevokeTokenRequest } from "@/interfaces/api/requests";
+import { AuthenticateUserRequest, CreateUserRequest, UpdateUserRequest, RevokeTokenRequest } from "@/interfaces/api/requests/user";
 import { AuthenticateUserResponse, CreateUserResponse, DeleteUserResponse, GetUserResponse, UpdateUserResponse, 
-	RefreshTokenResponse, RevokeTokenResponse, GetByEmailResponse, IsEmailUsedResponse } from "@/interfaces/api/responses";
+	RefreshTokenResponse, RevokeTokenResponse, GetByEmailResponse, IsEmailUsedResponse } from "@/interfaces/api/responses/user";
 import axios, { AxiosResponse } from "axios";
 
 export class Api {

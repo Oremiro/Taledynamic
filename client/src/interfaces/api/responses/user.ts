@@ -1,14 +1,11 @@
-interface BaseResponse {
-	statusCode?: number,
-	message?: string
-}
+import BaseResponse from '@/interfaces/api/responses/base'
 
 interface User {
 	id: number,
 	email: string
 }
 
-export interface AuthenticateUserResponse extends BaseResponse{
+export interface AuthenticateUserResponse extends BaseResponse {
 	id?: number,
 	email?: string,
 	jwtToken?: string
