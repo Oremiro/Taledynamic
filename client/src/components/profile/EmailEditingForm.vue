@@ -47,7 +47,7 @@ import { useStore } from '@/store';
 import { EmailEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
 import DelayedButton from '@/components/DelayedButton.vue'
-import { ApiHelper } from '@/helpers/api';
+import { Api } from '@/helpers/api';
 import { AxiosError } from 'axios';
 
 export default defineComponent({
@@ -97,7 +97,7 @@ export default defineComponent({
 								if (value === defaultEmailValue.value) {
 									resolve()
 								} else {
-									ApiHelper.userIsEmailUsed({ email: value })
+									Api.userIsEmailUsed({ email: value })
 									.then((response) => {
 										if(response.data.isEmailUsed) {
 											reject(new Error('Данный email занят другим пользователем'));

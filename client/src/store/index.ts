@@ -2,7 +2,7 @@ import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { SignInFormData, SignUpFormData } from '@/interfaces'
 import { VueCookieNext } from 'vue-cookie-next'
-import { ApiHelper } from '@/helpers/api'
+import { Api } from '@/helpers/api'
 import axios from 'axios'
 
 interface User {
@@ -89,7 +89,7 @@ export const store = createStore<State>({
 				confirmPassword: formData.confirmedPassword.value
 			}
 			try {
-				const { data } = await ApiHelper.userCreate({ user: newUser });
+				const { data } = await Api.userCreate({ user: newUser });
 				if (data.statusCode === 200) {
 					return;
 				} else {
@@ -111,7 +111,7 @@ export const store = createStore<State>({
 				password: formData.password.value
 			}
 			try {
-				const { data } = await ApiHelper.userAuthenticate({ user: requestedUser });
+				const { data } = await Api.userAuthenticate({ user: requestedUser });
 				if (data.statusCode === 200) {
 					const responsedUser: User = {
 						id: data.id ?? null, 
@@ -139,7 +139,7 @@ export const store = createStore<State>({
 		},
 		async logout({ commit, state }): Promise<void> {
 			try {
-				const { data } = await ApiHelper.userRevokeToken({}, state.accessTokenInMemory)
+				const { data } = await Api.userRevokeToken({}, state.accessTokenInMemory)
 				if (data.isSuccess && data.statusCode === 200) {
 					commit('logout');
 					VueCookieNext.removeCookie('remembered');
@@ -160,7 +160,7 @@ export const store = createStore<State>({
 		},
 		async refresh({ commit }): Promise<void> {			
 			try {
-				const { data } = await ApiHelper.userRefreshToken();
+				const { data } = await Api.userRefreshToken();
 				if (data.id && data.email && data.jwtToken) {
 					const user: User = { id: data.id, email: data.email };
 					const token: string = data.jwtToken
@@ -186,7 +186,7 @@ export const store = createStore<State>({
 		async updateEmail({ commit, state }, data: UpdatedEmailData): Promise<void> {
 			if (state.user.id) {
 				try {
-					const { data: responseData } = await ApiHelper.userUpdate({ 
+					const { data: responseData } = await Api.userUpdate({ 
 						user: { 
 							id: state.user.id, 
 							password: data.currentPassword, 
@@ -218,7 +218,7 @@ export const store = createStore<State>({
 		async updatePassword({ commit, state }, data: UpdatedPasswordData): Promise<void> {
 			if (state.user.id) {
 				try {
-					const { data: responseData } = await ApiHelper.userUpdate({ 
+					const { data: responseData } = await Api.userUpdate({ 
 						user: { 
 							id: state.user.id, 
 							password: data.currentPassword,
@@ -251,7 +251,7 @@ export const store = createStore<State>({
 		async delete({ commit, state }): Promise<void> {
 			if (state.user.id) {
 				try {
-					await ApiHelper.userDelete({ userId: state.user.id }, state.accessTokenInMemory);
+					await Api.userDelete({ userId: state.user.id }, state.accessTokenInMemory);
 					commit('logout');
 					VueCookieNext.removeCookie('remembered');
 					localStorage.removeItem('user');

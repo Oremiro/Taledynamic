@@ -1,77 +1,12 @@
+import { AuthenticateUserRequest, CreateUserRequest, UpdateUserRequest, RevokeTokenRequest } from "@/interfaces/api/requests";
+import { AuthenticateUserResponse, CreateUserResponse, DeleteUserResponse, GetUserResponse, UpdateUserResponse, 
+	RefreshTokenResponse, RevokeTokenResponse, GetByEmailResponse, IsEmailUsedResponse } from "@/interfaces/api/responses";
 import axios, { AxiosResponse } from "axios";
 
-interface User {
-	id: number,
-	email: string
-}
-
-interface BaseResponse {
-	statusCode?: number,
-	message?: string
-}
-
-interface AuthenticateUserRequest {
-	email: string,
-	password: string
-}
-
-interface AuthenticateUserResponse extends BaseResponse{
-	id?: number,
-	email?: string,
-	jwtToken?: string
-}
-
-interface CreateUserRequest extends AuthenticateUserRequest {
-	confirmPassword: string
-}
-
-interface CreateUserResponse extends BaseResponse {}
-
-interface GetUserResponse extends BaseResponse {
-	userDto?: User
-}
-
-interface UpdateUserRequest {
-	id: number,
-	password: string,
-	email?: string,
-	newPassword?: string,
-	confirmNewPassword?: string
-}
-
-interface UpdateUserResponse extends BaseResponse {
-	user: User
-}
-
-interface DeleteUserResponse extends BaseResponse {}
-
-interface RefreshTokenResponse extends BaseResponse {
-	id?: number,
-	email?: string,
-	jwtToken?: string
-}
-
-interface RevokeTokenRequest {
-	token?: string
-}
-
-interface RevokeTokenResponse extends BaseResponse {
-	isSuccess?: boolean
-}
-
-interface GetByEmailResponse extends BaseResponse {
-	user: User
-}
-
-interface IsEmailUsedResponse extends BaseResponse {
-	isEmailUsed: boolean
-}
-
-
-export class ApiHelper {
+export class Api {
 	private static readonly baseUrl: string = process.env.VUE_APP_API_BASEURL;
 	private static readonly axiosInstance = axios.create({
-		baseURL: ApiHelper.baseUrl,
+		baseURL: Api.baseUrl,
 		withCredentials: true
 	})
 
