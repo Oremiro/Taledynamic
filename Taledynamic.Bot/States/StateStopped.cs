@@ -22,7 +22,7 @@ namespace TaleDynamicBot.States
                 chatId: update.Message.Chat.Id,
                 text: "Please,Wait"
             );
-             this._user.Change_State(new StateAuth());
+             this._user.ChangeState(new StateAuth());
         }
 
         public override void StopSendingData(ITelegramBotClient botClient,Update update)
