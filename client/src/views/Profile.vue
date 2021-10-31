@@ -4,7 +4,6 @@
 			<n-gi :span="8">
 				<n-card
 					hoverable
-					style="min-height: 100%"
 					size="small"
 					content-style="padding-left: 0; padding-right: 0"
 				>
@@ -13,9 +12,13 @@
 			</n-gi>
 			<n-gi :span="1" />
 			<n-gi :span="21">
-				<n-card hoverable>
-					<router-view />
-				</n-card>
+				<router-view v-slot="{ Component }">
+					<transition name="fade" mode="out-in">
+						<n-card hoverable :key="route.path">
+							<component :is="Component" />
+						</n-card>
+					</transition>
+				</router-view>
 			</n-gi>
 		</n-grid>
 	</div>
@@ -60,10 +63,10 @@ export default defineComponent({
 				label: () =>
 					h(
 						RouterLink,
-						{ to: '/profile/edit' },
+						{ to: '/profile/data' },
 						{ default: () => 'Данные' }
 					),
-				key: '/profile/edit',
+				key: '/profile/data',
 			},
 			{
 				label: () =>

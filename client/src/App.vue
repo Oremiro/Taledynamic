@@ -7,7 +7,11 @@
 					<Header @changeTheme="setTheme" :currentTheme="currentTheme" />
 				</n-loading-bar-provider>
 				<n-layout-content position="absolute" embedded>
-					<router-view />
+					<router-view v-slot="{ Component }">
+						<transition name="fade" mode="out-in">
+							<component :is="Component" />
+						</transition>
+					</router-view>
 				</n-layout-content>
 			</n-layout>
 		</n-message-provider>
@@ -20,16 +24,25 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
+
+.fade-enter-active, .fade-leave-active {
+  transition: all .3s ease-out;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
 </style>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import "vfonts/OpenSans.css";
-import { darkTheme, GlobalTheme, useOsTheme } from "naive-ui";
+import { darkTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
 import Header from "@/layouts/Header.vue";
+import { Theme } from "@/interfaces";
 
-type Theme = GlobalTheme | null;
+
 
 export default defineComponent({
 	components: {

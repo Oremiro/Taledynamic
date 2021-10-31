@@ -4,7 +4,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-		name: 'Index',
+		name: 'Home',
     component: () => import('@/views/Home.vue')
   },
   {
@@ -16,34 +16,35 @@ const routes: Array<RouteRecordRaw> = [
 			{
         path: 'signin',
 				name: 'AuthSignIn',
-        component: () => import('@/components/SignInForm.vue'),
+        component: () => import('@/components/auth/SignInForm.vue'),
       },
       {
         path: 'signup',
 				name: 'AuthSignUp',
-        component: () => import('@/components/SignUpForm.vue'),
-      },
+        component: () => import('@/components/auth/SignUpForm.vue'),
+      }
 		]
   },
   {
     path: '/profile',
+		name: 'Profile',
     component: () => import('@/views/Profile.vue'),
 		meta: { requiresAuth: true },
     children: [
       {
         path: '',
 				name: 'ProfileIndex',
-        component: () => import('@/components/ProfileMain.vue'),
+        component: () => import('@/components/profile/MainSection.vue'),
       },
       {
         path: 'settings',
 				name: 'ProfileSettings',
-        component: () => import('@/components/ProfileSettings.vue'),
+        component: () => import('@/components/profile/SettingsSection.vue'),
       },
 			{
-				path: 'edit',
-				name: 'ProfileEdit',
-				component: () => import('@/components/ProfileEdit.vue')
+				path: 'data',
+				name: 'ProfileData',
+				component: () => import('@/components/profile/DataSection.vue')
 			}
     ]
   },

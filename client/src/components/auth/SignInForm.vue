@@ -45,7 +45,7 @@ import { SignInFormData } from '@/interfaces'
 import DelayedButton from '@/components/DelayedButton.vue'
 
 export default defineComponent({
-  name: "SignInForm",
+  name: 'AuthSignInForm',
 	components: {
 		DelayedButton
 	},
