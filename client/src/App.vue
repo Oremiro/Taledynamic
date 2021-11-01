@@ -4,7 +4,7 @@
 		<n-message-provider>
 			<n-layout position="absolute" style="min-height: 100vh">
 				<n-loading-bar-provider>
-					<Header @changeTheme="setTheme" :currentTheme="currentTheme" />
+					<layout-header @changeTheme="setTheme" :currentTheme="currentTheme" />
 				</n-loading-bar-provider>
 				<n-layout-content position="absolute" embedded>
 					<router-view v-slot="{ Component }">
@@ -35,18 +35,18 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
 import "vfonts/OpenSans.css";
+import { defineComponent, ref } from "vue";
 import { darkTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
-import Header from "@/layouts/Header.vue";
+import LayoutHeader from "@/layouts/Header.vue";
 import { Theme } from "@/interfaces";
 
 
 
 export default defineComponent({
 	components: {
-		Header,
+		LayoutHeader
 	},
 	setup() {
 		const currentTheme = ref<Theme>(darkTheme);

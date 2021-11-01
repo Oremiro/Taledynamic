@@ -58,73 +58,68 @@
 </style>
 
 
-<script lang="ts">
-import { computed, ComputedRef, defineComponent, h, watch, PropType } from 'vue'
+<script setup lang="ts">
+import { computed, h, watch, PropType } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { darkTheme, MenuOption, useLoadingBar, useMessage } from 'naive-ui'
 import { useStore } from '@/store'
 import { Theme } from '@/interfaces'
 
-export default defineComponent({
-	name: 'Header',
-	props: {
-		currentTheme: Object as PropType<Theme>
-	},
-	setup(props, context) {
-		// data
-		const loadingBar = useLoadingBar()
-		loadingBar.start();
-		const message = useMessage();
-		const store = useStore();
-		const route = useRoute();
+const props = defineProps({
+	currentTheme: Object as PropType<Theme>
+});
+const emit = defineEmits<{
+  (e: 'changeTheme', theme: Theme): void
+}>();
 
-		// computed
-		const menuOptions: ComputedRef<MenuOption[]> = computed((): MenuOption[] => {
-			const baseMenuOptions = [
-				{
-					label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
-					key: '',
-				}
-			];
-			
-			if (store.getters.isLoggedIn) {
-				baseMenuOptions.push({
-					label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
-					key: 'profile'
-				})
-			} else {
-				baseMenuOptions.push({
-					label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),
-					key: 'auth'
-				})
-			}
-			return baseMenuOptions;
-		})		
-		const currentPath = computed(() => route.path.split('/')[1])
 
-		// methods
-		const changeTheme = (): void => {
-			if (props.currentTheme === null) {
-				context.emit('changeTheme', darkTheme)
-			} else {
-				context.emit('changeTheme', null)
-			}
+// data
+const loadingBar = useLoadingBar();
+loadingBar.start();
+const message = useMessage();
+const store = useStore();
+const route = useRoute();
+
+// computed
+const menuOptions = computed((): MenuOption[] => {
+	const baseMenuOptions = [
+		{
+			label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
+			key: '',
 		}
+	];
+	
+	if (store.getters.isLoggedIn) {
+		baseMenuOptions.push({
+			label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
+			key: 'profile'
+		})
+	} else {
+		baseMenuOptions.push({
+			label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),
+			key: 'auth'
+		})
+	}
+	return baseMenuOptions;
+})		
+const currentPath = computed(() => route.path.split('/')[1])
 
-		//watchers
-		watch(() => store.state.pageStatus, () => {
-			if (store.state.pageStatus === 'ready') {
-				loadingBar.finish();
-			} else {
-				loadingBar.error();
-				message.error('Ваша сессия устарела')
-			}
-		});
-		return {
-			menuOptions,
-			currentPath,	
-			changeTheme
-		}
-	},
-})
+// methods
+const changeTheme = (): void => {
+	if (props.currentTheme === null) {
+		emit('changeTheme', darkTheme)
+	} else {
+		emit('changeTheme', null)
+	}
+}
+
+// watchers
+watch(() => store.state.pageStatus, () => {
+	if (store.state.pageStatus === 'ready') {
+		loadingBar.finish();
+	} else {
+		loadingBar.error();
+		message.error('Ваша сессия устарела')
+	}
+});
 </script>
