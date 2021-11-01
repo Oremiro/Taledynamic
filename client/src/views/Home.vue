@@ -30,6 +30,6 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'Home'
+  name: 'HomeView'
 })
 </script>

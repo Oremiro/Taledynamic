@@ -14,22 +14,12 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>
-
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { onBeforeRouteUpdate, useRouter } from 'vue-router';
 
 export default defineComponent({
-  name: 'Auth',
+  name: 'AuthView',
 	setup() {
 		const router = useRouter();
 		const activeTab = ref(router.currentRoute.value.name === 'AuthSignIn' ? 'signin' : 'signup');

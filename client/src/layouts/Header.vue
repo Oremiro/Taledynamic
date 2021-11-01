@@ -1,5 +1,5 @@
 <template>
-	<n-layout-header position="absolute" bordered style="padding: .3rem 0 .3rem 0; z-index: 1">
+	<n-layout-header bordered style="padding: .3rem 3% .3rem 3%">
 		<n-grid cols="12">
 			<n-gi span="2">
 				<div class="nav-logo">
@@ -43,7 +43,7 @@
 .nav-logo {
 	@extend %nav;
 	font-size: 1.25rem;
-	justify-content: center;
+	justify-content: flex-start;
 }
 
 .nav-menu {
@@ -53,7 +53,7 @@
 
 .nav-extra {
 	@extend %nav;
-	justify-content: center;
+	justify-content: flex-end;
 }
 </style>
 
@@ -95,32 +95,6 @@ const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
 			{
 				label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
 				key: 'profile'
-			},
-			{
-				label: 'Рабочие пространства',
-				key: 'workspaces',
-				children: [
-					{
-						label: 'Beverage',
-						key: 'beverage'
-					},
-					{
-						label: 'Food',
-						key: 'food',
-					},
-					{
-						label: 'The past increases. The future recedes.',
-						key: 'the-past-increases-the-future-recedes'
-					},
-					{
-						type: 'divider',
-						key: 'divider'
-					},
-					{
-						label: () => h(RouterLink, { to: '/workspaces' }, { default: () => 'Показать все' }),
-						key: 'all'
-					}
-				]
 			}
 		)
 	} else {
