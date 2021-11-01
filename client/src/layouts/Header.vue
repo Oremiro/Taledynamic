@@ -8,7 +8,7 @@
 			</n-gi>
 			<n-gi span="6" offset="1">
 				<div class="nav-menu">
-					<n-menu :value="currentPath" :options="menuOptions" mode="horizontal" />
+					<n-menu :value="currentPath" :options="menuOptions" dropdown-placement="top-start" mode="horizontal" />
 				</div>
 			</n-gi>
 			<n-gi span="2" offset="1">
@@ -61,10 +61,11 @@
 <script setup lang="ts">
 import { computed, h, watch, PropType } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { darkTheme, MenuOption, useLoadingBar, useMessage } from 'naive-ui'
+import { darkTheme, MenuGroupOption, MenuOption, NIcon, useLoadingBar, useMessage } from 'naive-ui'
 import { useStore } from '@/store'
 import { Theme } from '@/interfaces'
 
+/* global defineProps, defineEmits */
 const props = defineProps({
 	currentTheme: Object as PropType<Theme>
 });
@@ -81,8 +82,8 @@ const store = useStore();
 const route = useRoute();
 
 // computed
-const menuOptions = computed((): MenuOption[] => {
-	const baseMenuOptions = [
+const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
+	const baseMenuOptions: Array<MenuOption | MenuGroupOption> = [
 		{
 			label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
 			key: '',
@@ -90,10 +91,38 @@ const menuOptions = computed((): MenuOption[] => {
 	];
 	
 	if (store.getters.isLoggedIn) {
-		baseMenuOptions.push({
-			label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
-			key: 'profile'
-		})
+		baseMenuOptions.push(
+			{
+				label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
+				key: 'profile'
+			},
+			{
+				label: 'Рабочие пространства',
+				key: 'workspaces',
+				children: [
+					{
+						label: 'Beverage',
+						key: 'beverage'
+					},
+					{
+						label: 'Food',
+						key: 'food',
+					},
+					{
+						label: 'The past increases. The future recedes.',
+						key: 'the-past-increases-the-future-recedes'
+					},
+					{
+						type: 'divider',
+						key: 'divider'
+					},
+					{
+						label: () => h(RouterLink, { to: '/workspaces' }, { default: () => 'Показать все' }),
+						key: 'all'
+					}
+				]
+			}
+		)
 	} else {
 		baseMenuOptions.push({
 			label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),

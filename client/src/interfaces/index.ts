@@ -31,3 +31,11 @@ export interface PasswordEditFormData extends UserFieldEditFormData {
 }
 
 export type Theme = GlobalTheme | null;
+
+export interface WorkspaceItem {
+	id: number,
+	isActive?: boolean,
+	name: string,
+	created?: Date,
+	modified?: Date
+}
