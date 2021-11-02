@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<div style="padding: 0rem 1rem .5rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+	<div style="height: 100%; display: flex; flex-direction: column;">
+		<div style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
 			<n-text depth="3">Ваши рабочие пространства</n-text>
 			<n-popselect trigger="click" :options="popOptions" v-model:value="popSortValue" @update:value="updateHandler">
 				<n-button text>
@@ -10,7 +10,12 @@
 				</n-button>
 			</n-popselect>
 		</div>
-		<n-menu :options="menuOptions" :indent="30" />
+		<n-scrollbar style="height: 100%;">
+			<n-menu :options="menuOptions" :indent="30" style="padding: 0 .25rem;"/>
+		</n-scrollbar>
+		<div style="padding: 1rem 0; display: flex; align-items: center; justify-content: center;">
+			<n-button>Добавить пространство</n-button>
+		</div>
 	</div>
 </template>
 
@@ -19,7 +24,7 @@ import { WorkspaceItem } from '@/interfaces';
 import { ref, h, reactive, computed, onMounted } from 'vue';
 import { MenuGroupOption, MenuOption, SelectGroupOption, SelectOption } from 'naive-ui';
 import WorkspacesListItem from '@/components/workspaces/WorkspacesListItem.vue';
-import { NPopselect } from 'naive-ui';
+import { NPopselect, NScrollbar } from 'naive-ui';
 
 // data
 const workspaces = reactive<WorkspaceItem[]>([
@@ -37,7 +42,7 @@ const workspaces = reactive<WorkspaceItem[]>([
 		id: 2,
 		name: 'Университет',
 		modified: new Date('2020-11-04')
-	},
+	}
 ])
 const popOptions: Array<SelectOption | SelectGroupOption> = [
 	{

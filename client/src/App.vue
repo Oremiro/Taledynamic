@@ -2,20 +2,21 @@
 	<n-config-provider :theme="currentTheme">
 		<n-global-style />
 		<n-message-provider>
-			<n-layout style="min-height: 100vh">
+			<n-content-layout style="min-height: 100vh">
 				<n-loading-bar-provider>
 				<layout-header @changeTheme="setTheme" :currentTheme="currentTheme" />
 				</n-loading-bar-provider>
 				<n-layout has-sider position="absolute" style="top: 3.3rem;">
-					<n-layout-sider 
-						:native-scrollbar="false" 
-						bordered
-						collapse-mode="transform"
-						show-trigger="bar"
-						:collapsed-width="0"
-						content-style="padding: 1rem 0">
-						<workspaces-list />
-					</n-layout-sider>
+					<transition name="fade">
+						<n-layout-sider
+							v-if="isLoggedIn"
+							bordered
+							collapse-mode="transform"
+							show-trigger="bar"
+							:collapsed-width="0">
+							<workspaces-list />
+						</n-layout-sider>
+					</transition>
 					<n-layout-content embedded>
 						<router-view v-slot="{ Component }">
 							<transition name="fade" mode="out-in">
@@ -24,7 +25,7 @@
 						</router-view>
 					</n-layout-content>
 				</n-layout>
-			</n-layout>
+			</n-content-layout>
 		</n-message-provider>
 	</n-config-provider>
 </template>
@@ -55,18 +56,20 @@
 
 <script setup lang="ts">
 import "vfonts/OpenSans.css";
-import { ref } from "@vue/reactivity";
+import { computed, ref } from "@vue/reactivity";
 import { darkTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
 import LayoutHeader from "@/layouts/Header.vue";
 import WorkspacesList from "./components/workspaces/WorkspacesList.vue";
 import { Theme } from "@/interfaces";
+import { useStore } from "@/store";
 
 
 // data
 const currentTheme = ref<Theme>(darkTheme);
 const cookie = useCookie();
 const cookieTheme: string | null = cookie.getCookie("theme");
+const store = useStore();
 
 if (cookieTheme === null) {
 	const osThemeRef = useOsTheme();
@@ -74,6 +77,9 @@ if (cookieTheme === null) {
 } else {
 	currentTheme.value = cookieTheme === "dark" ? darkTheme : null;
 }
+
+// computed
+const isLoggedIn = computed<boolean>(() => store.getters.isLoggedIn);
 
 // methods
 const setTheme = (value: Theme) => {

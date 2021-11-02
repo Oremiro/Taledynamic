@@ -1,8 +1,13 @@
 <template>
 	<div style="display: flex; justify-content: space-between; align-items: center;">
-		<router-link :to="to">
-			<slot></slot>
-		</router-link>
+		<n-ellipsis :tooltip="{ delay: 500 }">
+			<router-link :to="to">
+				<slot></slot>
+			</router-link>
+			<template #tooltip>
+				<slot></slot>
+			</template>
+		</n-ellipsis>
 		<div style="display: flex; align-items: center;">
 			<n-button text style="margin-right: .3rem;">
 				<n-icon size="1.2rem">
@@ -20,6 +25,7 @@
 
 <script lang="ts" setup>
 import { RouterLink } from 'vue-router';
+import { NEllipsis } from 'naive-ui'
 
 /* global defineProps */
 defineProps({
