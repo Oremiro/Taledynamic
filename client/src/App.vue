@@ -13,12 +13,10 @@
 						collapse-mode="transform"
 						show-trigger="bar"
 						:collapsed-width="0"
-						width="16rem"
-						:default-collapsed="true"
 						content-style="padding: 1rem 0">
 						<workspaces-list />
 					</n-layout-sider>
-					<n-layout-content embedded style="min-width: 100%; min-height: 100%;">
+					<n-layout-content embedded>
 						<router-view v-slot="{ Component }">
 							<transition name="fade" mode="out-in">
 								<component :is="Component" />
