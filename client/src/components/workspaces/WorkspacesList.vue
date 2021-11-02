@@ -2,10 +2,10 @@
 	<div>
 		<div style="padding: 0rem 1rem .5rem 1rem; display: flex; align-items: center; justify-content: space-between;">
 			<n-text depth="3">Ваши рабочие пространства</n-text>
-			<n-popselect trigger="click" :options="popOptions" v-model:value="popValue" @update:value="updateHandler">
+			<n-popselect trigger="click" :options="popOptions" v-model:value="popSortValue" @update:value="updateHandler">
 				<n-button text>
 					<n-icon size="1.2rem">
-						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M17 19.44l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V2.75a.75.75 0 0 1 1.5 0v16.69zM7.072 2a.75.75 0 0 1 .697.487l3.184 8.5a.75.75 0 0 1-1.405.526L8.794 9.5H5.238l-.79 2.023a.75.75 0 0 1-1.397-.546l3.317-8.5A.75.75 0 0 1 7.072 2zm-.02 2.85L5.823 8h2.41l-1.18-3.15zM4.75 13a.75.75 0 1 0 0 1.5h3.388l-4.021 6.349a.75.75 0 0 0 .633 1.15H9.5a.75.75 0 1 0 0-1.5H6.113l4.021-6.348A.75.75 0 0 0 9.5 13H4.75z" fill="currentColor"></path></g></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M17.25 4l-.1.007a.75.75 0 0 0-.65.743v12.692l-3.22-3.218l-.084-.072a.75.75 0 0 0-.976 1.134l4.504 4.5l.084.072a.75.75 0 0 0 .976-.073l4.497-4.5l.072-.084a.75.75 0 0 0-.073-.977l-.084-.072a.75.75 0 0 0-.977.073L18 17.446V4.75l-.006-.102A.75.75 0 0 0 17.251 4zm-11.036.22L1.72 8.715l-.073.084a.75.75 0 0 0 .073.976l.084.073a.75.75 0 0 0 .976-.073l3.217-3.218v12.698l.008.102a.75.75 0 0 0 .743.648l.101-.007a.75.75 0 0 0 .649-.743L7.497 6.559l3.223 3.217l.084.072a.75.75 0 0 0 .975-1.134L7.275 4.22l-.085-.072a.75.75 0 0 0-.976.073z" fill="currentColor"></path></g></svg>
 					</n-icon>
 				</n-button>
 			</n-popselect>
@@ -16,24 +16,29 @@
 
 <script lang="ts" setup>
 import { WorkspaceItem } from '@/interfaces';
-import { ref, h } from 'vue';
+import { ref, h, reactive, computed, onMounted } from 'vue';
 import { MenuGroupOption, MenuOption, SelectGroupOption, SelectOption } from 'naive-ui';
 import WorkspacesListItem from '@/components/workspaces/WorkspacesListItem.vue';
 import { NPopselect } from 'naive-ui';
 
-const workspaces: WorkspaceItem[] = [
+// data
+const workspaces = reactive<WorkspaceItem[]>([
 	{
 		id: 0,
-		name: 'Университет'
+		name: 'Аббатство',
+		modified: new Date('2021-11-03')
 	},
 	{
 		id: 1,
-		name: 'Работа'
+		name: 'Работа',
+		modified: new Date('2021-11-04')
 	},
-]
-
-const popValue = ref<string | null>('sortAscendingByDate');
-
+	{
+		id: 2,
+		name: 'Университет',
+		modified: new Date('2020-11-04')
+	},
+])
 const popOptions: Array<SelectOption | SelectGroupOption> = [
 	{
 		type: 'group',
@@ -42,11 +47,11 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		children: [
 			{
 				label: 'Сначала новые',
-				value: 'sortAscendingByDate'
+				value: 'sortDescendingByDate'
 			},
 			{
 				label: 'Сначала старые',
-				value: 'sortDescendingByDate'
+				value: 'sortAscendingByDate'
 			},
 		]
 	},
@@ -66,15 +71,57 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		]
 	}
 ]
-
-const menuOptions: Array<MenuOption | MenuGroupOption> = workspaces.map(item => ({
+const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() => workspaces.map(item => ({
 	label: () => 
 		h(WorkspacesListItem, { to: `/workspaces/${item.id}` }, { default: () => item.name }),
 		key: `workspace-${item.id}`
 	})
-)
+))
+const popSortValue = ref<string>(localStorage.getItem('workspacesSort') ?? 'sortAscendingByDate');
 
-const updateHandler = (value: string) => {
-	console.log(value);	
+// methods
+const sortWorkspacesListByName = (reverse = false): void => {
+	workspaces.sort((itemFirst, itemSecond) => {
+		if (itemFirst.name > itemSecond.name) {
+			return reverse ? -1 : 1;
+		} else if (itemFirst.name < itemSecond.name) {
+			return reverse ? 1 : -1;
+		}
+		return 0;
+	})
 }
+const sortWorkspacesListByDate = (reverse = false): void => {
+	workspaces.sort((itemFirst, itemSecond) => reverse ? 
+		itemSecond.modified.getTime() - itemFirst.modified.getTime() : 
+		itemFirst.modified.getTime() - itemSecond.modified.getTime())
+}
+const sortWorkspacesList = (value: string): void => {
+	switch (value) {
+		case 'sortAscendingByName': {
+			sortWorkspacesListByName();
+			break;
+		}
+		case 'sortDescendingByName': {
+			sortWorkspacesListByName(true);
+			break;
+		}
+		case 'sortAscendingByDate': {
+			sortWorkspacesListByDate();
+			break;
+		}
+		case 'sortDescendingByDate': {
+			sortWorkspacesListByDate(true);
+			break;
+		}
+	}
+}
+
+const updateHandler = (value: string): void => {
+	localStorage.setItem('workspacesSort', value);
+	sortWorkspacesList(value);
+}
+
+onMounted(() => {
+	sortWorkspacesList(popSortValue.value);
+})
 </script>

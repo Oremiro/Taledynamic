@@ -37,5 +37,5 @@ export interface WorkspaceItem {
 	isActive?: boolean,
 	name: string,
 	created?: Date,
-	modified?: Date
+	modified: Date
 }
