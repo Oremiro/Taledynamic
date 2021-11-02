@@ -200,7 +200,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors): Promise<void> => {
         if (!errors) {
 					try {
-						await store.dispatch('register', formData)
+						await store.dispatch('user/register', formData)
 						message.success('Вы успешно зарегистрировались');
 						router.push({ name: 'AuthSignIn' });
 					} catch (error) {

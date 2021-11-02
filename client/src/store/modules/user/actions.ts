@@ -3,10 +3,10 @@ import { ActionTree } from "vuex";
 import { VueCookieNext } from "vue-cookie-next";
 import { Api } from "@/helpers/api";
 import { SignUpFormData, SignInFormData } from "@/interfaces";
-import { State, UpdatedEmailData, UpdatedPasswordData, User } from "@/interfaces/store";
+import { State, UserState, UpdatedEmailData, UpdatedPasswordData, User } from "@/interfaces/store";
 
 
-export const actions: ActionTree<State, State> = {
+export const actions: ActionTree<UserState, State> = {
 	async init({ dispatch }): Promise<boolean> {
 		const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 		const localStorageUser: string | null = localStorage.getItem('user');

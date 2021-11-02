@@ -70,7 +70,7 @@ export default defineComponent({
 			{
 				onClick: async (): Promise<void> => {
 					try {
-						await store.dispatch('logout')
+						await store.dispatch('user/logout')
 						router.push({ name: 'Auth'});
 						message.info('Вы вышли из аккаунта');
 					} catch (error) {

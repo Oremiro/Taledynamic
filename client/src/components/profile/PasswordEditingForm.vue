@@ -159,7 +159,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors) => {
         if (!errors) {
 					try {
-						await store.dispatch('updatePassword', {
+						await store.dispatch('user/updatePassword', {
 							currentPassword: formData.currentPassword.value, 
 							newPassword: formData.newPassword.value, 
 							confirmedNewPassword: formData.confirmedPassword.value 

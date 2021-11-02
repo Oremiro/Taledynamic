@@ -90,7 +90,7 @@ const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
 		}
 	];
 	
-	if (store.getters.isLoggedIn) {
+	if (store.getters['user/isLoggedIn']) {
 		baseMenuOptions.push(
 			{
 				label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),

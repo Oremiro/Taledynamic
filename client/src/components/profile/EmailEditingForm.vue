@@ -59,7 +59,7 @@ export default defineComponent({
 		// data
 		const store = useStore();
 		const formRef = ref<InstanceType<typeof NForm>>();
-		const defaultEmailValue = ref<string>(store.state.user.email);
+		const defaultEmailValue = ref<string>(store.getters['user/email']);
 		const formData = reactive<EmailEditFormData>({
 			email: {
 				value: defaultEmailValue.value,
@@ -142,7 +142,7 @@ export default defineComponent({
 		}
 		const saveChanges = (): void => {
 			formData.currentPassword.value = '';
-			defaultEmailValue.value = store.state.user.email;
+			defaultEmailValue.value = store.getters['user/email'];
 			isSubmitButtonShown.value = false;
 		}
 		const submitForm = (): void => {
@@ -150,7 +150,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors) => {
         if (!errors) {
 					try {
-						await store.dispatch('updateEmail', { 
+						await store.dispatch('user/updateEmail', { 
 							currentPassword: formData.currentPassword.value, 
 							newEmail: formData.email.value 
 						});

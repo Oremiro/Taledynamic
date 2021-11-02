@@ -38,7 +38,7 @@ export default defineComponent({
 
 		const deleteUser = async (): Promise<void> => {
 			try {
-				await store.dispatch('delete');
+				await store.dispatch('user/delete');
 				router.push({ name: 'Auth'});
 				message.info('Вы успешно удалили аккаунт');
 			} catch (error) {

@@ -2,7 +2,7 @@
 	<n-config-provider :theme="currentTheme">
 		<n-global-style />
 		<n-message-provider>
-			<n-content-layout style="min-height: 100vh">
+			<n-layout style="min-height: 100vh">
 				<n-loading-bar-provider>
 				<layout-header @changeTheme="setTheme" :currentTheme="currentTheme" />
 				</n-loading-bar-provider>
@@ -25,7 +25,7 @@
 						</router-view>
 					</n-layout-content>
 				</n-layout>
-			</n-content-layout>
+			</n-layout>
 		</n-message-provider>
 	</n-config-provider>
 </template>
@@ -79,7 +79,7 @@ if (cookieTheme === null) {
 }
 
 // computed
-const isLoggedIn = computed<boolean>(() => store.getters.isLoggedIn);
+const isLoggedIn = computed<boolean>(() => store.getters['user/isLoggedIn']);
 
 // methods
 const setTheme = (value: Theme) => {
