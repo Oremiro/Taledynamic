@@ -1,36 +1,70 @@
-import { CreateWorkspaceResponse, UpdateWorkspaceResponse, DeleteWorkspaceResponse, GetWorkspaceByIdResponse, GetWorkspacesByUserResponse } from "@/interfaces/api/responses";
-import { AxiosResponse } from "axios";
-import { Api } from "@/helpers/api/base";
+import { CreateWorkspaceRequest, DeleteWorkspaceRequest, GetWorkspaceByIdRequest, UpdateWorkspaceRequest } from "@/interfaces/api/requests";
+import { CreateWorkspaceResponse, UpdateWorkspaceResponse, DeleteWorkspaceResponse, GetWorkspaceByIdResponse, 
+	GetWorkspacesByUserResponse } from "@/interfaces/api/responses";
+import axios, { AxiosPromise } from "axios";
 
+export class WorkspaceApi {
+	private static readonly axiosInstance = axios.create({
+		baseURL: process.env.VUE_APP_API_BASEURL + '/data/workspace',
+		withCredentials: true
+	})
 
-export class WorkspaceApi extends Api {
-	static create(): Promise<AxiosResponse<CreateWorkspaceResponse>> {
+	static create(data: CreateWorkspaceRequest, accessToken: string): AxiosPromise<CreateWorkspaceResponse> {
 		return this.axiosInstance.post<CreateWorkspaceResponse>(
-			'/data/workspace/create',
+			'/create',
+			data,
+			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			}
 		) 
 	}
 
-	static delete(): Promise<AxiosResponse<DeleteWorkspaceResponse>> {
+	static delete(params: DeleteWorkspaceRequest, accessToken: string): AxiosPromise<DeleteWorkspaceResponse> {
 		return this.axiosInstance.delete<DeleteWorkspaceResponse>(
-			'/data/workspace/delete',
+			'/delete',
+			{
+				params,
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			}
 		) 
 	}
 
-	static update(): Promise<AxiosResponse<UpdateWorkspaceResponse>> {
+	static update(data: UpdateWorkspaceRequest, accessToken: string): AxiosPromise<UpdateWorkspaceResponse> {
 		return this.axiosInstance.put<UpdateWorkspaceResponse>(
-			'/data/workspace/update',
+			'/update',
+			data,
+			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			}
 		) 
 	}
 
-	static get(): Promise<AxiosResponse<GetWorkspaceByIdResponse>> {
+	static get(params: GetWorkspaceByIdRequest, accessToken: string): AxiosPromise<GetWorkspaceByIdResponse> {
 		return this.axiosInstance.get<GetWorkspaceByIdResponse>(
-			'/data/workspace/get',
+			'/get',
+			{
+				params,
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			}
 		) 
 	}
 
-	static getByUser(): Promise<AxiosResponse<GetWorkspacesByUserResponse>> {
+	static getByUser(accessToken: string): AxiosPromise<GetWorkspacesByUserResponse> {
 		return this.axiosInstance.get<GetWorkspacesByUserResponse>(
-			'/data/workspace/get-filtered-by-user',
+			'/get-filtered-by-user',
+			{
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
+				}
+			}
 		) 
 	}
 }

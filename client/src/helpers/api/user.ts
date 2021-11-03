@@ -1,47 +1,48 @@
-import { AuthenticateUserRequest, CreateUserRequest, UpdateUserRequest } from "@/interfaces/api/requests";
+import { AuthenticateUserRequest, CreateUserRequest, DeleteUserRequest, GetByEmailRequest, GetUserRequest, 
+	IsEmailUsedRequest, RevokeTokenRequest, UpdateUserRequest } from "@/interfaces/api/requests";
 import { AuthenticateUserResponse, CreateUserResponse, DeleteUserResponse, GetUserResponse, UpdateUserResponse, 
 	RefreshTokenResponse, RevokeTokenResponse, GetByEmailResponse, IsEmailUsedResponse } from "@/interfaces/api/responses";
-import { AxiosResponse } from "axios";
-import { Api } from "@/helpers/api/base";
+import axios, { AxiosPromise } from "axios";
 
 
-export class UserApi extends Api {
-	static authenticate(data: { user: AuthenticateUserRequest }): Promise<AxiosResponse<AuthenticateUserResponse>> {
+export class UserApi {
+	private static readonly axiosInstance = axios.create({
+		baseURL: process.env.VUE_APP_API_BASEURL + '/auth/user',
+		withCredentials: true
+	})
+
+	static authenticate(data: AuthenticateUserRequest): AxiosPromise<AuthenticateUserResponse> {
 		return this.axiosInstance.post<AuthenticateUserResponse>(
-			'/auth/user/authenticate', 
-			data.user
+			'/authenticate', 
+			data
 		);
 	}
 
-	static create(data: { user: CreateUserRequest }): Promise<AxiosResponse<CreateUserResponse>> {
+	static create(data: CreateUserRequest): AxiosPromise<CreateUserResponse> {
 		return this.axiosInstance.post<CreateUserResponse>(
-			'/auth/user/create', 
-			data.user
+			'/create', 
+			data
 		)
 	}
 
 
-	static delete(data: { userId: number }, accessToken: string): Promise<AxiosResponse<DeleteUserResponse>> {
+	static delete(params: DeleteUserRequest, accessToken: string): AxiosPromise<DeleteUserResponse> {
 		return this.axiosInstance.delete<DeleteUserResponse>(
-			'/auth/user/delete',
+			'/delete',
 			{
+				params,
 				headers: {
 					'Authorization': `Bearer ${accessToken}`
-				},
-				params: { 
-					userId: data.userId 
 				}
 			}
 		)
 	}
 
-	static get(data: { userId: number }, accessToken: string): Promise<AxiosResponse<GetUserResponse>> {
+	static get(params: GetUserRequest, accessToken: string): AxiosPromise<GetUserResponse> {
 		return this.axiosInstance.get<GetUserResponse>(
-			'/auth/user/get', 
+			'/get', 
 			{
-				params: {
-					id: data.userId
-				},
+				params,
 				headers: {
 					'Authorization': `Bearer ${accessToken}`
 				}
@@ -49,10 +50,10 @@ export class UserApi extends Api {
 		);
 	}
 
-	static update(data: { user: UpdateUserRequest }, accessToken: string): Promise<AxiosResponse<UpdateUserResponse>> {
+	static update(data: UpdateUserRequest, accessToken: string): AxiosPromise<UpdateUserResponse> {
 		return this.axiosInstance.put<UpdateUserResponse>(
-			'/auth/user/update',
-			data.user,
+			'/update',
+			data,
 			{
 				headers: {
 					'Authorization': `Bearer ${accessToken}`
@@ -61,15 +62,15 @@ export class UserApi extends Api {
 		);
 	}
 
-	static refreshToken(): Promise<AxiosResponse<RefreshTokenResponse>> {
+	static refreshToken(): AxiosPromise<RefreshTokenResponse> {
 		return this.axiosInstance.post<RefreshTokenResponse>(
-			'/auth/user/refresh-token'
+			'/refresh-token'
 		)
 	}
 
-	static revokeToken(data: { token?: string }, accessToken: string): Promise<AxiosResponse<RevokeTokenResponse>> {
+	static revokeToken(data: RevokeTokenRequest, accessToken: string): AxiosPromise<RevokeTokenResponse> {
 		return this.axiosInstance.post<RevokeTokenResponse>(
-			'/auth/user/revoke-token',
+			'/revoke-token',
 			data,
 			{
 				headers: {
@@ -79,24 +80,23 @@ export class UserApi extends Api {
 		);
 	}
 
-	static getByEmail(data: { email: string }): Promise<AxiosResponse<GetByEmailResponse>> {
+	static getByEmail(params: GetByEmailRequest, accessToken: string): AxiosPromise<GetByEmailResponse> {
 		return this.axiosInstance.get<GetByEmailResponse>(
-			'/auth/user/get-by-email',
+			'/get-by-email',
 			{
-				params: {
-					email: data.email
+				params,
+				headers: {
+					'Authorization': `Bearer ${accessToken}`
 				}
 			}
 		)
 	}
 
-	static isEmailUsed(data: { email: string }): Promise<AxiosResponse<IsEmailUsedResponse>> {
+	static isEmailUsed(params: IsEmailUsedRequest): AxiosPromise<IsEmailUsedResponse> {
 		return this.axiosInstance.get<IsEmailUsedResponse>(
-			'/auth/user/is-email-used',
+			'/is-email-used',
 			{
-				params: {
-					email: data.email
-				}
+				params
 			}
 		)
 	}

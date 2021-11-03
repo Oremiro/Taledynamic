@@ -7,6 +7,14 @@ export interface CreateUserRequest extends AuthenticateUserRequest {
 	confirmPassword: string
 }
 
+export interface DeleteUserRequest {
+	userId: number
+}
+
+export interface GetUserRequest {
+	id: number
+}
+
 export interface UpdateUserRequest {
 	id: number,
 	password: string,
@@ -16,5 +24,11 @@ export interface UpdateUserRequest {
 }
 
 export interface RevokeTokenRequest {
-	token?: string
+	refreshToken?: string
 }
+
+export interface GetByEmailRequest {
+	email: string
+}
+
+export interface IsEmailUsedRequest extends GetByEmailRequest {}
