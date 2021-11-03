@@ -15,7 +15,7 @@ export const actions: ActionTree<UserState, State> = {
 				await dispatch('refresh');
 				return true;
 			} else {
-				throw new Error('Empty data to continue session')
+				throw new Error('Cookie/storage is empty')
 			}
 		} catch (error) {
 			VueCookieNext.removeCookie('remembered');

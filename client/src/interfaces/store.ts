@@ -33,5 +33,6 @@ export interface Workspace {
 }
 
 export interface WorkspacesState {
-	workspaces: Workspace[]
+	workspaces: Workspace[],
+	currentWorkspace: Workspace | null
 }
