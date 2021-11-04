@@ -1,7 +1,7 @@
 <template>
 	<div style="display: flex; justify-content: space-between; align-items: center;">
 		<n-ellipsis :tooltip="{ delay: 500 }">
-			<router-link :to="to">
+			<router-link :to="toLink">
 				<slot></slot>
 			</router-link>
 			<template #tooltip>
@@ -28,10 +28,16 @@ import { RouterLink } from 'vue-router';
 import { NEllipsis } from 'naive-ui'
 
 /* global defineProps */
-defineProps({
-	to: {
-		type: String,
+const props = defineProps({
+	id: {
+		type: Number,
 		required: true
 	}
 });
+
+const toLink = `/workspaces/${props.id}`;
+
+function deleteWorkspace() {
+	return
+}
 </script>

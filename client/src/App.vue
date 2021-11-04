@@ -13,8 +13,10 @@
 							bordered
 							collapse-mode="transform"
 							show-trigger="bar"
-							:collapsed-width="0">
-							<workspaces-list />
+							:collapsed-width="0"
+							:default-collapsed="isDefaultCollapsed"
+							@update:collapsed="collapsedHandler">
+							<workspaces-list v-if="isWorkspaceListShown" />
 						</n-layout-sider>
 					</transition>
 					<n-layout-content embedded>
@@ -60,12 +62,11 @@ import { computed, ref } from "@vue/reactivity";
 import { darkTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
 import LayoutHeader from "@/layouts/Header.vue";
-import WorkspacesList from "./components/workspaces/WorkspacesList.vue";
+import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
 import { Theme } from "@/interfaces";
 import { useStore } from "@/store";
 
 
-// data
 const currentTheme = ref<Theme>(darkTheme);
 const cookie = useCookie();
 const cookieTheme: string | null = cookie.getCookie("theme");
@@ -78,14 +79,20 @@ if (cookieTheme === null) {
 	currentTheme.value = cookieTheme === "dark" ? darkTheme : null;
 }
 
-// computed
 const isLoggedIn = computed<boolean>(() => store.getters['user/isLoggedIn']);
 
-// methods
 const setTheme = (value: Theme) => {
 	currentTheme.value = value;
 	cookie.setCookie("theme", value === null ? "light" : "dark", {
 		expire: Infinity,
 	});
 };
+
+const isDefaultCollapsed = ref<boolean>(true); //
+const isWorkspaceListShown = ref<boolean>(!isDefaultCollapsed.value);
+function collapsedHandler(): void {
+	if (!isWorkspaceListShown.value) {
+		isWorkspaceListShown.value = true;
+	}
+}
 </script>

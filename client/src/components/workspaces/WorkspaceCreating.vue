@@ -4,7 +4,7 @@
 		v-if="!isWorkspaceInputShown"
 		ref="workspaceCreatingButton"
 		@click="isWorkspaceInputShown = true" 
-		:disabled="isWorkspaceCreatingPending" 
+		:disabled="disabled || isWorkspaceCreatingPending" 
 		:loading="isWorkspaceCreatingPending">
 		{{ isWorkspaceCreatingPending ? 'Создание пространства' : 'Создать пространство' }}
 	</delayed-button>
@@ -40,6 +40,13 @@ import { useStore } from '@/store';
 import DynamicallyTypedButton from '@/components/DynamicallyTypedButton.vue';
 import DelayedButton from '@/components/DelayedButton.vue';
 
+/* global defineProps */
+defineProps({
+	disabled: {
+		type: Boolean,
+		default: false
+	}
+})
 
 const newWorkspaceName = ref<string>('');
 const isWorkspaceInputValid = ref<boolean>(false);

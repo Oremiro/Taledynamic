@@ -7,16 +7,16 @@ function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace {
 		id: workspace.id,
 		name: workspace.name,
 		created: new Date(workspace.created instanceof Date ? workspace.created.getTime() : workspace.created),
-		user: {
-			id: workspace.user.id,
-			email: workspace.user.email
-		}
+		userId: workspace.userId
 	}
 }
 
 export const mutations: MutationTree<WorkspacesState> = {
 	setWorkspaces(state: WorkspacesState, payload: { workspaces: Workspace[] | ReceivedWorkspace[] }): void {
-		state.workspaces = payload.workspaces.map(item => cloneWorkspace(item));
+		state.workspaces = []; 
+		payload.workspaces.forEach((item: Workspace | ReceivedWorkspace) => {
+			state.workspaces.push(cloneWorkspace(item));
+		});
 	},
 	addWorkspace(state: WorkspacesState, payload: { workspace: Workspace | ReceivedWorkspace }): void {
 		state.workspaces.push(cloneWorkspace(payload.workspace));
