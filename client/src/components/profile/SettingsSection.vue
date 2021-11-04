@@ -33,7 +33,7 @@ export default defineComponent({
 		const isDeletionConfirmationShown = ref<boolean>(false);
 		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 		const buttonText = ref<string>('Удалить');
-		const buttonType = ref<string>('default');
+		const buttonType = ref<'default' | 'error'>('default');
 
 
 		const deleteUser = async (): Promise<void> => {

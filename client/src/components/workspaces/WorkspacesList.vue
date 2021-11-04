@@ -1,6 +1,6 @@
 <template>
-	<div style="height: 100%; display: flex; flex-direction: column;">
-		<div style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+	<div class="workspaces-list">
+		<div class="workspaces-list--header">
 			<n-text depth="3">Ваши рабочие пространства</n-text>
 			<n-popselect trigger="click" :options="popOptions" v-model:value="popSortValue" @update:value="updateHandler">
 				<n-button text>
@@ -13,18 +13,38 @@
 		<n-scrollbar style="height: 100%;">
 			<n-menu :options="menuOptions" :indent="30" style="padding: 0 .25rem;"/>
 		</n-scrollbar>
-		<div style="padding: 1rem 0; display: flex; align-items: center; justify-content: center;">
-			<n-button>Добавить пространство</n-button>
+		<div class="workspaces-list--footer">
+			<workspace-creating-button />
 		</div>
 	</div>
 </template>
 
-<script lang="ts" setup>
+<style lang="scss" scoped>
+.workspaces-list {
+	height: 100%; 
+	display: flex; 
+	flex-direction: column;
+}
+.workspaces-list--header {
+	padding: 1rem; 
+	display: flex; 
+	align-items: center; 
+	justify-content: space-between;
+}
+.workspaces-list--footer {
+	padding: 1rem; 
+	display: flex; 
+	align-items: center; 
+	justify-content: center;
+}
+</style>
+
+<script setup lang="ts">
 import { WorkspaceItem } from '@/interfaces';
 import { ref, h, reactive, computed, onMounted } from 'vue';
-import { MenuGroupOption, MenuOption, SelectGroupOption, SelectOption } from 'naive-ui';
+import { MenuGroupOption, MenuOption, SelectGroupOption, SelectOption, NPopselect, NScrollbar } from 'naive-ui';
 import WorkspacesListItem from '@/components/workspaces/WorkspacesListItem.vue';
-import { NPopselect, NScrollbar } from 'naive-ui';
+import WorkspaceCreatingButton from '@/components/workspaces/WorkspaceCreating.vue';
 
 // data
 const workspaces = reactive<WorkspaceItem[]>([
@@ -84,6 +104,7 @@ const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() => workspac
 ))
 const popSortValue = ref<string>(localStorage.getItem('workspacesSort') ?? 'sortAscendingByDate');
 
+
 // methods
 const sortWorkspacesListByName = (reverse = false): void => {
 	workspaces.sort((itemFirst, itemSecond) => {
@@ -120,13 +141,13 @@ const sortWorkspacesList = (value: string): void => {
 		}
 	}
 }
-
 const updateHandler = (value: string): void => {
 	localStorage.setItem('workspacesSort', value);
 	sortWorkspacesList(value);
 }
 
-onMounted(() => {
+
+onMounted((): void => {
 	sortWorkspacesList(popSortValue.value);
 })
 </script>

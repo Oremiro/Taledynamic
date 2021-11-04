@@ -27,6 +27,8 @@ export const actions: ActionTree<WorkspacesState, State> = {
 				if (error.response?.status === 401) {
 					// TODO: 401 handler
 					throw new Error('Access token is incorrect')
+				} else {
+					throw new Error(error.response?.statusText)
 				}
 			}
 		}
