@@ -29,7 +29,7 @@ export interface Workspace {
 	id: number,
 	name: string,
 	created: Date,
-	user?: User
+	user: User
 }
 
 export interface WorkspacesState {

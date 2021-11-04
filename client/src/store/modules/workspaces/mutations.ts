@@ -1,21 +1,32 @@
 import { MutationTree } from "vuex";
 import { Workspace, WorkspacesState } from "@/interfaces/store";
+import { Workspace as ReceivedWorkspace } from "@/interfaces/api/responses";
 
+function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace { 
+	return {
+		id: workspace.id,
+		name: workspace.name,
+		created: new Date(workspace.created instanceof Date ? workspace.created.getTime() : workspace.created),
+		user: {
+			id: workspace.user.id,
+			email: workspace.user.email
+		}
+	}
+}
 
 export const mutations: MutationTree<WorkspacesState> = {
-	setWorkspaces(state: WorkspacesState, payload: { workspaces: Workspace[] }): void {
-		// TODO: deep copy
-		state.workspaces = JSON.parse(JSON.stringify(payload.workspaces));
+	setWorkspaces(state: WorkspacesState, payload: { workspaces: Workspace[] | ReceivedWorkspace[] }): void {
+		state.workspaces = payload.workspaces.map(item => cloneWorkspace(item));
 	},
-	addWorkspace(state: WorkspacesState, payload: { workspace: Workspace }): void {
-		state.workspaces.push(payload.workspace);
+	addWorkspace(state: WorkspacesState, payload: { workspace: Workspace | ReceivedWorkspace }): void {
+		state.workspaces.push(cloneWorkspace(payload.workspace));
 	},
 	deleteWorkspace(state: WorkspacesState, payload: { id: number }): void {
 		const index = state.workspaces.findIndex(item => item.id === payload.id);
 		if (~index) {
 			state.workspaces.splice(index, 1);
 		}
-	}
+	},
 }
 
 

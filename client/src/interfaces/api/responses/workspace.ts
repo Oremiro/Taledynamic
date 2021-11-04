@@ -1,12 +1,13 @@
 import BaseResponse from "@/interfaces/api/responses/base";
 import { User } from "@/interfaces/api/responses/user";
 
-interface Workspace {
+export interface Workspace {
 	id: number,
 	name: string,
 	created: string,
 	modified: string,
-	user: User
+	user: User,
+	userId: number
 }
 
 export interface CreateWorkspaceResponse extends BaseResponse {}

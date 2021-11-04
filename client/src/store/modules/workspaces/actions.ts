@@ -1,5 +1,5 @@
 import { WorkspaceApi } from "@/helpers/api/workspace";
-import { State, WorkspacesState } from "@/interfaces/store";
+import { State, Workspace, WorkspacesState } from "@/interfaces/store";
 import { ActionTree } from "vuex";
 import axios from "axios";
 
