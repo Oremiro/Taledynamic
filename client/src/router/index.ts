@@ -48,6 +48,13 @@ const routes: Array<RouteRecordRaw> = [
 			}
     ]
   },
+	{
+		path: '/workspace/:id',
+		name: 'Workspace',
+		props: true,
+		meta: { requiresAuth: true },
+		component: () => import('@/views/Workspace.vue')
+	},
   {
     path: '/:pathMatch(.*)*',
 		name: 'NotFound',

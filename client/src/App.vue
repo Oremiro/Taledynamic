@@ -88,9 +88,14 @@ const setTheme = (value: Theme) => {
 	});
 };
 
-const isDefaultCollapsed = ref<boolean>(true); //
+const isDefaultCollapsed = ref<boolean>(localStorage.getItem('siderCollapsed') ? true : false);
 const isWorkspaceListShown = ref<boolean>(!isDefaultCollapsed.value);
-function collapsedHandler(): void {
+function collapsedHandler(collapsed: boolean): void {
+	if (collapsed) {
+		localStorage.setItem('siderCollapsed', '1');
+	} else {
+		localStorage.removeItem('siderCollapsed');
+	}
 	if (!isWorkspaceListShown.value) {
 		isWorkspaceListShown.value = true;
 	}

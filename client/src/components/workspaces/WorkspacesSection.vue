@@ -91,7 +91,7 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 
 const popSortValue = ref<string>(localStorage.getItem('workspacesSort') ?? 'sortAscendingByDate');
 
-const isListLoading = ref<boolean>(true);
+const isListLoading = ref<boolean>(workspaces.value.length ? false : true);
 const isListLoadingError = ref<boolean>(false);
 
 // methods
@@ -148,9 +148,13 @@ async function getWorkspaces(): Promise<void> {
 }
 
 onMounted((): void => {
-	setTimeout(async (): Promise<void> => {
-		await getWorkspaces();
+	if(!workspaces.value.length) {
+		setTimeout(async (): Promise<void> => {
+			await getWorkspaces();
+			sortWorkspacesList(popSortValue.value);
+		}, 500);
+	} else {
 		sortWorkspacesList(popSortValue.value);
-	}, 500);
+	}
 })
 </script>

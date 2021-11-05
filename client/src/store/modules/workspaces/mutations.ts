@@ -28,6 +28,9 @@ export const mutations: MutationTree<WorkspacesState> = {
 			state.workspaces.splice(index, 1);
 		}
 	},
+	setCurrent(state: WorkspacesState, payload: { workspace: Workspace }): void {
+		state.currentWorkspace = payload.workspace;
+	}
 }
 
 
