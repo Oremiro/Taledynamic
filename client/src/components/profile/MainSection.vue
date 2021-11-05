@@ -4,7 +4,7 @@
         <img class="user-img" src="https://picsum.photos/500" alt="">
     </div>
     <div class="user-info-background">
-        <n-text type="primary" style="font-size: 1.25rem">{{ store.state.user.email }}</n-text>
+        <n-text type="primary" style="font-size: 1.25rem">{{ store.getters['user/email'] }}</n-text>
     </div>
     </div>
 </template>

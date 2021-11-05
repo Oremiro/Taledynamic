@@ -101,7 +101,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors): Promise<void> => {
         if (!errors) {
 					try {
-						await store.dispatch('login', formData);
+						await store.dispatch('user/login', formData);
 						message.success('Вы успешно вошли!');
 						router.push('/profile');
 					} catch (error) {

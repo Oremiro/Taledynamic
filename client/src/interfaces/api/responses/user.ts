@@ -1,6 +1,6 @@
 import BaseResponse from '@/interfaces/api/responses/base'
 
-interface User {
+export interface User {
 	id: number,
 	email: string
 }

@@ -17,7 +17,23 @@ export interface UpdatedPasswordData extends UpdatedBaseData {
 }
 
 export interface State {
+	pageStatus: 'loading' | 'ready' | 'error'
+}
+
+export interface UserState {
 	user: User,
 	accessTokenInMemory: string,
-	pageStatus: 'loading' | 'ready' | 'error'
+}
+
+export interface Workspace {
+	id: number,
+	name: string,
+	created: Date,
+	modified: Date,
+	userId: number
+}
+
+export interface WorkspacesState {
+	workspaces: Workspace[],
+	currentWorkspace: Workspace | null
 }

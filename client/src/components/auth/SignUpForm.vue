@@ -63,7 +63,7 @@ import { useRouter } from 'vue-router';
 import { AxiosError } from 'axios';
 import { useStore } from '@/store';
 import { emailRegex, passwordRegex, externalOptions } from "@/helpers";
-import { Api } from '@/helpers/api';
+import { UserApi } from '@/helpers/api/user';
 import { SignUpFormData } from '@/interfaces'
 import QuestionTooltip from "@/components/QuestionTooltip.vue"
 import DelayedButton from "@/components/DelayedButton.vue"
@@ -115,7 +115,7 @@ export default defineComponent({
 						asyncValidator: (rule, value) => 
 							new Promise<void>((resolve, reject) => {
 								formData.email.isValid = false;
-								Api.userIsEmailUsed({ email: value })
+								UserApi.isEmailUsed({ email: value })
 								.then((response) => {
 									if(response.data.isEmailUsed) {
 										reject(new Error('Данный email занят другим пользователем'));
@@ -200,7 +200,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors): Promise<void> => {
         if (!errors) {
 					try {
-						await store.dispatch('register', formData)
+						await store.dispatch('user/register', formData)
 						message.success('Вы успешно зарегистрировались');
 						router.push({ name: 'AuthSignIn' });
 					} catch (error) {

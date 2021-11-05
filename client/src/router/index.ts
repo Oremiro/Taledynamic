@@ -48,6 +48,13 @@ const routes: Array<RouteRecordRaw> = [
 			}
     ]
   },
+	{
+		path: '/workspace/:id',
+		name: 'Workspace',
+		props: true,
+		meta: { requiresAuth: true },
+		component: () => import('@/views/Workspace.vue')
+	},
   {
     path: '/:pathMatch(.*)*',
 		name: 'NotFound',
@@ -61,9 +68,9 @@ const router = createRouter({
 })
 
 router.beforeResolve(async to => {
-	let isLoggedIn: boolean = store.getters.isLoggedIn;
+	let isLoggedIn: boolean = store.getters['user/isLoggedIn'];
 	if (!isLoggedIn) {
-		isLoggedIn = await store.dispatch('init');
+		isLoggedIn = await store.dispatch('user/init');
 	}
   if (to.meta.requiresAuth && !isLoggedIn) {
 		store.commit('pageError');

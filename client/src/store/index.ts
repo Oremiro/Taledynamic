@@ -2,17 +2,19 @@ import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { State } from '@/interfaces/store'
 import { state } from '@/store/state'
-import { getters } from '@/store/getters'
 import { mutations } from '@/store/mutations'
-import { actions } from '@/store/actions'
+import user from '@/store/modules/user'
+import workspaces from '@/store/modules/workspaces'
 
 export const key: InjectionKey<Store<State>> = Symbol()
 
-export const store = createStore<State>({
-  state: state,
-	getters: getters,
-	mutations: mutations,
-  actions: actions
+export const store = createStore({
+	state,
+	mutations,
+  modules: {
+		user,
+		workspaces
+	}
 })
 
 export function useStore(): Store<State> {

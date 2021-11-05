@@ -47,7 +47,7 @@ import { useStore } from '@/store';
 import { EmailEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
 import DelayedButton from '@/components/DelayedButton.vue'
-import { Api } from '@/helpers/api';
+import { UserApi } from '@/helpers/api/user';
 import { AxiosError } from 'axios';
 
 export default defineComponent({
@@ -59,7 +59,7 @@ export default defineComponent({
 		// data
 		const store = useStore();
 		const formRef = ref<InstanceType<typeof NForm>>();
-		const defaultEmailValue = ref<string>(store.state.user.email);
+		const defaultEmailValue = ref<string>(store.getters['user/email']);
 		const formData = reactive<EmailEditFormData>({
 			email: {
 				value: defaultEmailValue.value,
@@ -97,7 +97,7 @@ export default defineComponent({
 								if (value === defaultEmailValue.value) {
 									resolve()
 								} else {
-									Api.userIsEmailUsed({ email: value })
+									UserApi.isEmailUsed({ email: value })
 									.then((response) => {
 										if(response.data.isEmailUsed) {
 											reject(new Error('Данный email занят другим пользователем'));
@@ -142,7 +142,7 @@ export default defineComponent({
 		}
 		const saveChanges = (): void => {
 			formData.currentPassword.value = '';
-			defaultEmailValue.value = store.state.user.email;
+			defaultEmailValue.value = store.getters['user/email'];
 			isSubmitButtonShown.value = false;
 		}
 		const submitForm = (): void => {
@@ -150,7 +150,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors) => {
         if (!errors) {
 					try {
-						await store.dispatch('updateEmail', { 
+						await store.dispatch('user/updateEmail', { 
 							currentPassword: formData.currentPassword.value, 
 							newEmail: formData.email.value 
 						});

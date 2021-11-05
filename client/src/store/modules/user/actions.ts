@@ -1,12 +1,12 @@
 import axios from "axios";
 import { ActionTree } from "vuex";
 import { VueCookieNext } from "vue-cookie-next";
-import { Api } from "@/helpers/api";
+import { UserApi } from "@/helpers/api/user";
 import { SignUpFormData, SignInFormData } from "@/interfaces";
-import { State, UpdatedEmailData, UpdatedPasswordData, User } from "@/interfaces/store";
+import { State, UserState, UpdatedEmailData, UpdatedPasswordData, User } from "@/interfaces/store";
 
 
-export const actions: ActionTree<State, State> = {
+export const actions: ActionTree<UserState, State> = {
 	async init({ dispatch }): Promise<boolean> {
 		const isRemembered: string | null = VueCookieNext.getCookie('remembered');
 		const localStorageUser: string | null = localStorage.getItem('user');
@@ -15,7 +15,7 @@ export const actions: ActionTree<State, State> = {
 				await dispatch('refresh');
 				return true;
 			} else {
-				throw new Error('Empty data to continue session')
+				throw new Error('Cookie/storage is empty')
 			}
 		} catch (error) {
 			VueCookieNext.removeCookie('remembered');
@@ -30,7 +30,7 @@ export const actions: ActionTree<State, State> = {
 			confirmPassword: formData.confirmedPassword.value
 		}
 		try {
-			const { data } = await Api.userCreate({ user: newUser });
+			const { data } = await UserApi.create(newUser);
 			if (data.statusCode === 200) {
 				return;
 			} else {
@@ -52,7 +52,7 @@ export const actions: ActionTree<State, State> = {
 			password: formData.password.value
 		}
 		try {
-			const { data } = await Api.userAuthenticate({ user: requestedUser });
+			const { data } = await UserApi.authenticate(requestedUser);
 			if (data.statusCode === 200) {
 				const responsedUser: User = {
 					id: data.id ?? null, 
@@ -80,7 +80,7 @@ export const actions: ActionTree<State, State> = {
 	},
 	async logout({ commit, state }): Promise<void> {
 		try {
-			const { data } = await Api.userRevokeToken({}, state.accessTokenInMemory)
+			const { data } = await UserApi.revokeToken({}, state.accessTokenInMemory)
 			if (data.isSuccess && data.statusCode === 200) {
 				commit('logout');
 				VueCookieNext.removeCookie('remembered');
@@ -101,7 +101,7 @@ export const actions: ActionTree<State, State> = {
 	},
 	async refresh({ commit }): Promise<void> {			
 		try {
-			const { data } = await Api.userRefreshToken();
+			const { data } = await UserApi.refreshToken();
 			if (data.id && data.email && data.jwtToken) {
 				const user: User = { id: data.id, email: data.email };
 				const token: string = data.jwtToken
@@ -127,13 +127,12 @@ export const actions: ActionTree<State, State> = {
 	async updateEmail({ commit, state }, data: UpdatedEmailData): Promise<void> {
 		if (state.user.id) {
 			try {
-				const { data: responseData } = await Api.userUpdate({ 
-					user: { 
+				const { data: responseData } = await UserApi.update(
+					{ 
 						id: state.user.id, 
 						password: data.currentPassword, 
 						email: data.newEmail
-					}
-				}, state.accessTokenInMemory);
+					}, state.accessTokenInMemory);
 				const user: User = {
 					id: responseData.user.id, 
 					email: responseData.user.email, 
@@ -159,14 +158,13 @@ export const actions: ActionTree<State, State> = {
 	async updatePassword({ commit, state }, data: UpdatedPasswordData): Promise<void> {
 		if (state.user.id) {
 			try {
-				const { data: responseData } = await Api.userUpdate({ 
-					user: { 
+				const { data: responseData } = await UserApi.update( 
+					{ 
 						id: state.user.id, 
 						password: data.currentPassword,
 						newPassword: data.newPassword, 
 						confirmNewPassword: data.confirmedNewPassword
-					}
-				}, state.accessTokenInMemory)
+					}, state.accessTokenInMemory)
 				const user: User = {
 					id: responseData.user.id, 
 					email: responseData.user.email, 
@@ -192,7 +190,7 @@ export const actions: ActionTree<State, State> = {
 	async delete({ commit, state }): Promise<void> {
 		if (state.user.id) {
 			try {
-				await Api.userDelete({ userId: state.user.id }, state.accessTokenInMemory);
+				await UserApi.delete({ userId: state.user.id }, state.accessTokenInMemory);
 				commit('logout');
 				VueCookieNext.removeCookie('remembered');
 				localStorage.removeItem('user');
