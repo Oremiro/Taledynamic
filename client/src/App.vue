@@ -4,21 +4,10 @@
 		<n-message-provider>
 			<n-layout style="min-height: 100vh">
 				<n-loading-bar-provider>
-				<layout-header @changeTheme="setTheme" :currentTheme="currentTheme" />
+					<layout-header @changeTheme="setTheme" :currentTheme="currentTheme" />
 				</n-loading-bar-provider>
 				<n-layout has-sider position="absolute" style="top: 3.3rem;">
-					<transition name="fade">
-						<n-layout-sider
-							v-if="isLoggedIn"
-							bordered
-							collapse-mode="transform"
-							show-trigger="bar"
-							:collapsed-width="0"
-							:default-collapsed="isDefaultCollapsed"
-							@update:collapsed="collapsedHandler">
-							<workspaces-section v-if="isWorkspaceListShown" />
-						</n-layout-sider>
-					</transition>
+					<layout-sider />
 					<n-layout-content embedded>
 						<router-view v-slot="{ Component }">
 							<transition name="fade" mode="out-in">
@@ -40,7 +29,7 @@
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: all .3s ease-out;
+  transition: opacity .3s ease-out;
 }
 
 .fade-enter-from, .fade-leave-to {
@@ -58,19 +47,17 @@
 
 <script setup lang="ts">
 import "vfonts/OpenSans.css";
-import { computed, ref } from "@vue/reactivity";
+import { ref } from "@vue/reactivity";
 import { darkTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
-import LayoutHeader from "@/layouts/Header.vue";
-import WorkspacesSection from "@/components/workspaces/WorkspacesSection.vue";
+import LayoutHeader from "@/layouts/LayoutHeader.vue";
+import LayoutSider from "@/layouts/LayoutSider.vue";
 import { Theme } from "@/interfaces";
-import { useStore } from "@/store";
 
 
 const currentTheme = ref<Theme>(darkTheme);
 const cookie = useCookie();
 const cookieTheme: string | null = cookie.getCookie("theme");
-const store = useStore();
 
 if (cookieTheme === null) {
 	const osThemeRef = useOsTheme();
@@ -79,25 +66,10 @@ if (cookieTheme === null) {
 	currentTheme.value = cookieTheme === "dark" ? darkTheme : null;
 }
 
-const isLoggedIn = computed<boolean>(() => store.getters['user/isLoggedIn']);
-
 const setTheme = (value: Theme) => {
 	currentTheme.value = value;
 	cookie.setCookie("theme", value === null ? "light" : "dark", {
 		expire: Infinity,
 	});
 };
-
-const isDefaultCollapsed = ref<boolean>(localStorage.getItem('siderCollapsed') ? true : false);
-const isWorkspaceListShown = ref<boolean>(!isDefaultCollapsed.value);
-function collapsedHandler(collapsed: boolean): void {
-	if (collapsed) {
-		localStorage.setItem('siderCollapsed', '1');
-	} else {
-		localStorage.removeItem('siderCollapsed');
-	}
-	if (!isWorkspaceListShown.value) {
-		isWorkspaceListShown.value = true;
-	}
-}
 </script>
