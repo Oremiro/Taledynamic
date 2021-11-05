@@ -16,7 +16,7 @@
 							:collapsed-width="0"
 							:default-collapsed="isDefaultCollapsed"
 							@update:collapsed="collapsedHandler">
-							<workspaces-list v-if="isWorkspaceListShown" />
+							<workspaces-section v-if="isWorkspaceListShown" />
 						</n-layout-sider>
 					</transition>
 					<n-layout-content embedded>
@@ -62,7 +62,7 @@ import { computed, ref } from "@vue/reactivity";
 import { darkTheme, useOsTheme } from "naive-ui";
 import { useCookie } from "vue-cookie-next";
 import LayoutHeader from "@/layouts/Header.vue";
-import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
+import WorkspacesSection from "@/components/workspaces/WorkspacesSection.vue";
 import { Theme } from "@/interfaces";
 import { useStore } from "@/store";
 

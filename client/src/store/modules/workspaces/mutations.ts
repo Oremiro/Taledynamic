@@ -7,6 +7,7 @@ function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace {
 		id: workspace.id,
 		name: workspace.name,
 		created: new Date(workspace.created instanceof Date ? workspace.created.getTime() : workspace.created),
+		modified: new Date(workspace.modified instanceof Date ? workspace.modified.getTime() : workspace.modified),
 		userId: workspace.userId
 	}
 }

@@ -29,6 +29,7 @@ export interface Workspace {
 	id: number,
 	name: string,
 	created: Date,
+	modified: Date,
 	userId: number
 }
 

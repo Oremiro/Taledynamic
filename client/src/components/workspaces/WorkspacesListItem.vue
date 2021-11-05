@@ -1,6 +1,6 @@
 <template>
 	<div style="display: flex; justify-content: space-between; align-items: center;">
-		<n-ellipsis :tooltip="{ delay: 500 }">
+		<n-ellipsis :tooltip="{ delay: 500, placement: 'top-end'}">
 			<router-link :to="toLink">
 				<slot></slot>
 			</router-link>
