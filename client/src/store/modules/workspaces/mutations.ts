@@ -19,17 +19,20 @@ export const mutations: MutationTree<WorkspacesState> = {
 			state.workspaces.push(cloneWorkspace(item));
 		});
 	},
-	addWorkspace(state: WorkspacesState, payload: { workspace: Workspace | ReceivedWorkspace }): void {
+	setCurrent(state: WorkspacesState, payload: { workspace: Workspace }): void {
+		state.currentWorkspace = payload.workspace;
+	},
+	add(state: WorkspacesState, payload: { workspace: Workspace | ReceivedWorkspace }): void {
 		state.workspaces.push(cloneWorkspace(payload.workspace));
 	},
-	deleteWorkspace(state: WorkspacesState, payload: { id: number }): void {
+	delete(state: WorkspacesState, payload: { id: number }): void {
 		const index = state.workspaces.findIndex(item => item.id === payload.id);
 		if (~index) {
 			state.workspaces.splice(index, 1);
 		}
 	},
-	setCurrent(state: WorkspacesState, payload: { workspace: Workspace }): void {
-		state.currentWorkspace = payload.workspace;
+	update(state: WorkspacesState, payload: { workspace: Workspace, name: string }): void {
+		payload.workspace.name = payload.name;
 	}
 }
 
