@@ -34,27 +34,32 @@ export const actions: ActionTree<WorkspacesState, State> = {
 			}
 		}
 	},
-	async delete({ commit, rootGetters }, payload: { id: number }): Promise<void> {
-		try {
-			await WorkspaceApi.delete({ id: payload.id }, rootGetters['user/accessToken'])
-			commit('delete', { id: payload.id })
-		} catch (error) {
-			if (axios.isAxiosError(error)) {
-				if (error.response?.status === 401) {
-					// TODO: 401 handler
-					throw new Error('Access token is incorrect')
-				} else {
-					throw new Error(error.response?.statusText);
+	async delete({ commit, state, rootGetters }, payload: { id: number }): Promise<void> {
+		const workspaceIndex = state.workspaces.findIndex(item => item.id === payload.id);
+		if (~workspaceIndex) {
+			try {
+				await WorkspaceApi.delete({ id: payload.id }, rootGetters['user/accessToken'])
+				commit('delete', { workspaceIndex: workspaceIndex })
+			} catch (error) {
+				if (axios.isAxiosError(error)) {
+					if (error.response?.status === 401) {
+						// TODO: 401 handler
+						throw new Error('Access token is incorrect')
+					} else {
+						throw new Error(error.response?.statusText);
+					}
 				}
 			}
+		} else {
+			throw new Error('Workspace id is incorrect')
 		}
 	},
-	async update({ commit, state, rootGetters }, payload: { workspaceId: number, name: string }): Promise<void> {
-		const workspace = state.workspaces.find(item => item.id === payload.workspaceId);
-		if (workspace) {
+	async update({ commit, state, rootGetters }, payload: { id: number, name: string }): Promise<void> {
+		const workspaceIndex = state.workspaces.findIndex(item => item.id === payload.id);
+		if (~workspaceIndex) {
 			try {
-				await WorkspaceApi.update({ id: payload.workspaceId, name: payload.name }, rootGetters['user/accessToken'])
-				commit('update', { workspace: workspace, name: payload.name });
+				const { data } = await WorkspaceApi.update({ id: payload.id, name: payload.name }, rootGetters['user/accessToken'])
+				// commit('update', { oldWorkspaceIndex: workspaceIndex, newWorkspace: data.workspace });
 			} catch (error) {
 				if(axios.isAxiosError(error)) {
 					if (error.response?.status === 401) {

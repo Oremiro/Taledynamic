@@ -20,3 +20,15 @@ export function externalOptions(value: string): AutoCompleteOption[] {
         }
     })
 }
+
+
+export async function workspaceNameValidator(targetValue: string): Promise<void> {
+	const trimmedValue: string = targetValue.trim();
+	if (trimmedValue === '') {
+		throw new Error('Required');
+	} else if (trimmedValue !== targetValue) {
+		throw new Error('Starts/ends with whitespaces');
+	} else {
+		return;
+	}
+}

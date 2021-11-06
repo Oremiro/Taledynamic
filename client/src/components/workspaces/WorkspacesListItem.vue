@@ -1,7 +1,16 @@
 <template>
 	<div style="display: flex; justify-content: space-between; align-items: center;">
 		<transition name="fade" mode="out-in" @enter="doAfterTransition">
-			<n-input ref="nameInput" v-if="isNameInputShown" v-model:value="workspaceName" size="small" placeholder="Название"/>
+			<n-input 
+				ref="nameInput" 
+				v-if="isNameInputShown" 
+				v-model:value="workspaceName" 
+				:loading="isNameInputLoading"
+				:disabled="isNameInputLoading"
+				size="small" 
+				placeholder="Название"
+				@keyup.enter="editWorkspaceName"
+				@focusout="isNameInputShown = false" />
 			<div v-else>
 				<n-ellipsis :tooltip="{ delay: 500, placement: 'top-end'}">
 					<router-link :to="toLink">
@@ -14,7 +23,7 @@
 			</div>
 		</transition>
 		<div style="display: flex; align-items: center; margin-left: 1rem;">
-			<n-button text style="margin-right: .3rem;" @click="isNameInputShown = !isNameInputShown">
+			<n-button text style="margin-right: .3rem;" @click="isNameInputShown = true">
 				<n-icon size="1.2rem">
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M21.03 2.97a3.578 3.578 0 0 1 0 5.06L9.062 20a2.25 2.25 0 0 1-.999.58l-5.116 1.395a.75.75 0 0 1-.92-.921l1.395-5.116a2.25 2.25 0 0 1 .58-.999L15.97 2.97a3.578 3.578 0 0 1 5.06 0zM15 6.06L5.062 16a.75.75 0 0 0-.193.333l-1.05 3.85l3.85-1.05A.75.75 0 0 0 8 18.938L17.94 9L15 6.06zm2.03-2.03l-.97.97L19 7.94l.97-.97a2.079 2.079 0 0 0-2.94-2.94z" fill="currentColor"></path></g></svg>
 				</n-icon>
@@ -48,10 +57,11 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router';
-import { NEllipsis, NInput, NPopconfirm, useMessage, useThemeVars } from 'naive-ui'
+import { FormItemRule, NEllipsis, NInput, NPopconfirm, useMessage, useThemeVars } from 'naive-ui'
 import { useStore } from '@/store';
 import DynamicallyTypedButton from '@/components/DynamicallyTypedButton.vue';
 import { Workspace } from '@/interfaces/store';
+import { workspaceNameValidator } from '@/helpers';
 
 /* global defineProps */
 const props = defineProps({
@@ -72,6 +82,43 @@ const isNameInputShown = ref<boolean>(false);
 function doAfterTransition(): void {
 	if (isNameInputShown.value) {
 		nameInput.value?.focus();
+	}
+}
+
+const isWorkspaceNameValid = ref<boolean>(true);
+
+const workspaceNameRule: FormItemRule = {
+	trigger: 'input',
+	asyncValidator: async (): Promise<void> => {
+		isWorkspaceNameValid.value = false;
+		try {
+			await workspaceNameValidator(workspaceName.value);
+			isWorkspaceNameValid.value = true;
+		} catch (error) {
+			if (error instanceof Error) {
+				throw error;
+			}
+		}
+	}
+};
+
+const isNameInputLoading = ref<boolean>(false);
+
+async function editWorkspaceName(): Promise<void> {
+	if (workspaceName.value === props.name || !isWorkspaceNameValid.value) {
+		isNameInputShown.value = false;
+		return
+	}
+	isNameInputLoading.value = true;
+	try {
+		await store.dispatch('workspaces/update', { id: props.id, name: workspaceName.value });
+	} catch (error) {
+		if(error instanceof Error) {
+			message.error(error.message);
+		}
+	} finally {
+		isNameInputShown.value = false;
+		isNameInputLoading.value = false;
 	}
 }
 

@@ -25,14 +25,11 @@ export const mutations: MutationTree<WorkspacesState> = {
 	add(state: WorkspacesState, payload: { workspace: Workspace | ReceivedWorkspace }): void {
 		state.workspaces.push(cloneWorkspace(payload.workspace));
 	},
-	delete(state: WorkspacesState, payload: { id: number }): void {
-		const index = state.workspaces.findIndex(item => item.id === payload.id);
-		if (~index) {
-			state.workspaces.splice(index, 1);
-		}
+	delete(state: WorkspacesState, payload: { workspaceIndex: number }): void {
+		state.workspaces.splice(payload.workspaceIndex, 1);
 	},
-	update(state: WorkspacesState, payload: { workspace: Workspace, name: string }): void {
-		payload.workspace.name = payload.name;
+	update(state: WorkspacesState, payload: { oldWorkspaceIndex: number, newWorkspace: Workspace | ReceivedWorkspace }): void {
+		state.workspaces[payload.oldWorkspaceIndex] = cloneWorkspace(payload.newWorkspace);
 	}
 }
 
