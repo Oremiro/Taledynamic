@@ -1,9 +1,9 @@
 <template>
-<transition name="fade" mode="out-in">
+<transition name="fade" mode="out-in" @enter="doAfterTransition">
 	<delayed-button 
 		v-if="!isWorkspaceInputShown"
 		ref="workspaceCreatingButton"
-		@click="isWorkspaceInputShown = true" 
+		@click="isWorkspaceInputShown = true;" 
 		:disabled="disabled || isWorkspaceCreatingPending" 
 		:loading="isWorkspaceCreatingPending">
 		{{ isWorkspaceCreatingPending ? 'Создание пространства' : 'Создать пространство' }}
@@ -11,6 +11,7 @@
 	<n-form-item v-else :show-label="false" :show-feedback="false" :rule="workspaceCreatingRule">
 		<n-input-group>
 			<n-input
+				ref="nameInput"
 				v-model:value="newWorkspaceName"
 				placeholder="Название пространства"
 				@keydown.enter="createWorkspace"/>
@@ -20,7 +21,7 @@
 				</n-icon>
 			</n-button>
 			<dynamically-typed-button
-				@click="clearWorkspaceCreating"
+				@click="clearNameInput"
 				ghost
 				style="padding: .6rem;"
 				type="error">
@@ -35,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { FormItemRule, NInputGroup, useMessage } from 'naive-ui';
+import { FormItemRule, NInput, NInputGroup, useMessage } from 'naive-ui';
 import { useStore } from '@/store';
 import DynamicallyTypedButton from '@/components/DynamicallyTypedButton.vue';
 import DelayedButton from '@/components/DelayedButton.vue';
@@ -70,7 +71,15 @@ const workspaceCreatingRule: FormItemRule = {
 
 const isWorkspaceInputShown = ref<boolean>(false);
 
-function clearWorkspaceCreating(): void {
+const nameInput = ref<InstanceType<typeof NInput>>();
+
+function doAfterTransition(): void {
+	if (isWorkspaceInputShown.value) {
+		nameInput.value?.focus();
+	}
+}
+
+function clearNameInput(): void {
 	newWorkspaceName.value = '';
 	isWorkspaceInputShown.value = false;
 }
@@ -95,8 +104,9 @@ async function createWorkspace(): Promise<void> {
 			message.error(error.message);
 		}	
 	} finally {
-		clearWorkspaceCreating();
 		isWorkspaceCreatingPending.value = false;
+		isWorkspaceInputValid.value = false;
+		newWorkspaceName.value = '';
 	}
 }
 

@@ -1,15 +1,20 @@
 <template>
 	<div style="display: flex; justify-content: space-between; align-items: center;">
-		<n-ellipsis :tooltip="{ delay: 500, placement: 'top-end'}">
-			<router-link :to="toLink">
-				<slot></slot>
-			</router-link>
-			<template #tooltip>
-				<slot></slot>
-			</template>
-		</n-ellipsis>
+		<transition name="fade" mode="out-in" @enter="doAfterTransition">
+			<n-input ref="nameInput" v-if="isNameInputShown" v-model:value="workspaceName" size="small" placeholder="Название"/>
+			<div v-else>
+				<n-ellipsis :tooltip="{ delay: 500, placement: 'top-end'}">
+					<router-link :to="toLink">
+						{{ name }}
+					</router-link>
+					<template #tooltip>
+						{{ name }}
+					</template>
+				</n-ellipsis>
+			</div>
+		</transition>
 		<div style="display: flex; align-items: center; margin-left: 1rem;">
-			<n-button text style="margin-right: .3rem;">
+			<n-button text style="margin-right: .3rem;" @click="isNameInputShown = !isNameInputShown">
 				<n-icon size="1.2rem">
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M21.03 2.97a3.578 3.578 0 0 1 0 5.06L9.062 20a2.25 2.25 0 0 1-.999.58l-5.116 1.395a.75.75 0 0 1-.92-.921l1.395-5.116a2.25 2.25 0 0 1 .58-.999L15.97 2.97a3.578 3.578 0 0 1 5.06 0zM15 6.06L5.062 16a.75.75 0 0 0-.193.333l-1.05 3.85l3.85-1.05A.75.75 0 0 0 8 18.938L17.94 9L15 6.06zm2.03-2.03l-.97.97L19 7.94l.97-.97a2.079 2.079 0 0 0-2.94-2.94z" fill="currentColor"></path></g></svg>
 				</n-icon>
@@ -41,9 +46,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from '@vue/reactivity';
+import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router';
-import { NEllipsis, NPopconfirm, useMessage, useThemeVars } from 'naive-ui'
+import { NEllipsis, NInput, NPopconfirm, useMessage, useThemeVars } from 'naive-ui'
 import { useStore } from '@/store';
 import DynamicallyTypedButton from '@/components/DynamicallyTypedButton.vue';
 import { Workspace } from '@/interfaces/store';
@@ -53,8 +58,23 @@ const props = defineProps({
 	id: {
 		type: Number,
 		required: true
+	},
+	name: {
+		type: String,
+		required: true
 	}
 });
+
+const workspaceName = ref<string>(props.name);
+const nameInput = ref<InstanceType<typeof NInput>>();
+const isNameInputShown = ref<boolean>(false);
+
+function doAfterTransition(): void {
+	if (isNameInputShown.value) {
+		nameInput.value?.focus();
+	}
+}
+
 
 const { errorColor } = useThemeVars().value;
 const confirmShow = ref<boolean>(false);
@@ -85,4 +105,5 @@ async function deleteWorkspace() {
 		}
 	}
 }
+
 </script>

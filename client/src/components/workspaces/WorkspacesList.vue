@@ -19,7 +19,7 @@ const props = defineProps({
 const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(
 	() => props.workspaces.map((item: Workspace) => {
 		return {
-			label: () => h(WorkspacesListItem, { id: item.id }, { default: () => item.name }), 
+			label: () => h(WorkspacesListItem, { id: item.id, name: item.name }), 
 			key: `/workspace/${item.id}`
 		}}
 	)
