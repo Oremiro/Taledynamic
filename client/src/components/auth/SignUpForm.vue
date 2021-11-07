@@ -7,7 +7,9 @@
 			#default="{ handleInput, handleBlur, handleFocus, value }">
 				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value">
 					<template v-if="!formData.email.isValid" #prefix>
-						<question-tooltip text="Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным."/>
+						<question-tooltip>
+							Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
+						</question-tooltip>
 					</template>
 				</n-input>
 			</n-auto-complete>
@@ -20,7 +22,9 @@
 				v-model:value="formData.password.value"
 				@input="handlePasswordInput">
 				<template v-if="!formData.password.isValid" #prefix>
-					<question-tooltip text="Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ."/>
+					<question-tooltip >
+						Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
+					</question-tooltip>
 				</template>
 			</n-input>
 		</n-form-item>

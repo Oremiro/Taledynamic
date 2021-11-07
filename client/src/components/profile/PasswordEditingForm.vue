@@ -9,7 +9,9 @@
 				@input="handlePasswordInput"
 			>
 				<template v-if="!formData.newPassword.isValid" #prefix>
-					<question-tooltip text="Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ."/>
+					<question-tooltip>
+						Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
+					</question-tooltip>
 				</template>
 			</n-input>
 		</n-form-item>
