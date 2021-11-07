@@ -14,66 +14,49 @@
 	</n-collapse-transition>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useMessage } from "naive-ui";
 import { useStore } from "@/store";
 import DelayedButton from '@/components/DelayedButton.vue'
 
-export default defineComponent({
-	name: 'ProfileSettingsSection',
-	components: {
-		DelayedButton
-	},
-	setup() {
-		const router = useRouter();
-		const store = useStore();
-		const message = useMessage();
-		const isDeletionConfirmationShown = ref<boolean>(false);
-		const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
-		const buttonText = ref<string>('Удалить');
-		const buttonType = ref<'default' | 'error'>('default');
+const router = useRouter();
+const store = useStore();
+const message = useMessage();
+const isDeletionConfirmationShown = ref<boolean>(false);
+const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
+const buttonText = ref<string>('Удалить');
+const buttonType = ref<'default' | 'error'>('default');
 
 
-		const deleteUser = async (): Promise<void> => {
-			try {
-				await store.dispatch('user/delete');
-				router.push({ name: 'Auth'});
-				message.info('Вы успешно удалили аккаунт');
-			} catch (error) {
-				if (error instanceof Error) {
-					message.error(error.message); 
-				}
-			}
+async function deleteUser(): Promise<void> {
+	try {
+		await store.dispatch('user/delete');
+		router.push({ name: 'Auth'});
+		message.info('Вы успешно удалили аккаунт');
+	} catch (error) {
+		if (error instanceof Error) {
+			message.error(error.message); 
 		}
+	}
+}
 
-		const showDeletionConfirmation = async (): Promise<void> => {
-			if (isDeletionConfirmationShown.value) {
-				await deleteUser();
-			} else {
-				isDeletionConfirmationShown.value = true;
-				buttonText.value = 'Да';
-				buttonType.value = 'error';
-				submitButtonRef.value?.holdDisabled();
-			}
-		}
+async function showDeletionConfirmation(): Promise<void> {
+	if (isDeletionConfirmationShown.value) {
+		await deleteUser();
+	} else {
+		isDeletionConfirmationShown.value = true;
+		buttonText.value = 'Да';
+		buttonType.value = 'error';
+		submitButtonRef.value?.holdDisabled();
+	}
+}
 
-		const cancelDeletion = () => {
-			isDeletionConfirmationShown.value = false;
-			buttonText.value = 'Удалить';
-			buttonType.value = 'default';
-			submitButtonRef.value?.cancelHolding();
-		}
-
-		return { 
-			isDeletionConfirmationShown,
-			submitButtonRef,
-			buttonText,
-			buttonType,
-			showDeletionConfirmation,
-			cancelDeletion
-		};
-	},
-});
+function cancelDeletion() {
+	isDeletionConfirmationShown.value = false;
+	buttonText.value = 'Удалить';
+	buttonType.value = 'default';
+	submitButtonRef.value?.cancelHolding();
+}
 </script>

@@ -5,15 +5,7 @@
 	<password-editing-form />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 import EmailEditingForm from '@/components/profile/EmailEditingForm.vue'
 import PasswordEditingForm from '@/components/profile/PasswordEditingForm.vue'
-
-export default defineComponent({
-	name: 'ProfileDataSection',
-	components: {
-		EmailEditingForm, PasswordEditingForm
-	}
-})
 </script>
