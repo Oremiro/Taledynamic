@@ -9,8 +9,5 @@
 	</div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'NotFoundView',
-}
+<script setup lang="ts">
 </script>

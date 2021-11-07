@@ -24,69 +24,60 @@
 	</div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useStore } from "@/store";
 import { MenuOption, useMessage } from "naive-ui";
-import { defineComponent, h } from "vue";
+import { h } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
-export default defineComponent({
-	name: "ProfileView",
-	setup() {
-		const store = useStore();
-		const router = useRouter();
-		const route = useRoute();
-		const message = useMessage();
-		const menuOptions: MenuOption[] = [
-			{
-				label: () =>
-					h(
-						RouterLink,
-						{
-							to: "/profile",
-						},
-						{ default: () => "Профиль" }
-					),
-				key: '/profile',
-			},
-						{
-				label: () =>
-					h(
-						RouterLink,
-						{ to: '/profile/data' },
-						{ default: () => 'Данные' }
-					),
-				key: '/profile/data',
-			},
-			{
-				label: () =>
-					h(
-						RouterLink,
-						{ to: '/profile/settings' },
-						{ default: () => 'Настройки' }
-					),
-				key: '/profile/settings',
-			},
-			{
-				onClick: async (): Promise<void> => {
-					try {
-						await store.dispatch('user/logout')
-						router.push({ name: 'Auth'});
-						message.info('Вы вышли из аккаунта');
-					} catch (error) {
-						if(error instanceof Error) {
-							message.error(error.message);
-						}
-					}
+const store = useStore();
+const router = useRouter();
+const route = useRoute();
+const message = useMessage();
+const menuOptions: MenuOption[] = [
+	{
+		label: () =>
+			h(
+				RouterLink,
+				{
+					to: "/profile",
 				},
-				label: 'Выйти',
-				key: '/profile/quit',
-			}
-		];
-		return { 
-			menuOptions,
-			route 
-		};
+				{ default: () => "Профиль" }
+			),
+		key: '/profile',
 	},
-});
+				{
+		label: () =>
+			h(
+				RouterLink,
+				{ to: '/profile/data' },
+				{ default: () => 'Данные' }
+			),
+		key: '/profile/data',
+	},
+	{
+		label: () =>
+			h(
+				RouterLink,
+				{ to: '/profile/settings' },
+				{ default: () => 'Настройки' }
+			),
+		key: '/profile/settings',
+	},
+	{
+		onClick: async (): Promise<void> => {
+			try {
+				await store.dispatch('user/logout')
+				router.push({ name: 'Auth'});
+				message.info('Вы вышли из аккаунта');
+			} catch (error) {
+				if(error instanceof Error) {
+					message.error(error.message);
+				}
+			}
+		},
+		label: 'Выйти',
+		key: '/profile/quit',
+	}
+];
 </script>
