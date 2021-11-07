@@ -66,10 +66,10 @@ if (cookieTheme === null) {
 	currentTheme.value = cookieTheme === "dark" ? darkTheme : null;
 }
 
-const setTheme = (value: Theme) => {
+function setTheme(value: Theme): void {
 	currentTheme.value = value;
 	cookie.setCookie("theme", value === null ? "light" : "dark", {
 		expire: Infinity,
 	});
-};
+}
 </script>

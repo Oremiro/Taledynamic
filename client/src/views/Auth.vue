@@ -14,26 +14,17 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { onBeforeRouteUpdate, useRouter } from 'vue-router';
 
-export default defineComponent({
-  name: 'AuthView',
-	setup() {
-		const router = useRouter();
-		const activeTab = ref(router.currentRoute.value.name === 'AuthSignIn' ? 'signin' : 'signup');
+const router = useRouter();
+const activeTab = ref(router.currentRoute.value.name === 'AuthSignIn' ? 'signin' : 'signup');
 
-		const handleUpdateTab = (value: string) => {
-			router.push({ name: value === 'signin' ? 'AuthSignIn' : 'AuthSignUp' })
-		}
-		onBeforeRouteUpdate(to => {
-			activeTab.value = (to.name === 'AuthSignIn' ? 'signin' : 'signup');
-		})
-		return {
-			activeTab,
-			handleUpdateTab
-		}
-	}
-})
+function handleUpdateTab(value: string): void {
+	router.push({ name: value === 'signin' ? 'AuthSignIn' : 'AuthSignUp' })
+}
+onBeforeRouteUpdate(to => {
+	activeTab.value = (to.name === 'AuthSignIn' ? 'signin' : 'signup');
+});
 </script>

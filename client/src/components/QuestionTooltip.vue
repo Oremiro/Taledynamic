@@ -7,17 +7,11 @@
                 </n-icon>
             </n-button>
         </template>
-        <span>{{ text }}</span>
+        <span>
+					<slot></slot>
+				</span>
     </n-tooltip>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-    name: 'QuestionTooltip',
-    props: {
-        text: String
-    }
-})
+<script setup lang="ts">
 </script>

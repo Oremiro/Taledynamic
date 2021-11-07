@@ -71,7 +71,7 @@
 	</transition>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router';
 import { FormItemRule, NEllipsis, NInput, NPopconfirm, useMessage, useThemeVars } from 'naive-ui'
