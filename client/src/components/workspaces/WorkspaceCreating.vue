@@ -8,7 +8,7 @@
 		:loading="isWorkspaceCreatingPending">
 		{{ isWorkspaceCreatingPending ? 'Создание пространства' : 'Создать пространство' }}
 	</delayed-button>
-	<n-form-item v-else :show-label="false" :show-feedback="true" :rule="workspaceCreatingRule">
+	<n-form-item v-else :show-label="false" :show-feedback="false" :rule="workspaceCreatingRule">
 		<n-input-group>
 			<n-input
 				ref="nameInput"

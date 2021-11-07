@@ -1,5 +1,5 @@
 <template>
-	<n-menu :value="$route.path" :options="menuOptions" :indent="30" style="padding: 0 .25rem;"/>
+	<n-menu :value="$route.path" :options="menuOptions" :indent="22" style="padding: 0 .25rem;"/>
 </template>
 
 <script setup lang="ts">
