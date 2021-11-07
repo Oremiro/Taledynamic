@@ -42,6 +42,7 @@ namespace Taledynamic.Core.Services
             return new CreateTableResponse
             {
                 StatusCode = (HttpStatusCode) 200,
+                Table = new TableDto(table),
                 Message = "Success."
             };
         }
@@ -121,6 +122,8 @@ namespace Taledynamic.Core.Services
         public async Task<UpdateTableResponse> UpdateTableAsync(UpdateTableRequest request)
         {
             // не уверен что изменяемость нужна в этой таблице, сделаю через дефолтный update
+            // нет, мне просто лень писать через soft update без очереди, иначе вообще с ума сойти можно с
+            // обновлением строк
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -144,6 +147,7 @@ namespace Taledynamic.Core.Services
             return new UpdateTableResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
+                Table = new TableDto(table),
                 Message = "Success.",
             };
         }

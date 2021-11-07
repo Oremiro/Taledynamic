@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.DAL.Entities;
+using Taledynamic.DAL.Models.DTOs;
 using Taledynamic.DAL.Models.Requests.WorkspaceRequests;
 using Taledynamic.DAL.Models.Responses.WorkspaceResponses;
 
@@ -108,6 +109,7 @@ namespace Taledynamic.Core.Services
             return new CreateWorkspaceResponse
             {
                 StatusCode = (HttpStatusCode) 200,
+                Workspace = new WorkspaceDto(workspace),
                 Message = "Success."
             };
         }
@@ -153,6 +155,7 @@ namespace Taledynamic.Core.Services
             var response = new UpdateWorkspaceResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
+                Workspace = new WorkspaceDto(newWorkspace),
                 Message = "Success."
             };
 
