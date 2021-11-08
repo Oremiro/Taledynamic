@@ -62,6 +62,9 @@ export const actions: ActionTree<WorkspacesState, State> = {
 			try {
 				const { data } = await WorkspaceApi.update({ id: payload.id, name: payload.name }, rootGetters['user/accessToken'])
 				commit('update', { oldWorkspaceIndex: workspaceIndex, newWorkspace: data.workspace });
+				if (payload.id === state.currentWorkspace?.id) {
+					commit('setCurrent', { workspace: data.workspace });
+				}
 				await dispatch('sort', { sortType: state.sortType });
 			} catch (error) {
 				if(axios.isAxiosError(error)) {
