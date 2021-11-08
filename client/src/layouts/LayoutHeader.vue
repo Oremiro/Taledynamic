@@ -1,5 +1,5 @@
 <template>
-	<n-layout-header position="absolute" bordered style="padding: .3rem 0 .3rem 0; z-index: 1">
+	<n-layout-header bordered style="padding: .3rem 3% .3rem 3%">
 		<n-grid cols="12">
 			<n-gi span="2">
 				<div class="nav-logo">
@@ -8,7 +8,7 @@
 			</n-gi>
 			<n-gi span="6" offset="1">
 				<div class="nav-menu">
-					<n-menu :value="route.path" :options="menuOptions" mode="horizontal" />
+					<n-menu :value="currentPath" :options="menuOptions" dropdown-placement="top-start" mode="horizontal" />
 				</div>
 			</n-gi>
 			<n-gi span="2" offset="1">
@@ -43,7 +43,7 @@
 .nav-logo {
 	@extend %nav;
 	font-size: 1.25rem;
-	justify-content: center;
+	justify-content: flex-start;
 }
 
 .nav-menu {
@@ -53,70 +53,76 @@
 
 .nav-extra {
 	@extend %nav;
-	justify-content: center;
+	justify-content: flex-end;
 }
 </style>
 
 
-<script lang="ts">
-import { computed, ComputedRef, defineComponent, h, watch } from 'vue'
+<script setup lang="ts">
+import { computed, h, watch, PropType } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { darkTheme, MenuOption, useLoadingBar, useMessage } from 'naive-ui'
+import { darkTheme, MenuGroupOption, MenuOption, NIcon, useLoadingBar, useMessage } from 'naive-ui'
 import { useStore } from '@/store'
+import { Theme } from '@/interfaces'
 
-export default defineComponent({
-	name: 'Header',
-	props: {
-		currentTheme: Object
-	},
-	setup(props, context) {
-		const loadingBar = useLoadingBar()
-		loadingBar.start();
-		const message = useMessage();
-		const store = useStore();
-		const menuOptions: ComputedRef<MenuOption[]> = computed((): MenuOption[] => {
-			const baseMenuOptions = [
-				{
-					label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
-					key: '/',
-				}
-			];
-			
-			if (store.getters.isLoggedIn) {
-				baseMenuOptions.push({
-					label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
-					key: '/profile'
-				})
-			} else {
-				baseMenuOptions.push({
-					label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),
-					key: '/auth'
-				})
+/* global defineProps, defineEmits */
+const props = defineProps({
+	currentTheme: Object as PropType<Theme>
+});
+const emit = defineEmits<{
+  (e: 'changeTheme', theme: Theme): void
+}>();
+
+
+// data
+const loadingBar = useLoadingBar();
+loadingBar.start();
+const message = useMessage();
+const store = useStore();
+const route = useRoute();
+
+// computed
+const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
+	const baseMenuOptions: Array<MenuOption | MenuGroupOption> = [
+		{
+			label: () => h(RouterLink, { to: '/' }, { default: () => 'О проекте' }),
+			key: '',
+		}
+	];
+	
+	if (store.getters['user/isLoggedIn']) {
+		baseMenuOptions.push(
+			{
+				label: () => h(RouterLink, { to: '/profile' }, { default: () => 'Профиль' }),
+				key: 'profile'
 			}
-			return baseMenuOptions;
+		)
+	} else {
+		baseMenuOptions.push({
+			label: () => h(RouterLink, { to: '/auth' }, { default: () => 'Вход' }),
+			key: 'auth'
 		})
-		
+	}
+	return baseMenuOptions;
+})		
+const currentPath = computed(() => route.path.split('/')[1])
 
-		const changeTheme = (): void => {
-			if (props.currentTheme === null) {
-				context.emit('changeTheme', darkTheme)
-			} else {
-				context.emit('changeTheme', null)
-			}
-		}
-		watch(() => store.state.pageStatus, () => {
-			if (store.state.pageStatus == 'ready') {
-				loadingBar.finish();
-			} else {
-				loadingBar.error();
-				message.error('Ваша сессия устарела')
-			}
-		});
-		return {
-			route: useRoute(),
-			menuOptions,
-			changeTheme
-		}
-	},
-})
+// methods
+const changeTheme = (): void => {
+	if (props.currentTheme === null) {
+		emit('changeTheme', darkTheme)
+	} else {
+		emit('changeTheme', null)
+	}
+}
+
+// watchers
+watch(() => store.state.pageStatus, () => {
+	if (store.state.pageStatus === 'ready') {
+		loadingBar.finish();
+	} else {
+		loadingBar.error();
+		message.error('Ваша сессия устарела')
+	}
+});
 </script>

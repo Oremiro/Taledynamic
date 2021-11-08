@@ -1,5 +1,4 @@
 import { AutoCompleteOption } from "naive-ui";
-import { Ref } from "vue";
 
 export const emailRegex = /^[a-zA-Z0-9][\w.-]*@[a-zA-Z]{2,}(\.[a-zA-Z]{2,})+$/;
 export const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*_(),.+-]).{8,64}$/;
@@ -22,12 +21,14 @@ export function externalOptions(value: string): AutoCompleteOption[] {
     })
 }
 
-export function holdSubmitDisabled(submitDisabled: Ref<number>): void {
-	submitDisabled.value = 15;
-	const submitDisabledTimer = setInterval(() => {
-		submitDisabled.value--;
-		if (submitDisabled.value == 0) {
-			clearInterval(submitDisabledTimer);
-		}
-	}, 1000);
+
+export async function workspaceNameValidator(targetValue: string): Promise<void> {
+	const trimmedValue: string = targetValue.trim();
+	if (trimmedValue === '') {
+		throw new Error('Required');
+	} else if (trimmedValue !== targetValue) {
+		throw new Error('Starts/ends with whitespaces');
+	} else {
+		return;
+	}
 }

@@ -4,41 +4,57 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-		name: 'Index',
+		name: 'Home',
     component: () => import('@/views/Home.vue')
   },
   {
     path: '/auth',
 		name: 'Auth',
-    component: () => import('@/views/Auth.vue')
+		redirect: () => ({ name: 'AuthSignIn'}),
+    component: () => import('@/views/Auth.vue'),
+		children: [
+			{
+        path: 'signin',
+				name: 'AuthSignIn',
+        component: () => import('@/components/auth/SignInForm.vue'),
+      },
+      {
+        path: 'signup',
+				name: 'AuthSignUp',
+        component: () => import('@/components/auth/SignUpForm.vue'),
+      }
+		]
   },
   {
     path: '/profile',
+		name: 'Profile',
     component: () => import('@/views/Profile.vue'),
 		meta: { requiresAuth: true },
     children: [
       {
         path: '',
 				name: 'ProfileIndex',
-        component: () => import('@/components/ProfileMain.vue'),
+        component: () => import('@/components/profile/MainSection.vue'),
       },
       {
         path: 'settings',
 				name: 'ProfileSettings',
-        component: () => import('@/components/ProfileSettings.vue'),
+        component: () => import('@/components/profile/SettingsSection.vue'),
       },
 			{
-				path: 'password',
-				name: 'ProfilePassword',
-				component: () => import('@/components/ProfilePassword.vue')
-			},
-			{
-				path: 'email',
-				name: 'ProfileEmail',
-				component: () => import('@/components/ProfileEmail.vue')
+				path: 'data',
+				name: 'ProfileData',
+				component: () => import('@/components/profile/DataSection.vue')
 			}
     ]
   },
+	{
+		path: '/workspace/:id',
+		name: 'Workspace',
+		props: true,
+		meta: { requiresAuth: true },
+		component: () => import('@/views/Workspace.vue')
+	},
   {
     path: '/:pathMatch(.*)*',
 		name: 'NotFound',
@@ -52,9 +68,9 @@ const router = createRouter({
 })
 
 router.beforeResolve(async to => {
-	let isLoggedIn: boolean = store.getters.isLoggedIn;
+	let isLoggedIn: boolean = store.getters['user/isLoggedIn'];
 	if (!isLoggedIn) {
-		isLoggedIn = await store.dispatch('init');
+		isLoggedIn = await store.dispatch('user/init');
 	}
   if (to.meta.requiresAuth && !isLoggedIn) {
 		store.commit('pageError');
