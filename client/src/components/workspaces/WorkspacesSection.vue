@@ -47,7 +47,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { SelectGroupOption, SelectOption, NPopselect, NScrollbar } from 'naive-ui';
 import { useStore } from '@/store';
-import { Workspace, SortType } from '@/interfaces/store';
+import { Workspace, WorkspacesSortType } from '@/interfaces/store';
 import WorkspaceCreatingButton from '@/components/workspaces/WorkspaceCreating.vue';
 import WorkspacesList from '@/components/workspaces/WorkspacesList.vue'
 import WorkspaceLoading from '@/components/workspaces/WorkspacesLoading.vue'
@@ -64,11 +64,11 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		children: [
 			{
 				label: 'Сначала новые',
-				value: SortType.DateDescending
+				value: WorkspacesSortType.DateDescending
 			},
 			{
 				label: 'Сначала старые',
-				value: SortType.DateAscending
+				value: WorkspacesSortType.DateAscending
 			},
 		]
 	},
@@ -79,19 +79,19 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		children: [
 			{
 				label: 'От A до Z',
-				value: SortType.NameAscending
+				value: WorkspacesSortType.NameAscending
 			},
 			{
 				label: 'От Z до A',
-				value: SortType.NameDescending
+				value: WorkspacesSortType.NameDescending
 			},
 		]
 	}
 ]
 
 const popSortValueStored: string | null = localStorage.getItem('workspacesSort');
-const popSortValueParsed: number = popSortValueStored ? parseInt(popSortValueStored) : SortType.DateDescending;
-const popSortValue = ref<SortType>(!isNaN(popSortValueParsed) ? popSortValueParsed : SortType.DateDescending);
+const popSortValueParsed: number = popSortValueStored ? parseInt(popSortValueStored) : WorkspacesSortType.DateDescending;
+const popSortValue = ref<WorkspacesSortType>(!isNaN(popSortValueParsed) ? popSortValueParsed : WorkspacesSortType.DateDescending);
 
 const isListLoading = ref<boolean>(workspaces.value.length ? false : true);
 const isListLoadingError = ref<boolean>(false);

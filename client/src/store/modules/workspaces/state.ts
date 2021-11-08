@@ -1,6 +1,7 @@
-import { WorkspacesState } from "@/interfaces/store";
+import { WorkspacesSortType, WorkspacesState } from "@/interfaces/store";
 
 export const state: WorkspacesState = {
 	workspaces: [],
-	currentWorkspace: null
+	currentWorkspace: null,
+	sortType: WorkspacesSortType.DateDescending
 };

@@ -124,6 +124,7 @@ const isNameInputLoading = ref<boolean>(false);
 async function editWorkspaceName(): Promise<void> {
 	if (workspaceName.value === props.name || !isWorkspaceNameValid.value) {
 		isNameInputShown.value = false;
+		workspaceName.value = props.name;
 		return
 	}
 	isNameInputLoading.value = true;
