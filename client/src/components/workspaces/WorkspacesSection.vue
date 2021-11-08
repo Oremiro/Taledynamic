@@ -44,7 +44,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { SelectGroupOption, SelectOption, NPopselect, NScrollbar } from 'naive-ui';
 import { useStore } from '@/store';
 import { Workspace, SortType } from '@/interfaces/store';
@@ -64,11 +64,11 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		children: [
 			{
 				label: 'Сначала новые',
-				value: 'sortDescendingByDate'
+				value: SortType.DateDescending
 			},
 			{
 				label: 'Сначала старые',
-				value: 'sortAscendingByDate'
+				value: SortType.DateAscending
 			},
 		]
 	},
@@ -79,26 +79,27 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		children: [
 			{
 				label: 'От A до Z',
-				value: 'sortAscendingByName'
+				value: SortType.NameAscending
 			},
 			{
 				label: 'От Z до A',
-				value: 'sortDescendingByName'
+				value: SortType.NameDescending
 			},
 		]
 	}
 ]
 
-const popSortValue = ref<SortType>(localStorage.getItem('workspacesSort') ?? SortType.DateDescending);
+const popSortValueStored: string | null = localStorage.getItem('workspacesSort');
+const popSortValueParsed: number = popSortValueStored ? parseInt(popSortValueStored) : SortType.DateDescending;
+const popSortValue = ref<SortType>(!isNaN(popSortValueParsed) ? popSortValueParsed : SortType.DateDescending);
 
 const isListLoading = ref<boolean>(workspaces.value.length ? false : true);
 const isListLoadingError = ref<boolean>(false);
 
 
-function updateHandler(value: string): void {
-	localStorage.setItem('workspacesSort', value);
-	store.dispatch('sort', { sortType:  })
-	sortWorkspacesList(value);
+async function updateHandler(value: number): Promise<void> {
+	localStorage.setItem('workspacesSort', value.toString());
+	await store.dispatch('workspaces/sort', { sortType: value });
 }
 
 async function getWorkspaces(): Promise<void> {
@@ -113,14 +114,14 @@ async function getWorkspaces(): Promise<void> {
 	}
 }
 
-onMounted((): void => {
+onMounted(async (): Promise<void> => {
 	if(!workspaces.value.length) {
 		setTimeout(async (): Promise<void> => {
 			await getWorkspaces();
-			sortWorkspacesList(popSortValue.value);
+			await store.dispatch('workspaces/sort', { sortType: popSortValue.value });
 		}, 500);
 	} else {
-		sortWorkspacesList(popSortValue.value);
+		await store.dispatch('workspaces/sort', { sortType: popSortValue.value });
 	}
 })
 </script>

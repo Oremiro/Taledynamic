@@ -89,7 +89,7 @@ export const actions: ActionTree<WorkspacesState, State> = {
 				commit('sortByDateAscending');
 				break;
 			}
-			case SortType.DateDescending: {
+			default: {
 				commit('sortByDateDescending');
 				break;
 			}
