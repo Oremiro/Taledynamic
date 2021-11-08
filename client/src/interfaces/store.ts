@@ -37,3 +37,10 @@ export interface WorkspacesState {
 	workspaces: Workspace[],
 	currentWorkspace: Workspace | null
 }
+
+export enum SortType {
+	NameAscending,
+	NameDescending,
+	DateAscending,
+	DateDescending
+}

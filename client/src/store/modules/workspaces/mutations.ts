@@ -30,7 +30,23 @@ export const mutations: MutationTree<WorkspacesState> = {
 	},
 	update(state: WorkspacesState, payload: { oldWorkspaceIndex: number, newWorkspace: Workspace | ReceivedWorkspace }): void {
 		state.workspaces[payload.oldWorkspaceIndex] = cloneWorkspace(payload.newWorkspace);
-	}
+	},
+	sortByDateAscending(state: WorkspacesState) {
+		// От старых к новым
+		state.workspaces.sort((itemFirst, itemSecond) => itemFirst.modified.getTime() - itemSecond.modified.getTime()); 
+	},
+	sortByDateDescending(state: WorkspacesState) {
+		// От новых к старым
+		state.workspaces.sort((itemFirst, itemSecond) => itemSecond.modified.getTime() - itemFirst.modified.getTime());
+	},
+	sortByNameAscending(state: WorkspacesState) {
+		// По возрастанию (A -> Z)
+		state.workspaces.sort((itemFirst, itemSecond) => itemFirst.name.localeCompare(itemSecond.name));
+	},
+	sortByNameDescending(state: WorkspacesState) {
+		// По убыванию (Z -> A)
+		state.workspaces.sort((itemFirst, itemSecond) => itemSecond.name.localeCompare(itemFirst.name));
+	},
 }
 
 

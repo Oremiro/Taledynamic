@@ -44,18 +44,18 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { SelectGroupOption, SelectOption, NPopselect, NScrollbar } from 'naive-ui';
 import { useStore } from '@/store';
-import { Workspace } from '@/interfaces/store';
+import { Workspace, SortType } from '@/interfaces/store';
 import WorkspaceCreatingButton from '@/components/workspaces/WorkspaceCreating.vue';
 import WorkspacesList from '@/components/workspaces/WorkspacesList.vue'
 import WorkspaceLoading from '@/components/workspaces/WorkspacesLoading.vue'
 
-// data
+
 const store = useStore();
-// TODO
-const workspaces = computed<Workspace[]>(() => store.getters['workspaces/workspaces'])
+
+const workspaces = computed<Workspace[]>(() => store.getters['workspaces/workspaces']);
 const popOptions: Array<SelectOption | SelectGroupOption> = [
 	{
 		type: 'group',
@@ -89,49 +89,15 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 	}
 ]
 
-const popSortValue = ref<string>(localStorage.getItem('workspacesSort') ?? 'sortAscendingByDate');
+const popSortValue = ref<SortType>(localStorage.getItem('workspacesSort') ?? SortType.DateDescending);
 
 const isListLoading = ref<boolean>(workspaces.value.length ? false : true);
 const isListLoadingError = ref<boolean>(false);
 
-// methods
-const sortWorkspacesListByName = (reverse = false): void => {
-	workspaces.value.sort((itemFirst, itemSecond) => {
-		if (itemFirst.name > itemSecond.name) {
-			return reverse ? -1 : 1;
-		} else if (itemFirst.name < itemSecond.name) {
-			return reverse ? 1 : -1;
-		}
-		return 0;
-	})
-}
-const sortWorkspacesListByDate = (reverse = false): void => {
-	workspaces.value.sort((itemFirst, itemSecond) => reverse ? 
-		itemSecond.modified.getTime() - itemFirst.modified.getTime() : 
-		itemFirst.modified.getTime() - itemSecond.modified.getTime())
-}
-const sortWorkspacesList = (value: string): void => {
-	switch (value) {
-		case 'sortAscendingByName': {
-			sortWorkspacesListByName();
-			break;
-		}
-		case 'sortDescendingByName': {
-			sortWorkspacesListByName(true);
-			break;
-		}
-		case 'sortAscendingByDate': {
-			sortWorkspacesListByDate();
-			break;
-		}
-		case 'sortDescendingByDate': {
-			sortWorkspacesListByDate(true);
-			break;
-		}
-	}
-}
-const updateHandler = (value: string): void => {
+
+function updateHandler(value: string): void {
 	localStorage.setItem('workspacesSort', value);
+	store.dispatch('sort', { sortType:  })
 	sortWorkspacesList(value);
 }
 
