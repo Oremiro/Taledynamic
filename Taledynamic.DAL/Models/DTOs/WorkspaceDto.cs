@@ -7,17 +7,24 @@ namespace Taledynamic.DAL.Models.DTOs
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Modified { get; set; }
+        public int UserId { get; set; }
+        
         public WorkspaceDto() {}
 
-        public WorkspaceDto(Workspace table)
+        public WorkspaceDto(Workspace workspace)
         {
-            if (table == null)
+            if (workspace == null)
             {
                 throw new NullReferenceException("Table entity is empty");
             }
 
-            Id = table.Id;
-            Name = table.Name;
+            Id = workspace.Id;
+            Name = workspace.Name;
+            Created = workspace.Created;
+            Modified = workspace.Modified;
+            UserId = workspace.UserId;
         }
     }
 }
