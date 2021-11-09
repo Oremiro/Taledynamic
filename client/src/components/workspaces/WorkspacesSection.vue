@@ -47,15 +47,15 @@
 import { ref, computed, onMounted } from 'vue';
 import { SelectGroupOption, SelectOption, NPopselect, NScrollbar } from 'naive-ui';
 import { useStore } from '@/store';
-import { Workspace } from '@/interfaces/store';
+import { Workspace, WorkspacesSortType } from '@/interfaces/store';
 import WorkspaceCreatingButton from '@/components/workspaces/WorkspaceCreating.vue';
 import WorkspacesList from '@/components/workspaces/WorkspacesList.vue'
 import WorkspaceLoading from '@/components/workspaces/WorkspacesLoading.vue'
 
-// data
+
 const store = useStore();
-// TODO
-const workspaces = computed<Workspace[]>(() => store.getters['workspaces/workspaces'])
+
+const workspaces = computed<Workspace[]>(() => store.getters['workspaces/workspaces']);
 const popOptions: Array<SelectOption | SelectGroupOption> = [
 	{
 		type: 'group',
@@ -64,11 +64,11 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		children: [
 			{
 				label: 'Сначала новые',
-				value: 'sortDescendingByDate'
+				value: WorkspacesSortType.DateDescending
 			},
 			{
 				label: 'Сначала старые',
-				value: 'sortAscendingByDate'
+				value: WorkspacesSortType.DateAscending
 			},
 		]
 	},
@@ -79,60 +79,27 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
 		children: [
 			{
 				label: 'От A до Z',
-				value: 'sortAscendingByName'
+				value: WorkspacesSortType.NameAscending
 			},
 			{
 				label: 'От Z до A',
-				value: 'sortDescendingByName'
+				value: WorkspacesSortType.NameDescending
 			},
 		]
 	}
 ]
 
-const popSortValue = ref<string>(localStorage.getItem('workspacesSort') ?? 'sortAscendingByDate');
+const popSortValueStored: string | null = localStorage.getItem('workspacesSort');
+const popSortValueParsed: number = popSortValueStored ? parseInt(popSortValueStored) : WorkspacesSortType.DateDescending;
+const popSortValue = ref<WorkspacesSortType>(!isNaN(popSortValueParsed) ? popSortValueParsed : WorkspacesSortType.DateDescending);
 
 const isListLoading = ref<boolean>(workspaces.value.length ? false : true);
 const isListLoadingError = ref<boolean>(false);
 
-// methods
-const sortWorkspacesListByName = (reverse = false): void => {
-	workspaces.value.sort((itemFirst, itemSecond) => {
-		if (itemFirst.name > itemSecond.name) {
-			return reverse ? -1 : 1;
-		} else if (itemFirst.name < itemSecond.name) {
-			return reverse ? 1 : -1;
-		}
-		return 0;
-	})
-}
-const sortWorkspacesListByDate = (reverse = false): void => {
-	workspaces.value.sort((itemFirst, itemSecond) => reverse ? 
-		itemSecond.modified.getTime() - itemFirst.modified.getTime() : 
-		itemFirst.modified.getTime() - itemSecond.modified.getTime())
-}
-const sortWorkspacesList = (value: string): void => {
-	switch (value) {
-		case 'sortAscendingByName': {
-			sortWorkspacesListByName();
-			break;
-		}
-		case 'sortDescendingByName': {
-			sortWorkspacesListByName(true);
-			break;
-		}
-		case 'sortAscendingByDate': {
-			sortWorkspacesListByDate();
-			break;
-		}
-		case 'sortDescendingByDate': {
-			sortWorkspacesListByDate(true);
-			break;
-		}
-	}
-}
-const updateHandler = (value: string): void => {
-	localStorage.setItem('workspacesSort', value);
-	sortWorkspacesList(value);
+
+async function updateHandler(value: number): Promise<void> {
+	localStorage.setItem('workspacesSort', value.toString());
+	await store.dispatch('workspaces/sort', { sortType: value });
 }
 
 async function getWorkspaces(): Promise<void> {
@@ -147,14 +114,14 @@ async function getWorkspaces(): Promise<void> {
 	}
 }
 
-onMounted((): void => {
+onMounted(async (): Promise<void> => {
 	if(!workspaces.value.length) {
 		setTimeout(async (): Promise<void> => {
 			await getWorkspaces();
-			sortWorkspacesList(popSortValue.value);
+			await store.dispatch('workspaces/sort', { sortType: popSortValue.value });
 		}, 500);
 	} else {
-		sortWorkspacesList(popSortValue.value);
+		await store.dispatch('workspaces/sort', { sortType: popSortValue.value });
 	}
 })
 </script>

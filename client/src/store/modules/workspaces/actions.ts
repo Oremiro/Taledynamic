@@ -1,7 +1,8 @@
 import { WorkspaceApi } from "@/helpers/api/workspace";
-import { State, WorkspacesState } from "@/interfaces/store";
+import { State, WorkspacesState, WorkspacesSortType } from "@/interfaces/store";
 import { ActionTree } from "vuex";
 import axios from "axios";
+
 
 export const actions: ActionTree<WorkspacesState, State> = {
 	async init({ commit, rootGetters }): Promise<void> {
@@ -19,10 +20,11 @@ export const actions: ActionTree<WorkspacesState, State> = {
 			}
 		}
 	},
-	async create({ commit, rootGetters }, payload: { name: string }): Promise<void> {
+	async create({ commit, dispatch, state, rootGetters }, payload: { name: string }): Promise<void> {
 		try {
 			const { data } = await WorkspaceApi.create({ name: payload.name }, rootGetters['user/accessToken'])
-			// TODO: commit('add', { workspace: data.workspace })
+			commit('add', { workspace: data.workspace })
+			await dispatch('sort', { sortType: state.sortType });
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				if (error.response?.status === 401) {
@@ -54,12 +56,16 @@ export const actions: ActionTree<WorkspacesState, State> = {
 			throw new Error('Workspace id is incorrect')
 		}
 	},
-	async update({ commit, state, rootGetters }, payload: { id: number, name: string }): Promise<void> {
+	async update({ commit, dispatch, state, rootGetters }, payload: { id: number, name: string }): Promise<void> {
 		const workspaceIndex = state.workspaces.findIndex(item => item.id === payload.id);
 		if (~workspaceIndex) {
 			try {
 				const { data } = await WorkspaceApi.update({ id: payload.id, name: payload.name }, rootGetters['user/accessToken'])
-				// commit('update', { oldWorkspaceIndex: workspaceIndex, newWorkspace: data.workspace });
+				commit('update', { oldWorkspaceIndex: workspaceIndex, newWorkspace: data.workspace });
+				if (payload.id === state.currentWorkspace?.id) {
+					commit('setCurrent', { workspace: data.workspace });
+				}
+				await dispatch('sort', { sortType: state.sortType });
 			} catch (error) {
 				if(axios.isAxiosError(error)) {
 					if (error.response?.status === 401) {
@@ -72,6 +78,28 @@ export const actions: ActionTree<WorkspacesState, State> = {
 			}
 		} else {
 			throw new Error('Workspace id is incorrect')
+		}
+	},
+	async sort({ commit }, payload: { sortType: WorkspacesSortType }): Promise<void> {
+		commit('setSortType', { sortType: payload.sortType });
+		switch (payload.sortType) {
+			case WorkspacesSortType.NameAscending: {
+				commit('sortByNameAscending');
+				break;
+			}
+			case WorkspacesSortType.NameDescending: {
+				commit('sortByNameDescending');
+				break;
+			}
+			case WorkspacesSortType.DateAscending: {
+				commit('sortByDateAscending');
+				break;
+			}
+			default: {
+				commit('setSortType', { sortType: WorkspacesSortType.DateDescending });
+				commit('sortByDateDescending');
+				break;
+			}
 		}
 	}
 }
