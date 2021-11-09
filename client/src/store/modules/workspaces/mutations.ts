@@ -1,5 +1,5 @@
 import { MutationTree } from "vuex";
-import { Workspace, WorkspacesState } from "@/interfaces/store";
+import { Workspace, WorkspacesSortType, WorkspacesState } from "@/interfaces/store";
 import { Workspace as ReceivedWorkspace } from "@/interfaces/api/responses";
 
 function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace { 
@@ -22,6 +22,9 @@ export const mutations: MutationTree<WorkspacesState> = {
 	setCurrent(state: WorkspacesState, payload: { workspace: Workspace }): void {
 		state.currentWorkspace = payload.workspace;
 	},
+	setSortType(state: WorkspacesState, payload: { sortType: WorkspacesSortType }) {
+		state.sortType = payload.sortType;
+	},
 	add(state: WorkspacesState, payload: { workspace: Workspace | ReceivedWorkspace }): void {
 		state.workspaces.push(cloneWorkspace(payload.workspace));
 	},
@@ -30,7 +33,23 @@ export const mutations: MutationTree<WorkspacesState> = {
 	},
 	update(state: WorkspacesState, payload: { oldWorkspaceIndex: number, newWorkspace: Workspace | ReceivedWorkspace }): void {
 		state.workspaces[payload.oldWorkspaceIndex] = cloneWorkspace(payload.newWorkspace);
-	}
+	},
+	sortByDateAscending(state: WorkspacesState) {
+		// От старых к новым
+		state.workspaces.sort((itemFirst, itemSecond) => itemFirst.modified.getTime() - itemSecond.modified.getTime()); 
+	},
+	sortByDateDescending(state: WorkspacesState) {
+		// От новых к старым
+		state.workspaces.sort((itemFirst, itemSecond) => itemSecond.modified.getTime() - itemFirst.modified.getTime());
+	},
+	sortByNameAscending(state: WorkspacesState) {
+		// По возрастанию (A -> Z)
+		state.workspaces.sort((itemFirst, itemSecond) => itemFirst.name.localeCompare(itemSecond.name));
+	},
+	sortByNameDescending(state: WorkspacesState) {
+		// По убыванию (Z -> A)
+		state.workspaces.sort((itemFirst, itemSecond) => itemSecond.name.localeCompare(itemFirst.name));
+	},
 }
 
 

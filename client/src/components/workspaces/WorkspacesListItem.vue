@@ -124,11 +124,16 @@ const isNameInputLoading = ref<boolean>(false);
 async function editWorkspaceName(): Promise<void> {
 	if (workspaceName.value === props.name || !isWorkspaceNameValid.value) {
 		isNameInputShown.value = false;
+		workspaceName.value = props.name;
 		return
 	}
 	isNameInputLoading.value = true;
 	try {
+		const currentWorkspaceId: number = store.getters['workspaces/currentWorkspace']?.id;
 		await store.dispatch('workspaces/update', { id: props.id, name: workspaceName.value });
+		if (props.id === currentWorkspaceId) {
+			router.push({ name: 'Workspace', params: { id: store.getters['workspaces/currentWorkspace']?.id } });
+		}
 	} catch (error) {
 		if(error instanceof Error) {
 			message.error(error.message);
