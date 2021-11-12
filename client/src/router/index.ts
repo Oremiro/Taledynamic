@@ -78,6 +78,10 @@ router.beforeResolve(async to => {
 			name: 'Auth',
 			query: { redirect: to.fullPath },
 		};
+	} else if ((to.name === 'AuthSignIn' || to.name === 'AuthSignUp') && isLoggedIn) {
+		return {
+			name: 'ProfileIndex'
+		}
 	}
 	store.commit('pageReady');
 })

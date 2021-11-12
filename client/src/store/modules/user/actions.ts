@@ -46,7 +46,7 @@ export const actions: ActionTree<UserState, State> = {
 			}
 		}
 	},
-	async login({ commit }, formData: SignInFormData): Promise<void> {
+	async login({ commit }, formData: SignInFormData): Promise<UserState> {
 		const requestedUser = {
 			email: formData.email.value, 
 			password: formData.password.value
@@ -58,13 +58,15 @@ export const actions: ActionTree<UserState, State> = {
 					id: data.id ?? null, 
 					email: data.email ?? formData.email.value, 
 				}
+				const accessToken: string = data.jwtToken ?? ''
 				commit('login', {
 					user: responsedUser,
-					accessToken: data.jwtToken
+					accessToken: accessToken
 				});
 				const expireValue: string = formData.remembered.value ? '7d' : '0';
 				VueCookieNext.setCookie('remembered', '1', { expire: expireValue })
 				localStorage.setItem('user', JSON.stringify(responsedUser))
+				return { user: responsedUser, accessTokenInMemory: accessToken };
 			} else {
 				throw new Error('Ошибка авторизации');
 			}
@@ -75,6 +77,8 @@ export const actions: ActionTree<UserState, State> = {
 				} else {
 					throw new Error('Ошибка авторизации');
 				}
+			} else {
+				throw error
 			}
 		}
 	},
