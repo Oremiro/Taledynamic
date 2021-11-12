@@ -1,7 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace TaleDynamicBot.States
 {
@@ -15,18 +20,29 @@ namespace TaleDynamicBot.States
             );
         }
 
-        public override void SendingData(ITelegramBotClient botClient, Update update)
+        public override void SendingData(ITelegramBotClient botClient, Message message)
         {
-            //реализация посылки сообщений, пока что в душе не чаю как
             botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
-                text: "Start sending...."
+                chatId: message.Chat.Id,
+                text: "Start handling...."
             );
+            this._user.ChangeState(new StateMessageHandling());
         }
 
         public override void StopSendingData(ITelegramBotClient botClient,Update update)
         {
-            this._user.ChangeState(new StateStopped());
+            botClient.SendTextMessageAsync(
+                chatId: update.Message.Chat.Id,
+                text: "Вы ещё не начали обработку сообщений"
+            );
+        }
+
+        public override void DefaultAction(ITelegramBotClient botClient, Message message)
+        {
+            botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Чтобы начать обработку сообщений, введите команду /sending"
+            );
         }
     }
 }

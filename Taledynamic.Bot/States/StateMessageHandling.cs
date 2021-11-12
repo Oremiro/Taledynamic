@@ -1,44 +1,43 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Text.Json;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace TaleDynamicBot.States
 {
-    public class StateStopped:State
+    public class StateMessageHandling:State
     {
-
         public override void Auth(ITelegramBotClient botClient, Update update)
-        { 
+        {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "You are already logged into the system"
+                text: "Вы уже авторизованы"
             );
         }
 
         public override void SendingData(ITelegramBotClient botClient, Message message)
         {
-            
-             botClient.SendTextMessageAsync(
+            botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "Please,Wait"
+                text: "Обработка уже запущена"
             );
-             this._user.ChangeState(new StateMessageHandling());
         }
 
-        public override void StopSendingData(ITelegramBotClient botClient,Update update)
+        public override void StopSendingData(ITelegramBotClient botClient, Update update)
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "You already stopped"
+                text: "Остановка...."
             );
+            this._user.ChangeState(new StateStopped());
         }
 
         public override void DefaultAction(ITelegramBotClient botClient, Message message)
         {
-            botClient.SendTextMessageAsync(
-                chatId: message.Chat.Id,
-                text: "Какой-то текст"
-            );
+            string json = JsonSerializer.Serialize<Message>(message);
         }
     }
 }

@@ -17,9 +17,11 @@ namespace TaleDynamicBot
 
         public void Auth(ITelegramBotClient botClient, Update update) => this._state.Auth(botClient,update);
 
-        public void SendingData(ITelegramBotClient botClient,Update update) => this._state.SendingData(botClient,update);
+        public void SendingData(ITelegramBotClient botClient,Update update) => this._state.SendingData(botClient,update.Message);
         
         public void StopSendingData(ITelegramBotClient botClient,Update update) => this._state.StopSendingData(botClient,update);
-        
+
+        public void DefaultAction(ITelegramBotClient botClient, Update update) => this._state.DefaultAction(botClient, update.Message);
+
     }
 }
