@@ -40,6 +40,7 @@ import { useStore } from '@/store'
 import { emailRegex, externalOptions } from '@/helpers'
 import { SignInFormData } from '@/interfaces'
 import DelayedButton from '@/components/DelayedButton.vue'
+import { UserState } from '@/interfaces/store'
 
 const formData = reactive<SignInFormData>({
 	email: {
@@ -91,7 +92,10 @@ function submitForm(): void {
 	formRef.value?.validate(async (errors): Promise<void> => {
 		if (!errors) {
 			try {
-				await store.dispatch('user/login', formData);
+				const userState: UserState = await store.dispatch('user/login', formData);
+				const signinBC = new BroadcastChannel('signin');
+				signinBC.postMessage(userState);
+				signinBC.close();
 				message.success('Вы успешно вошли!');
 				router.push('/profile');
 			} catch (error) {

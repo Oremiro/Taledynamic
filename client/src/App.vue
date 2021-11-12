@@ -47,13 +47,14 @@
 
 <script setup lang="ts">
 import "vfonts/OpenSans.css";
-import { ref } from "@vue/reactivity";
+import { ref, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import { darkTheme, useOsTheme } from "naive-ui";
 import LayoutHeader from "@/layouts/LayoutHeader.vue";
 import LayoutSider from "@/layouts/LayoutSider.vue";
 import { Theme } from "@/interfaces";
-import { useRouter } from "vue-router";
 import { useStore } from "@/store";
+import { UserState } from "@/interfaces/store";
 
 
 const currentTheme = ref<Theme>(darkTheme);
@@ -74,12 +75,23 @@ function setTheme(value: Theme): void {
 const router = useRouter();
 const store = useStore();
 
-onstorage = event => {
-	if (event.key === 'theme') {
-		currentTheme.value = event.newValue === 'dark' ? darkTheme : null;
-	} else if (event.key === 'user' && event.newValue === null) {
-		store.commit('user/logout');
-		router.push({ name: 'AuthSignIn'});
+onstorage = (event: StorageEvent): void => {
+	if (event.storageArea === localStorage) {
+		if (event.key === 'theme') {
+			currentTheme.value = event.newValue === 'dark' ? darkTheme : null;
+		} else if (event.key === 'user' && event.newValue === null) {
+			store.commit('user/logout');
+			router.push({ name: 'AuthSignIn'});
+		}
 	}
 }
+
+const signinBC = new BroadcastChannel('signin');
+signinBC.onmessage = (ev: MessageEvent<UserState>): void => {
+	const userState: UserState = ev.data;
+	store.commit('user/login', { user: userState.user, accessToken: userState.accessTokenInMemory});
+}
+onUnmounted(() => {
+	signinBC.close();
+})
 </script>
