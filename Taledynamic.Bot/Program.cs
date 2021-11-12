@@ -34,6 +34,7 @@ namespace TaleDynamicBot
             Console.ReadLine();
             
             cts.Cancel();
+            Log.CloseAndFlush();
         }
     }
 }

@@ -16,16 +16,16 @@ namespace TaleDynamicBot.States
             Log.Information($"Username {update.Message.Chat.Username} has logged");
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "You logging...."
+                text: "..."
             );
             //if auth successed
             this._user.ChangeState(new StateAuth());
         }
         
-        public override void SendingData(ITelegramBotClient botClient, Update update)
+        public override void SendingData(ITelegramBotClient botClient, Message message)
         {
              botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
+                chatId: message.Chat.Id,
                 text: "You are not logged in the system"
             );
         }
@@ -35,6 +35,14 @@ namespace TaleDynamicBot.States
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 text: "You are not logged in the system"
+            );
+        }
+
+        public override void DefaultAction(ITelegramBotClient botClient, Message message)
+        {
+            botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Пожалуйста, авторизуйтесь с помощью команды /auth"
             );
         }
     }
