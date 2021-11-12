@@ -74,14 +74,12 @@ const emit = defineEmits<{
 }>();
 
 
-// data
 const loadingBar = useLoadingBar();
 loadingBar.start();
 const message = useMessage();
 const store = useStore();
 const route = useRoute();
 
-// computed
 const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
 	const baseMenuOptions: Array<MenuOption | MenuGroupOption> = [
 		{
@@ -107,8 +105,7 @@ const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
 })		
 const currentPath = computed(() => route.path.split('/')[1])
 
-// methods
-const changeTheme = (): void => {
+function changeTheme(): void {
 	if (props.currentTheme === null) {
 		emit('changeTheme', darkTheme)
 	} else {
@@ -116,11 +113,10 @@ const changeTheme = (): void => {
 	}
 }
 
-// watchers
-watch(() => store.state.pageStatus, () => {
-	if (store.state.pageStatus === 'ready') {
+watch(() => store.state.pageStatus, (value, oldValue) => {
+	if (oldValue === 'loading' && value === 'ready') {
 		loadingBar.finish();
-	} else {
+	} else if (value === 'error') {
 		loadingBar.error();
 		message.error('Ваша сессия устарела')
 	}

@@ -88,10 +88,12 @@ onstorage = (event: StorageEvent): void => {
 
 const signinBC = new BroadcastChannel('signin');
 signinBC.onmessage = (ev: MessageEvent<UserState>): void => {
-	const userState: UserState = ev.data;
-	store.commit('user/login', { user: userState.user, accessToken: userState.accessTokenInMemory});
-	if (router.currentRoute.value.name === 'AuthSignIn' || router.currentRoute.value.name === 'AuthSignUp') {
-		router.push({ name: 'ProfileIndex'});
+	if (!store.getters['user/isLoggedIn']) {
+		const userState: UserState = ev.data;
+		store.commit('user/login', { user: userState.user, accessToken: userState.accessTokenInMemory});
+		if (router.currentRoute.value.name === 'AuthSignIn' || router.currentRoute.value.name === 'AuthSignUp') {
+			router.push({ name: 'ProfileIndex'});
+		}
 	}
 }
 onUnmounted(() => {
