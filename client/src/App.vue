@@ -49,27 +49,37 @@
 import "vfonts/OpenSans.css";
 import { ref } from "@vue/reactivity";
 import { darkTheme, useOsTheme } from "naive-ui";
-import { useCookie } from "vue-cookie-next";
 import LayoutHeader from "@/layouts/LayoutHeader.vue";
 import LayoutSider from "@/layouts/LayoutSider.vue";
 import { Theme } from "@/interfaces";
+import { useRouter } from "vue-router";
+import { useStore } from "@/store";
 
 
 const currentTheme = ref<Theme>(darkTheme);
-const cookie = useCookie();
-const cookieTheme: string | null = cookie.getCookie("theme");
+const storedTheme: string | null = localStorage.getItem('theme');
 
-if (cookieTheme === null) {
-	const osThemeRef = useOsTheme();
-	currentTheme.value = osThemeRef.value === "dark" ? darkTheme : null;
+if (storedTheme) {
+	currentTheme.value = storedTheme === 'dark' ? darkTheme : null;
 } else {
-	currentTheme.value = cookieTheme === "dark" ? darkTheme : null;
+	const osThemeRef = useOsTheme();
+	currentTheme.value = osThemeRef.value === 'dark' ? darkTheme : null;
 }
 
 function setTheme(value: Theme): void {
 	currentTheme.value = value;
-	cookie.setCookie("theme", value === null ? "light" : "dark", {
-		expire: Infinity,
-	});
+	localStorage.setItem('theme', value === null ? 'light' : 'dark');
+}
+
+const router = useRouter();
+const store = useStore();
+
+onstorage = event => {
+	if (event.key === 'theme') {
+		currentTheme.value = event.newValue === 'dark' ? darkTheme : null;
+	} else if (event.key === 'user' && event.newValue === null) {
+		store.commit('user/logout');
+		router.push({ name: 'AuthSignIn'});
+	}
 }
 </script>
