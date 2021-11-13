@@ -32,3 +32,16 @@ export async function workspaceNameValidator(targetValue: string): Promise<void>
 		return;
 	}
 }
+
+
+export function debounce<A extends unknown[], R = void>(fn: (...args: A) => R, ms = 500): (...args: A) => Promise<R> {
+	let timeoutId: ReturnType<typeof setTimeout>;
+	return function (this: ThisParameterType<typeof fn>, ...args: A): Promise<R> {
+		return new Promise<R>((resolve) => {
+			if (timeoutId !== undefined) {
+				clearTimeout(timeoutId);
+			}
+			timeoutId = setTimeout(() => resolve(fn.apply(this, args)), ms);
+		})
+	} 
+}
