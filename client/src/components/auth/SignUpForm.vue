@@ -6,7 +6,7 @@
 			v-model:value="formData.email.value" 
 			#default="{ handleInput, handleBlur, handleFocus, value }">
 				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value">
-					<template v-if="!formData.email.isValid" #prefix>
+					<template v-if="!formData.email.isValid && !isEmailUsed" #prefix>
 						<question-tooltip>
 							Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
 						</question-tooltip>
@@ -64,9 +64,9 @@
 import { computed, reactive, ref } from 'vue'
 import { useMessage, NForm, FormRules, NFormItem } from 'naive-ui';
 import { useRouter } from 'vue-router';
-import { AxiosError } from 'axios';
+import axios from 'axios';
 import { useStore } from '@/store';
-import { emailRegex, passwordRegex, externalOptions } from '@/helpers';
+import { debounce, emailRegex, passwordRegex, externalOptions } from '@/helpers';
 import { UserApi } from '@/helpers/api/user';
 import { SignUpFormData } from '@/interfaces'
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
@@ -86,6 +86,7 @@ const formData = reactive<SignUpFormData>({
 		isValid: false,
 	},
 });
+const isEmailUsed = ref<boolean>(false);
 const rules: FormRules = {
 	email: {
 		value: [
@@ -95,37 +96,37 @@ const rules: FormRules = {
 				trigger: 'blur',
 			},
 			{
-				asyncValidator: (rule, value) => {
-					return new Promise<void>((resolve, reject) => {
+				asyncValidator: debounce((rule, value) => {
+					if (!emailRegex.test(value)) {
 						formData.email.isValid = false;
-						if (!emailRegex.test(value)) {
-							reject(new Error('Введите корректный email'));
-						} else {
-							formData.email.isValid = true;
-							resolve();
-						}
-					});
-				},
-				trigger: ['blur', 'input'],
+						throw new Error('Введите корректный email');
+					} else {
+						formData.email.isValid = true;
+					}
+				}, 500),
+				trigger: ['blur', 'input']
 			},
 			{
-				asyncValidator: (rule, value) => 
-					new Promise<void>((resolve, reject) => {
+				asyncValidator: debounce(async (rule, value) => {
+					try {
+						const { data } = await UserApi.isEmailUsed({ email: value });
+						isEmailUsed.value = data.isEmailUsed;
+						if(data.isEmailUsed) {
+							throw new Error('Данный email занят другим пользователем');
+						} else {
+							formData.email.isValid = true;
+							return;
+						}
+					} catch (error) {
 						formData.email.isValid = false;
-						UserApi.isEmailUsed({ email: value })
-						.then((response) => {
-							if(response.data.isEmailUsed) {
-								reject(new Error('Данный email занят другим пользователем'));
-							} else {
-								formData.email.isValid = true;
-								resolve();
-							}
-						})
-						.catch((error: AxiosError) => {
-							reject(new Error(error.message));
-						});
-					}),
-				trigger: 'blur'
+						if (axios.isAxiosError(error)) {
+							throw new Error(error.message)
+						} else {
+							throw error;
+						}
+					}
+				}, 1000, { isAwaited: true }),
+				trigger: ['blur', 'input']
 			}
 		],
 	},
@@ -137,19 +138,14 @@ const rules: FormRules = {
 				trigger: 'blur'
 			},
 			{
-				asyncValidator: (rule, value) => {
-					return new Promise<void>((resolve, reject) => {
-						if (!passwordRegex.test(value)) {
-							formData.password.isValid = false;
-							reject(
-								new Error('Введите корректный сложный пароль')
-							);
-						} else {
-							formData.password.isValid = true;
-							resolve();
-						}
-					});
-				},
+				asyncValidator: debounce((rule, value) => {
+					if (!passwordRegex.test(value)) {
+						formData.password.isValid = false;
+						throw new Error('Введите корректный сложный пароль')
+					} else {
+						formData.password.isValid = true;
+					}
+				}, 500),
 				trigger: ['blur', 'input'],
 			},
 		],
@@ -162,17 +158,14 @@ const rules: FormRules = {
 				trigger: 'blur',
 			},
 			{
-				asyncValidator: (rule, value) => {
-					return new Promise<void>((resolve, reject) => {
-						if (value !== formData.password.value) {
-							formData.confirmedPassword.isValid = false;
-							reject(new Error('Пароли не совпадают'));
-						} else {
-							formData.confirmedPassword.isValid = true;
-							resolve();
-						}
-					});
-				},
+				asyncValidator: debounce((rule, value) => {
+					if (value !== formData.password.value) {
+						formData.confirmedPassword.isValid = false;
+						throw new Error('Пароли не совпадают');
+					} else {
+						formData.confirmedPassword.isValid = true;
+					}
+				}),
 				trigger: ['blur', 'input', 'password-input'],
 			},
 		],

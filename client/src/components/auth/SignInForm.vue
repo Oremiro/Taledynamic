@@ -37,7 +37,7 @@ import { computed, reactive, ref } from 'vue'
 import { NForm, useMessage, FormRules } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store'
-import { emailRegex, externalOptions } from '@/helpers'
+import { debounce, emailRegex, externalOptions } from '@/helpers'
 import { SignInFormData } from '@/interfaces'
 import DelayedButton from '@/components/DelayedButton.vue'
 import { UserState } from '@/interfaces/store'
@@ -59,21 +59,16 @@ const rules: FormRules = {
 	email: {
 		value: [
 			{
-				asyncValidator: (rule, value) => {
-					return new Promise<void>((resolve, reject) => {
-						if (emailRegex.test(value)) {
-							formData.email.isValid = true;
-							resolve();
-						} else {
-							formData.email.isValid = false;
-							if (formData.email.value === '') {
-								resolve()
-							} else {
-								reject(new Error('Введите корректный email'));
-							}
+				asyncValidator: debounce((rule, value) => {
+					if (emailRegex.test(value)) {
+						formData.email.isValid = true;
+					} else {
+						formData.email.isValid = false;
+						if (formData.email.value !== '') {
+							throw new Error('Введите корректный email');
 						}
-					});
-				},
+					}
+				}, 500),
 				trigger: ['blur', 'input'],
 			},
 		],
