@@ -32,3 +32,37 @@ export async function workspaceNameValidator(targetValue: string): Promise<void>
 		return;
 	}
 }
+
+
+export function debounce<A extends unknown[], R>(
+	fn: (...args: A) => R | Promise<R>, 
+	ms = 500,
+	options: {
+		isAwaited?: boolean,
+		immediateFunc?: () => void
+	} = {}
+): (...args: A) => Promise<R> {
+	let timeoutId: ReturnType<typeof setTimeout> | undefined;
+	return function (this: ThisParameterType<typeof fn>, ...args: A): Promise<R> {
+		return new Promise<R>((resolve, reject) => {
+			if (options.immediateFunc !== undefined) {
+				options.immediateFunc()
+			}
+			if (timeoutId !== undefined) {
+				clearTimeout(timeoutId);
+			}
+			timeoutId = setTimeout(async () => {
+				try {
+					const result = fn.apply(this, args);
+					if (options.isAwaited) {
+						resolve(await result);
+					} else {
+						resolve(result);
+					}
+				} catch (error) {
+					reject(error);
+				}
+			}, ms);
+		})
+	} 
+}

@@ -7,6 +7,7 @@
 				placeholder="" 
 				v-model:value="formData.newPassword.value"
 				@input="handlePasswordInput"
+				:loading="isNewPwdValidationPending"
 			>
 				<template v-if="!formData.newPassword.isValid" #prefix>
 					<question-tooltip>
@@ -16,9 +17,14 @@
 			</n-input>
 		</n-form-item>
 		<n-form-item first ref="confirmedPasswordRef" label="Повторите новый пароль" path="confirmedPassword.value">
-			<n-input type="password" show-password-on="click" placeholder="" v-model:value="formData.confirmedPassword.value" />
+			<n-input 
+				type="password" 
+				show-password-on="click" 
+				placeholder="" 
+				v-model:value="formData.confirmedPassword.value" 
+				:loading="isConfirmedPwdValidationPending" />
 		</n-form-item>
-		<n-collapse-transition :show="formData.newPassword.value !== '' || formData.confirmedPassword.value !== ''">
+		<n-collapse-transition :show="formData.newPassword.isValid && formData.confirmedPassword.isValid">
 			<n-form-item first label="Текущий пароль" path="currentPassword.value">
 				<n-input
 					type="password"
@@ -35,8 +41,8 @@
 				style="margin-right: 1rem"
 				@click="submitForm"
 				:loading="isSubmitButtonLoading"
-				:disabled="isSubmitButtonLoading"
-				v-show="formData.currentPassword.value && formData.newPassword.isValid && formData.confirmedPassword.isValid">
+				:disabled="!formData.currentPassword.value || !formData.newPassword.isValid || !formData.confirmedPassword.isValid ||
+									isSubmitButtonLoading || isNewPwdValidationPending || isConfirmedPwdValidationPending">
 				Сохранить
 			</delayed-button>
 			<n-button ghost type="error" @click="undoChanges">
@@ -50,7 +56,7 @@
 import { reactive, ref } from 'vue'
 import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { useStore } from '@/store';
-import { passwordRegex } from '@/helpers';
+import { debounce, passwordRegex } from '@/helpers';
 import { PasswordEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
 import DelayedButton from '@/components/DelayedButton.vue'
@@ -70,13 +76,16 @@ const formData = reactive<PasswordEditFormData>({
 		isValid: false,
 	},
 });
+
+const isNewPwdValidationPending = ref<boolean>(false);
+const isConfirmedPwdValidationPending = ref<boolean>(false);
 const rules: FormRules = {
 	currentPassword: {
 		value: [
 			{
 				required: true,
 				message: 'Пожалуйста, введите текущий пароль',
-				trigger: 'blur'
+				trigger: 'input'
 			}
 		]
 	},
@@ -84,24 +93,20 @@ const rules: FormRules = {
 		value: [
 			{
 				required: true,
-				message: 'Пожалуйста, введите новый пароль',
-				trigger: 'blur'
-			},
-			{
-				asyncValidator: (rule, value) => {
-					return new Promise<void>((resolve, reject) => {
+				asyncValidator: debounce( 
+					(rule, value) => {
+						isNewPwdValidationPending.value = false;
 						if (!passwordRegex.test(value)) {
 							formData.newPassword.isValid = false;
-							reject(
-								new Error("Введите корректный сложный пароль")
-							);
+							throw new Error('Введите корректный сложный пароль');
 						} else {
 							formData.newPassword.isValid = true;
-							resolve();
 						}
-					});
-				},
-				trigger: ['blur', 'input'],
+					},
+					700,
+					{ immediateFunc: () => { isNewPwdValidationPending.value = true } }
+				),
+				trigger: 'input',
 			},
 		],
 	},
@@ -109,22 +114,20 @@ const rules: FormRules = {
 		value: [
 			{
 				required: true,
-				message: 'Пожалуйста, повторите пароль',
-				trigger: 'blur',
-			},
-			{
-				asyncValidator: (rule, value) => {
-					return new Promise<void>((resolve, reject) => {
+				asyncValidator: debounce( 
+					(rule, value) => {
+						isConfirmedPwdValidationPending.value = false;
 						if (value !== formData.newPassword.value) {
 							formData.confirmedPassword.isValid = false;
-							reject(new Error('Пароли не совпадают'));
+							throw new Error('Пароли не совпадают')
 						} else {
 							formData.confirmedPassword.isValid = true;
-							resolve();
 						}
-					});
-				},
-				trigger: ['blur', 'input', 'password-input'],
+					},
+					700,
+					{ immediateFunc: () => { isConfirmedPwdValidationPending.value = true } }
+				),
+				trigger: ['input', 'password-input'],
 			},
 		],
 	},
@@ -145,6 +148,8 @@ function undoChanges(): void {
 	formData.currentPassword.value = '';
 	formData.newPassword.value = '';
 	formData.confirmedPassword.value = '';
+	formData.newPassword.isValid = false;
+	formData.confirmedPassword.isValid = false;
 	formRef.value?.restoreValidation();
 }
 

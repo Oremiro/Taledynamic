@@ -4,7 +4,8 @@
       <n-auto-complete
         :options="options"
         placeholder=""
-        v-model:value="formData.email.value"/>
+        v-model:value="formData.email.value"
+				:loading="isEmailValidationPending"/>
     </n-form-item>
     <n-form-item first label="Пароль" path="password.value">
       <n-input
@@ -24,7 +25,7 @@
 				type="primary"
 				ghost
 				:loading="submitLoading"
-				:disabled="!formData.email.isValid || !formData.password.value || submitLoading"
+				:disabled="!formData.email.isValid || !formData.password.value || submitLoading || isEmailValidationPending"
 				@click="submitForm">
 				Войти
 			</delayed-button>
@@ -37,7 +38,7 @@ import { computed, reactive, ref } from 'vue'
 import { NForm, useMessage, FormRules } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store'
-import { emailRegex, externalOptions } from '@/helpers'
+import { debounce, emailRegex, externalOptions } from '@/helpers'
 import { SignInFormData } from '@/interfaces'
 import DelayedButton from '@/components/DelayedButton.vue'
 import { UserState } from '@/interfaces/store'
@@ -55,26 +56,29 @@ const formData = reactive<SignInFormData>({
 		value: false,
 	},
 });
+const isEmailValidationPending = ref<boolean>(false);
 const rules: FormRules = {
 	email: {
 		value: [
 			{
-				asyncValidator: (rule, value) => {
-					return new Promise<void>((resolve, reject) => {
+				asyncValidator: debounce(
+					(rule, value) => {
+						isEmailValidationPending.value = false;
 						if (emailRegex.test(value)) {
 							formData.email.isValid = true;
-							resolve();
 						} else {
 							formData.email.isValid = false;
-							if (formData.email.value === '') {
-								resolve()
-							} else {
-								reject(new Error('Введите корректный email'));
+							if (formData.email.value !== '') {
+								throw new Error('Введите корректный email');
 							}
 						}
-					});
-				},
-				trigger: ['blur', 'input'],
+					}, 
+					700,
+					{
+						immediateFunc: () => { isEmailValidationPending.value = true }
+					}
+				),
+				trigger: 'input',
 			},
 		],
 	},
