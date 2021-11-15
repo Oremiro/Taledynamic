@@ -73,12 +73,12 @@ const rules: FormRules = {
 							}
 						}
 					}, 
-					500,
+					700,
 					{
 						immediateFunc: () => { isEmailValidationPending.value = true }
 					}
 				),
-				trigger: ['blur', 'input'],
+				trigger: 'input',
 			},
 		],
 	},

@@ -150,7 +150,7 @@ const rules: FormRules = {
 							formData.password.isValid = true;
 						}
 					}, 
-					500,
+					700,
 					{ immediateFunc: () => { isPasswordValidationPending.value = true; } }
 				),
 				trigger: 'input',
@@ -171,7 +171,7 @@ const rules: FormRules = {
 							formData.confirmedPassword.isValid = true;
 						}
 					}, 
-					500,
+					700,
 					{ immediateFunc: () => { isConfirmedPwdValidationPending.value = true } }
 				),
 				trigger: ['input', 'password-input'],
