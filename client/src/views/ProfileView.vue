@@ -1,32 +1,20 @@
 <template>
   <div class="container">
-    <n-grid
-      :cols="30"
-      style="max-width: 40rem"
-    >
+    <n-grid :cols="30" style="max-width: 40rem">
       <n-gi :span="8">
         <n-card
           hoverable
           size="small"
           content-style="padding-left: 0; padding-right: 0"
         >
-          <n-menu
-            :options="menuOptions"
-            :value="route.path"
-          />
+          <n-menu :options="menuOptions" :value="route.path" />
         </n-card>
       </n-gi>
       <n-gi :span="1" />
       <n-gi :span="21">
         <router-view v-slot="{ Component }">
-          <transition
-            name="fade"
-            mode="out-in"
-          >
-            <n-card
-              :key="route.path"
-              hoverable
-            >
+          <transition name="fade" mode="out-in">
+            <n-card :key="route.path" hoverable>
               <component :is="Component" />
             </n-card>
           </transition>
@@ -47,49 +35,45 @@ const router = useRouter();
 const route = useRoute();
 const message = useMessage();
 const menuOptions: MenuOption[] = [
-	{
-		label: () =>
-			h(
-				RouterLink,
-				{
-					to: "/profile",
-				},
-				{ default: () => "Профиль" }
-			),
-		key: '/profile',
-	},
-				{
-		label: () =>
-			h(
-				RouterLink,
-				{ to: '/profile/data' },
-				{ default: () => 'Данные' }
-			),
-		key: '/profile/data',
-	},
-	{
-		label: () =>
-			h(
-				RouterLink,
-				{ to: '/profile/settings' },
-				{ default: () => 'Настройки' }
-			),
-		key: '/profile/settings',
-	},
-	{
-		onClick: async (): Promise<void> => {
-			try {
-				await store.dispatch('user/logout')
-				router.push({ name: 'Auth'});
-				message.info('Вы вышли из аккаунта');
-			} catch (error) {
-				if(error instanceof Error) {
-					message.error(error.message);
-				}
-			}
-		},
-		label: 'Выйти',
-		key: '/profile/quit',
-	}
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: "/profile",
+        },
+        { default: () => "Профиль" }
+      ),
+    key: "/profile",
+  },
+  {
+    label: () =>
+      h(RouterLink, { to: "/profile/data" }, { default: () => "Данные" }),
+    key: "/profile/data",
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        { to: "/profile/settings" },
+        { default: () => "Настройки" }
+      ),
+    key: "/profile/settings",
+  },
+  {
+    onClick: async (): Promise<void> => {
+      try {
+        await store.dispatch("user/logout");
+        router.push({ name: "Auth" });
+        message.info("Вы вышли из аккаунта");
+      } catch (error) {
+        if (error instanceof Error) {
+          message.error(error.message);
+        }
+      }
+    },
+    label: "Выйти",
+    key: "/profile/quit",
+  },
 ];
 </script>

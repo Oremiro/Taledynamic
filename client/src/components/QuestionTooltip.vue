@@ -1,9 +1,5 @@
 <template>
-  <n-tooltip
-    width="20rem"
-    placement="top"
-    trigger="click"
-  >
+  <n-tooltip width="20rem" placement="top" trigger="click">
     <template #trigger>
       <n-button text>
         <n-icon class="n-input-question">
@@ -28,5 +24,4 @@
   </n-tooltip>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>

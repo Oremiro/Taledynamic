@@ -1,16 +1,16 @@
 export interface CreateWorkspaceRequest {
-	name: string
+  name: string;
 }
 
 export interface DeleteWorkspaceRequest {
-	id: number
+  id: number;
 }
 
 export interface UpdateWorkspaceRequest {
-	id: number,
-	name: string
+  id: number;
+  name: string;
 }
 
 export interface GetWorkspaceByIdRequest {
-	id: number
+  id: number;
 }

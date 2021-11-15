@@ -9,18 +9,11 @@
             @change-theme="setTheme"
           />
         </n-loading-bar-provider>
-        <n-layout
-          has-sider
-          position="absolute"
-          style="top: 3.3rem;"
-        >
+        <n-layout has-sider position="absolute" style="top: 3.3rem">
           <layout-sider />
           <n-layout-content embedded>
             <router-view v-slot="{ Component }">
-              <transition
-                name="fade"
-                mode="out-in"
-              >
+              <transition name="fade" mode="out-in">
                 <component :is="Component" />
               </transition>
             </router-view>
@@ -42,63 +35,70 @@ import { Theme } from "@/interfaces";
 import { useStore } from "@/store";
 import { UserState } from "@/interfaces/store";
 
-
 const currentTheme = ref<Theme>(darkTheme);
-const storedTheme: string | null = localStorage.getItem('theme');
+const storedTheme: string | null = localStorage.getItem("theme");
 
 if (storedTheme) {
-	currentTheme.value = storedTheme === 'dark' ? darkTheme : null;
+  currentTheme.value = storedTheme === "dark" ? darkTheme : null;
 } else {
-	const osThemeRef = useOsTheme();
-	currentTheme.value = osThemeRef.value === 'dark' ? darkTheme : null;
+  const osThemeRef = useOsTheme();
+  currentTheme.value = osThemeRef.value === "dark" ? darkTheme : null;
 }
 
 function setTheme(value: Theme): void {
-	currentTheme.value = value;
-	localStorage.setItem('theme', value === null ? 'light' : 'dark');
+  currentTheme.value = value;
+  localStorage.setItem("theme", value === null ? "light" : "dark");
 }
 
 const router = useRouter();
 const store = useStore();
 
 onstorage = (event: StorageEvent): void => {
-	if (event.storageArea === localStorage) {
-		if (event.key === 'theme') {
-			currentTheme.value = event.newValue === 'dark' ? darkTheme : null;
-		} else if (event.key === 'user' && event.newValue === null) {
-			store.commit('user/logout');
-			router.push({ name: 'AuthSignIn'});
-		}
-	}
-}
+  if (event.storageArea === localStorage) {
+    if (event.key === "theme") {
+      currentTheme.value = event.newValue === "dark" ? darkTheme : null;
+    } else if (event.key === "user" && event.newValue === null) {
+      store.commit("user/logout");
+      router.push({ name: "AuthSignIn" });
+    }
+  }
+};
 
-const signinBC = new BroadcastChannel('signin');
+const signinBC = new BroadcastChannel("signin");
 signinBC.onmessage = (ev: MessageEvent<UserState>): void => {
-	if (!store.getters['user/isLoggedIn']) {
-		const userState: UserState = ev.data;
-		store.commit('user/login', { user: userState.user, accessToken: userState.accessTokenInMemory});
-		if (router.currentRoute.value.name === 'AuthSignIn' || router.currentRoute.value.name === 'AuthSignUp') {
-			router.push({ name: 'ProfileIndex'});
-		}
-	}
-}
+  if (!store.getters["user/isLoggedIn"]) {
+    const userState: UserState = ev.data;
+    store.commit("user/login", {
+      user: userState.user,
+      accessToken: userState.accessTokenInMemory,
+    });
+    if (
+      router.currentRoute.value.name === "AuthSignIn" ||
+      router.currentRoute.value.name === "AuthSignUp"
+    ) {
+      router.push({ name: "ProfileIndex" });
+    }
+  }
+};
 onUnmounted(() => {
-	signinBC.close();
-})
+  signinBC.close();
+});
 </script>
 
 <style lang="scss">
 #app {
-	font-family: v-sans;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  font-family: v-sans;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .3s ease-out;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease-out;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 

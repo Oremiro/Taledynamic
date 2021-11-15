@@ -15,23 +15,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useStore } from '@/store';
+import { ref, computed } from "vue";
+import { useStore } from "@/store";
 import WorkspacesSection from "@/components/workspaces/WorkspacesSection.vue";
 
 const store = useStore();
-const isLoggedIn = computed<boolean>(() => store.getters['user/isLoggedIn']);
-const isDefaultCollapsed = ref<boolean>(localStorage.getItem('siderCollapsed') ? true : false);
+const isLoggedIn = computed<boolean>(() => store.getters["user/isLoggedIn"]);
+const isDefaultCollapsed = ref<boolean>(
+  localStorage.getItem("siderCollapsed") ? true : false
+);
 const isWorkspaceListShown = ref<boolean>(!isDefaultCollapsed.value);
 
 function collapsedHandler(collapsed: boolean): void {
-	if (collapsed) {
-		localStorage.setItem('siderCollapsed', '1');
-	} else {
-		localStorage.removeItem('siderCollapsed');
-	}
-	if (!isWorkspaceListShown.value) {
-		isWorkspaceListShown.value = true;
-	}
+  if (collapsed) {
+    localStorage.setItem("siderCollapsed", "1");
+  } else {
+    localStorage.removeItem("siderCollapsed");
+  }
+  if (!isWorkspaceListShown.value) {
+    isWorkspaceListShown.value = true;
+  }
 }
 </script>
