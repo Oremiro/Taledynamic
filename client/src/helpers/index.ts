@@ -38,12 +38,16 @@ export function debounce<A extends unknown[], R>(
 	fn: (...args: A) => R | Promise<R>, 
 	ms = 500,
 	options: {
-		isAwaited?: boolean
+		isAwaited?: boolean,
+		immediateFunc?: () => void
 	} = {}
 ): (...args: A) => Promise<R> {
 	let timeoutId: ReturnType<typeof setTimeout> | undefined;
 	return function (this: ThisParameterType<typeof fn>, ...args: A): Promise<R> {
 		return new Promise<R>((resolve, reject) => {
+			if (options.immediateFunc !== undefined) {
+				options.immediateFunc()
+			}
 			if (timeoutId !== undefined) {
 				clearTimeout(timeoutId);
 			}

@@ -2,11 +2,10 @@
 	<n-form ref="formRef" :rules="rules" :model="formData">
 		<n-form-item ref="emailInputRef" first label="Email" path="email.value">
 			<n-auto-complete 
-			v-model:value="formData.email.value" 
-			@update:value="handleEmailInput"
+			v-model:value="formData.email.value"
 			#default="{ handleInput, handleBlur, handleFocus, value }"
 			>
-				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value">
+				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value" :loading="isEmailValidationPending">
 					<template v-if="!formData.email.isValid" #prefix>
 						<question-tooltip>
 							Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
@@ -31,7 +30,7 @@
 				ghost 
 				style="margin-right: 1rem" 
 				@click="submitForm" 
-				:disabled="isSubmitButtonLoading"
+				:disabled="isSubmitButtonLoading || isEmailValidationPending"
 				:loading="isSubmitButtonLoading"
 				v-show="formData.email.isValid && formData.currentPassword.value">
 				Сохранить
@@ -42,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { emailRegex } from '@/helpers';
+import { debounce, emailRegex } from '@/helpers';
 import { FormRules, NForm, NFormItem, useMessage } from 'naive-ui';
 import { reactive, ref } from 'vue'
 import { useStore } from '@/store';
@@ -50,7 +49,6 @@ import { EmailEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
 import DelayedButton from '@/components/DelayedButton.vue'
 import { UserApi } from '@/helpers/api/user';
-import { AxiosError } from 'axios';
 
 const store = useStore();
 const formRef = ref<InstanceType<typeof NForm>>();
@@ -65,47 +63,51 @@ const formData = reactive<EmailEditFormData>({
 		isValid: false
 	}
 });
+
+
+const isEmailValidationPending = ref<boolean>(false);
 const rules: FormRules = {
 	email: {
 		value: [
 			{
 				required: true,
 				message: 'Пожалуйста, введите email',
-				trigger: ['blur', 'input']
+				trigger: 'blur'
 			},
 			{
-				asyncValidator: (rule, value) => 
-					new Promise<void>((resolve, reject) => {
-						formData.email.isValid = false;
-						if (!emailRegex.test(value)) {
-							reject(new Error('Введите корректный email'));
+				asyncValidator: debounce(
+					async (rule, value) => {
+						if (value === defaultEmailValue.value) {
+							formData.email.isValid = true;
+							isSubmitButtonShown.value = false;
+							isEmailValidationPending.value = false;
+							return;
+						} else if (!emailRegex.test(value)) {
+							formData.email.isValid = false;
+							isSubmitButtonShown.value = false;
+							isEmailValidationPending.value = false;
+							throw new Error('Введите корректный email');
+						}
+						const { data } = await UserApi.isEmailUsed({ email: value });
+						isEmailValidationPending.value = false;
+						if(data.isEmailUsed) {
+							formData.email.isValid = false;
+							isSubmitButtonShown.value = false;
+							throw new Error('Данный email занят другим пользователем');
 						} else {
 							formData.email.isValid = true;
-							resolve();
+							isSubmitButtonShown.value = true;
 						}
-					}),
-				trigger: ['blur', 'input'],
-			},
-			{
-				asyncValidator: (rule, value) => 
-					new Promise<void>((resolve, reject) => {
-						if (value === defaultEmailValue.value) {
-							resolve()
-						} else {
-							UserApi.isEmailUsed({ email: value })
-							.then((response) => {
-								if(response.data.isEmailUsed) {
-									reject(new Error('Данный email занят другим пользователем'));
-								} else {
-									resolve();
-								}
-							})
-							.catch((error: AxiosError) => {
-								reject(new Error(error.message));
-							});
+					}, 
+					1000,
+					{
+						isAwaited: true,
+						immediateFunc: () => {
+							isEmailValidationPending.value = true;
 						}
-					}),
-				trigger: 'blur'
+					}
+				),
+				trigger: 'input'
 			}
 		],
 	},
@@ -126,9 +128,6 @@ const isSubmitButtonShown = ref<boolean>(false);
 const isSubmitButtonLoading = ref<boolean>(false);
 
 
-function handleEmailInput(value: string | null): void {
-	isSubmitButtonShown.value = !(value === defaultEmailValue.value);
-}
 function undoChanges(): void {
 	formData.email.value = defaultEmailValue.value;
 	formData.currentPassword.value = '';
