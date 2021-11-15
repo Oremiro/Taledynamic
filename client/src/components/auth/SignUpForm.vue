@@ -5,7 +5,7 @@
 			:options="options" 
 			v-model:value="formData.email.value" 
 			#default="{ handleInput, handleBlur, handleFocus, value }">
-				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value">
+				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value" :loading="isEmailValidationPending">
 					<template v-if="!formData.email.isValid && !isEmailUsed" #prefix>
 						<question-tooltip>
 							Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
@@ -20,7 +20,8 @@
 				show-password-on="click"
 				placeholder=""
 				v-model:value="formData.password.value"
-				@input="handlePasswordInput">
+				@input="handlePasswordInput"
+				:loading="isPasswordValidationPending">
 				<template v-if="!formData.password.isValid" #prefix>
 					<question-tooltip >
 						Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
@@ -38,6 +39,7 @@
 				show-password-on="click"
 				placeholder=""
 				:disabled="!formData.password.isValid"
+				:loading="isConfirmedPwdValidationPending"
 				v-model:value="formData.confirmedPassword.value"/>
 		</n-form-item>
 
@@ -48,7 +50,9 @@
 				type="primary"
 				ghost
 				:loading="submitLoading"
-				:disabled="!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid"
+				:disabled="submitLoading ||
+									!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid ||
+									isEmailValidationPending || isPasswordValidationPending || isConfirmedPwdValidationPending"
 				@click="submitForm">Зарегистрироваться</delayed-button>
 		</n-form-item>
 	</n-form>
@@ -64,13 +68,13 @@
 import { computed, reactive, ref } from 'vue'
 import { useMessage, NForm, FormRules, NFormItem } from 'naive-ui';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 import { useStore } from '@/store';
 import { debounce, emailRegex, passwordRegex, externalOptions } from '@/helpers';
 import { UserApi } from '@/helpers/api/user';
 import { SignUpFormData } from '@/interfaces'
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
 import DelayedButton from '@/components/DelayedButton.vue'
+import axios from 'axios';
 
 const formData = reactive<SignUpFormData>({
 	email: {
@@ -87,46 +91,48 @@ const formData = reactive<SignUpFormData>({
 	},
 });
 const isEmailUsed = ref<boolean>(false);
+const isEmailValidationPending = ref<boolean>(false);
+const isPasswordValidationPending = ref<boolean>(false);
+const isConfirmedPwdValidationPending = ref<boolean>(false);
 const rules: FormRules = {
 	email: {
 		value: [
 			{
 				required: true,
-				message: 'Пожалуйста, введите email',
-				trigger: 'blur',
-			},
-			{
-				asyncValidator: debounce((rule, value) => {
-					if (!emailRegex.test(value)) {
-						formData.email.isValid = false;
-						throw new Error('Введите корректный email');
-					} else {
-						formData.email.isValid = true;
-					}
-				}, 500),
-				trigger: ['blur', 'input']
-			},
-			{
-				asyncValidator: debounce(async (rule, value) => {
-					try {
-						const { data } = await UserApi.isEmailUsed({ email: value });
-						isEmailUsed.value = data.isEmailUsed;
-						if(data.isEmailUsed) {
-							throw new Error('Данный email занят другим пользователем');
-						} else {
-							formData.email.isValid = true;
-							return;
+				asyncValidator: debounce(
+					async (rule, value) => {
+						if (!emailRegex.test(value)) {
+							formData.email.isValid = false;
+							isEmailValidationPending.value = false;
+							throw new Error('Введите корректный email');
 						}
-					} catch (error) {
-						formData.email.isValid = false;
-						if (axios.isAxiosError(error)) {
-							throw new Error(error.message)
-						} else {
-							throw error;
+						try {
+							const { data } = await UserApi.isEmailUsed({ email: value });
+							isEmailValidationPending.value = false;
+							if(data.isEmailUsed) {
+								formData.email.isValid = false;
+								throw new Error('Данный email занят другим пользователем');
+							} else {
+								formData.email.isValid = true;
+							}
+						} catch (error) {
+							isEmailValidationPending.value = false;
+							if (axios.isAxiosError(error)) {
+								throw new Error(error.response?.statusText);
+							} else {
+								throw error;
+							}
+						}
+					}, 
+					1000,
+					{
+						isAwaited: true,
+						immediateFunc: () => {
+							isEmailValidationPending.value = true;
 						}
 					}
-				}, 1000, { isAwaited: true }),
-				trigger: ['blur', 'input']
+				),
+				trigger: 'input'
 			}
 		],
 	},
@@ -134,19 +140,20 @@ const rules: FormRules = {
 		value: [
 			{
 				required: true,
-				message: 'Пожалуйста, введите пароль',
-				trigger: 'blur'
-			},
-			{
-				asyncValidator: debounce((rule, value) => {
-					if (!passwordRegex.test(value)) {
-						formData.password.isValid = false;
-						throw new Error('Введите корректный сложный пароль')
-					} else {
-						formData.password.isValid = true;
-					}
-				}, 500),
-				trigger: ['blur', 'input'],
+				asyncValidator: debounce(
+					(rule, value) => {
+						isPasswordValidationPending.value = false;
+						if (!passwordRegex.test(value)) {
+							formData.password.isValid = false;
+							throw new Error('Введите корректный сложный пароль')
+						} else {
+							formData.password.isValid = true;
+						}
+					}, 
+					500,
+					{ immediateFunc: () => { isPasswordValidationPending.value = true; } }
+				),
+				trigger: 'input',
 			},
 		],
 	},
@@ -154,19 +161,20 @@ const rules: FormRules = {
 		value: [
 			{
 				required: true,
-				message: 'Пожалуйста, повторите пароль',
-				trigger: 'blur',
-			},
-			{
-				asyncValidator: debounce((rule, value) => {
-					if (value !== formData.password.value) {
-						formData.confirmedPassword.isValid = false;
-						throw new Error('Пароли не совпадают');
-					} else {
-						formData.confirmedPassword.isValid = true;
-					}
-				}),
-				trigger: ['blur', 'input', 'password-input'],
+				asyncValidator: debounce(
+					(rule, value) => {
+						isConfirmedPwdValidationPending.value = false;
+						if (value !== formData.password.value) {
+							formData.confirmedPassword.isValid = false;
+							throw new Error('Пароли не совпадают');
+						} else {
+							formData.confirmedPassword.isValid = true;
+						}
+					}, 
+					500,
+					{ immediateFunc: () => { isConfirmedPwdValidationPending.value = true } }
+				),
+				trigger: ['input', 'password-input'],
 			},
 		],
 	},

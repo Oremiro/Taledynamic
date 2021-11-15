@@ -4,7 +4,8 @@
       <n-auto-complete
         :options="options"
         placeholder=""
-        v-model:value="formData.email.value"/>
+        v-model:value="formData.email.value"
+				:loading="isEmailValidationPending"/>
     </n-form-item>
     <n-form-item first label="Пароль" path="password.value">
       <n-input
@@ -24,7 +25,7 @@
 				type="primary"
 				ghost
 				:loading="submitLoading"
-				:disabled="!formData.email.isValid || !formData.password.value || submitLoading"
+				:disabled="!formData.email.isValid || !formData.password.value || submitLoading || isEmailValidationPending"
 				@click="submitForm">
 				Войти
 			</delayed-button>
@@ -55,20 +56,28 @@ const formData = reactive<SignInFormData>({
 		value: false,
 	},
 });
+const isEmailValidationPending = ref<boolean>(false);
 const rules: FormRules = {
 	email: {
 		value: [
 			{
-				asyncValidator: debounce((rule, value) => {
-					if (emailRegex.test(value)) {
-						formData.email.isValid = true;
-					} else {
-						formData.email.isValid = false;
-						if (formData.email.value !== '') {
-							throw new Error('Введите корректный email');
+				asyncValidator: debounce(
+					(rule, value) => {
+						isEmailValidationPending.value = false;
+						if (emailRegex.test(value)) {
+							formData.email.isValid = true;
+						} else {
+							formData.email.isValid = false;
+							if (formData.email.value !== '') {
+								throw new Error('Введите корректный email');
+							}
 						}
+					}, 
+					500,
+					{
+						immediateFunc: () => { isEmailValidationPending.value = true }
 					}
-				}, 500),
+				),
 				trigger: ['blur', 'input'],
 			},
 		],

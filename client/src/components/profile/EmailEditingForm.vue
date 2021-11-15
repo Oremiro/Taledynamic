@@ -14,7 +14,7 @@
 				</n-input>
 			</n-auto-complete>
 		</n-form-item>
-		<n-collapse-transition :show="isSubmitButtonShown">
+		<n-collapse-transition :show="isSubmitCollapseShown">
 			<n-form-item label="Текущий пароль" path="currentPassword.value">
 				<n-input
 					type="password"
@@ -25,14 +25,13 @@
 			</n-form-item>
 			<delayed-button 
 				ref="submitButtonRef" 
-				attr-type="submit" 
+				attr-type="submit"
 				type="success" 
 				ghost 
 				style="margin-right: 1rem" 
 				@click="submitForm" 
-				:disabled="isSubmitButtonLoading || isEmailValidationPending"
-				:loading="isSubmitButtonLoading"
-				v-show="formData.email.isValid && formData.currentPassword.value">
+				:disabled="isSubmitButtonLoading || isEmailValidationPending || !formData.email.isValid || !formData.currentPassword.value"
+				:loading="isSubmitButtonLoading">
 				Сохранить
 			</delayed-button>
 			<n-button ghost type="error" @click="undoChanges">Отменить</n-button>
@@ -49,6 +48,7 @@ import { EmailEditFormData } from '@/interfaces';
 import QuestionTooltip from '@/components/QuestionTooltip.vue'
 import DelayedButton from '@/components/DelayedButton.vue'
 import { UserApi } from '@/helpers/api/user';
+import axios from 'axios';
 
 const store = useStore();
 const formRef = ref<InstanceType<typeof NForm>>();
@@ -71,32 +71,37 @@ const rules: FormRules = {
 		value: [
 			{
 				required: true,
-				message: 'Пожалуйста, введите email',
-				trigger: 'blur'
-			},
-			{
 				asyncValidator: debounce(
 					async (rule, value) => {
 						if (value === defaultEmailValue.value) {
 							formData.email.isValid = true;
-							isSubmitButtonShown.value = false;
+							isSubmitCollapseShown.value = false;
 							isEmailValidationPending.value = false;
 							return;
 						} else if (!emailRegex.test(value)) {
 							formData.email.isValid = false;
-							isSubmitButtonShown.value = false;
+							isSubmitCollapseShown.value = false;
 							isEmailValidationPending.value = false;
 							throw new Error('Введите корректный email');
 						}
-						const { data } = await UserApi.isEmailUsed({ email: value });
-						isEmailValidationPending.value = false;
-						if(data.isEmailUsed) {
-							formData.email.isValid = false;
-							isSubmitButtonShown.value = false;
-							throw new Error('Данный email занят другим пользователем');
-						} else {
-							formData.email.isValid = true;
-							isSubmitButtonShown.value = true;
+						try {
+							const { data } = await UserApi.isEmailUsed({ email: value });
+							isEmailValidationPending.value = false;
+							if(data.isEmailUsed) {
+								formData.email.isValid = false;
+								isSubmitCollapseShown.value = false;
+								throw new Error('Данный email занят другим пользователем');
+							} else {
+								formData.email.isValid = true;
+								isSubmitCollapseShown.value = true;
+							}
+						} catch (error) {
+							isEmailValidationPending.value = false;
+							if (axios.isAxiosError(error)) {
+								throw new Error(error.response?.statusText)
+							} else {
+								throw error;
+							}
 						}
 					}, 
 					1000,
@@ -115,8 +120,8 @@ const rules: FormRules = {
 		value: [
 			{
 				required: true,
-				message: 'Пожалуйста, введите текущий пароль',
-				trigger: 'blur'
+				message: 'Введите текущий пароль',
+				trigger: 'input'
 			}
 		]
 	},
@@ -124,20 +129,20 @@ const rules: FormRules = {
 const emailInputRef = ref<InstanceType<typeof NFormItem>>();
 const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
 const message = useMessage();
-const isSubmitButtonShown = ref<boolean>(false);
+const isSubmitCollapseShown = ref<boolean>(false);
 const isSubmitButtonLoading = ref<boolean>(false);
 
 
 function undoChanges(): void {
 	formData.email.value = defaultEmailValue.value;
 	formData.currentPassword.value = '';
-	isSubmitButtonShown.value = false;
+	isSubmitCollapseShown.value = false;
 	emailInputRef.value?.restoreValidation();
 }
 function saveChanges(): void {
 	formData.currentPassword.value = '';
 	defaultEmailValue.value = store.getters['user/email'];
-	isSubmitButtonShown.value = false;
+	isSubmitCollapseShown.value = false;
 }
 function submitForm(): void {
 	isSubmitButtonLoading.value = true;
