@@ -1,7 +1,7 @@
 <template>
-<div>
-	{{ store.getters['workspaces/currentWorkspace'] }}
-</div>
+  <div>
+    {{ store.getters['workspaces/currentWorkspace'] }}
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -11,7 +11,6 @@ import { useStore } from '@/store';
 import { useMessage } from 'naive-ui';
 import { useRouter } from 'vue-router';
 
-/* global defineProps */
 const props = defineProps({
 	id: {
 		type: String,

@@ -10,8 +10,10 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
+<script setup lang="ts">
+</script>
 
+<style lang="scss" scoped>
 .home {
   padding-top: 3rem;
   display: flex;
@@ -26,5 +28,3 @@
 
 </style>
 
-<script setup lang="ts">
-</script>

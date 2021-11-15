@@ -1,27 +1,39 @@
 <template>
-	<div class="container">
-		<n-grid :cols="30" style="max-width: 40rem">
-			<n-gi :span="8">
-				<n-card
-					hoverable
-					size="small"
-					content-style="padding-left: 0; padding-right: 0"
-				>
-					<n-menu :options="menuOptions" :value="route.path" />
-				</n-card>
-			</n-gi>
-			<n-gi :span="1" />
-			<n-gi :span="21">
-				<router-view v-slot="{ Component }">
-					<transition name="fade" mode="out-in">
-						<n-card hoverable :key="route.path">
-							<component :is="Component" />
-						</n-card>
-					</transition>
-				</router-view>
-			</n-gi>
-		</n-grid>
-	</div>
+  <div class="container">
+    <n-grid
+      :cols="30"
+      style="max-width: 40rem"
+    >
+      <n-gi :span="8">
+        <n-card
+          hoverable
+          size="small"
+          content-style="padding-left: 0; padding-right: 0"
+        >
+          <n-menu
+            :options="menuOptions"
+            :value="route.path"
+          />
+        </n-card>
+      </n-gi>
+      <n-gi :span="1" />
+      <n-gi :span="21">
+        <router-view v-slot="{ Component }">
+          <transition
+            name="fade"
+            mode="out-in"
+          >
+            <n-card
+              :key="route.path"
+              hoverable
+            >
+              <component :is="Component" />
+            </n-card>
+          </transition>
+        </router-view>
+      </n-gi>
+    </n-grid>
+  </div>
 </template>
 
 <script setup lang="ts">

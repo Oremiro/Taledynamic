@@ -5,13 +5,13 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
 		name: 'Home',
-    component: () => import('@/views/Home.vue')
+    component: () => import('@/views/HomeView.vue')
   },
   {
     path: '/auth',
 		name: 'Auth',
 		redirect: () => ({ name: 'AuthSignIn'}),
-    component: () => import('@/views/Auth.vue'),
+    component: () => import('@/views/AuthView.vue'),
 		children: [
 			{
         path: 'signin',
@@ -28,7 +28,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/profile',
 		name: 'Profile',
-    component: () => import('@/views/Profile.vue'),
+    component: () => import('@/views/ProfileView.vue'),
 		meta: { requiresAuth: true },
     children: [
       {
@@ -53,12 +53,12 @@ const routes: Array<RouteRecordRaw> = [
 		name: 'Workspace',
 		props: true,
 		meta: { requiresAuth: true },
-		component: () => import('@/views/Workspace.vue')
+		component: () => import('@/views/WorkspaceView.vue')
 	},
   {
     path: '/:pathMatch(.*)*',
 		name: 'NotFound',
-    component: () => import('@/views/NotFound.vue')
+    component: () => import('@/views/NotFoundView.vue')
   }
 ]
 
