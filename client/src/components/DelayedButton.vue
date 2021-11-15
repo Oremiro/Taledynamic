@@ -11,7 +11,12 @@
     >
       <slot />
     </n-button>
-    <n-button v-if="disablingDuration" disabled :type="type" ghost>
+    <n-button
+      v-if="disablingDuration"
+      disabled
+      :type="type"
+      ghost
+    >
       {{ disablingDuration }}
     </n-button>
   </n-button-group>
@@ -20,7 +25,6 @@
 <script setup lang="ts">
 import { ref, PropType } from 'vue'
 
-/* global defineProps defineEmits defineExpose */
 const emit = defineEmits(['click'])
 const props = defineProps({
 	attrType: {

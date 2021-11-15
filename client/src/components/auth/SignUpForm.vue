@@ -1,68 +1,94 @@
 <template>
-	<n-form ref="formRef" :rules="rules" :model="formData">
-		<n-form-item first label="Email" path="email.value">
-			<n-auto-complete 
-			:options="options" 
-			v-model:value="formData.email.value" 
-			#default="{ handleInput, handleBlur, handleFocus, value }">
-				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value" :loading="isEmailValidationPending">
-					<template v-if="!formData.email.isValid && !isEmailUsed" #prefix>
-						<question-tooltip>
-							Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
-						</question-tooltip>
-					</template>
-				</n-input>
-			</n-auto-complete>
-		</n-form-item>
-		<n-form-item first label="Пароль" path="password.value">
-			<n-input
-				type="password"
-				show-password-on="click"
-				placeholder=""
-				v-model:value="formData.password.value"
-				@input="handlePasswordInput"
-				:loading="isPasswordValidationPending">
-				<template v-if="!formData.password.isValid" #prefix>
-					<question-tooltip >
-						Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
-					</question-tooltip>
-				</template>
-			</n-input>
-		</n-form-item>
-		<n-form-item
-			ref="confirmedPasswordRef"
-			first
-			label="Повторите пароль"
-			path="confirmedPassword.value">
-			<n-input
-				type="password"
-				show-password-on="click"
-				placeholder=""
-				:disabled="!formData.password.isValid"
-				:loading="isConfirmedPwdValidationPending"
-				v-model:value="formData.confirmedPassword.value"/>
-		</n-form-item>
+  <n-form
+    ref="formRef"
+    :rules="rules"
+    :model="formData"
+  >
+    <n-form-item
+      first
+      label="Email"
+      path="email.value"
+    >
+      <n-auto-complete 
+        v-slot="{ handleInput, handleBlur, handleFocus, value }" 
+        v-model:value="formData.email.value" 
+        :options="options"
+      >
+        <n-input
+          placeholder=""
+          :value="value"
+          :loading="isEmailValidationPending"
+          @input="handleInput"
+          @focus="handleFocus"
+          @blur="handleBlur"
+        >
+          <template
+            v-if="!formData.email.isValid && !isEmailUsed"
+            #prefix
+          >
+            <question-tooltip>
+              Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
+            </question-tooltip>
+          </template>
+        </n-input>
+      </n-auto-complete>
+    </n-form-item>
+    <n-form-item
+      first
+      label="Пароль"
+      path="password.value"
+    >
+      <n-input
+        v-model:value="formData.password.value"
+        type="password"
+        show-password-on="click"
+        placeholder=""
+        :loading="isPasswordValidationPending"
+        @input="handlePasswordInput"
+      >
+        <template
+          v-if="!formData.password.isValid"
+          #prefix
+        >
+          <question-tooltip>
+            Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
+          </question-tooltip>
+        </template>
+      </n-input>
+    </n-form-item>
+    <n-form-item
+      ref="confirmedPasswordRef"
+      first
+      label="Повторите пароль"
+      path="confirmedPassword.value"
+    >
+      <n-input
+        v-model:value="formData.confirmedPassword.value"
+        type="password"
+        show-password-on="click"
+        placeholder=""
+        :disabled="!formData.password.isValid"
+        :loading="isConfirmedPwdValidationPending"
+      />
+    </n-form-item>
 
-		<n-form-item>
-			<delayed-button 
-				ref="submitButtonRef" 
-				attr-type="submit"
-				type="primary"
-				ghost
-				:loading="submitLoading"
-				:disabled="submitLoading ||
-									!formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid ||
-									isEmailValidationPending || isPasswordValidationPending || isConfirmedPwdValidationPending"
-				@click="submitForm">Зарегистрироваться</delayed-button>
-		</n-form-item>
-	</n-form>
+    <n-form-item>
+      <delayed-button 
+        ref="submitButtonRef" 
+        attr-type="submit"
+        type="primary"
+        ghost
+        :loading="submitLoading"
+        :disabled="submitLoading ||
+          !formData.email.isValid || !formData.password.isValid || !formData.confirmedPassword.isValid ||
+          isEmailValidationPending || isPasswordValidationPending || isConfirmedPwdValidationPending"
+        @click="submitForm"
+      >
+        Зарегистрироваться
+      </delayed-button>
+    </n-form-item>
+  </n-form>
 </template>
-
-<style lang="scss" scoped>
-.n-input-question:hover {
-	color: var(--icon-color-hover);
-}
-</style>
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
@@ -207,13 +233,21 @@ function submitForm(): void {
 				}
 			} finally {
 				submitLoading.value = false;
+        // @ts-expect-error: vue-next #4397
 				submitButtonRef.value?.holdDisabled();
 			}
 		} else {
 			message.error('Данные не являются корректными');
 			submitLoading.value = false;
+      // @ts-expect-error: vue-next #4397
 			submitButtonRef.value?.holdDisabled();
 		}
 	});
 }
 </script>
+
+<style lang="scss" scoped>
+.n-input-question:hover {
+	color: var(--icon-color-hover);
+}
+</style>

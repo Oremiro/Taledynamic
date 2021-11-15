@@ -1,42 +1,71 @@
 <template>
-	<n-form ref="formRef" :rules="rules" :model="formData">
-		<n-form-item ref="emailInputRef" first label="Email" path="email.value">
-			<n-auto-complete 
-			v-model:value="formData.email.value"
-			#default="{ handleInput, handleBlur, handleFocus, value }"
-			>
-				<n-input placeholder="" @input="handleInput" @focus="handleFocus" @blur="handleBlur" :value="value" :loading="isEmailValidationPending">
-					<template v-if="!formData.email.isValid" #prefix>
-						<question-tooltip>
-							Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
-						</question-tooltip>
-					</template>
-				</n-input>
-			</n-auto-complete>
-		</n-form-item>
-		<n-collapse-transition :show="isSubmitCollapseShown">
-			<n-form-item label="Текущий пароль" path="currentPassword.value">
-				<n-input
-					type="password"
-					show-password-on="click"
-					placeholder=""
-					v-model:value="formData.currentPassword.value"
-				/>
-			</n-form-item>
-			<delayed-button 
-				ref="submitButtonRef" 
-				attr-type="submit"
-				type="success" 
-				ghost 
-				style="margin-right: 1rem" 
-				@click="submitForm" 
-				:disabled="isSubmitButtonLoading || isEmailValidationPending || !formData.email.isValid || !formData.currentPassword.value"
-				:loading="isSubmitButtonLoading">
-				Сохранить
-			</delayed-button>
-			<n-button ghost type="error" @click="undoChanges">Отменить</n-button>
-		</n-collapse-transition>
-	</n-form>
+  <n-form
+    ref="formRef"
+    :rules="rules"
+    :model="formData"
+  >
+    <n-form-item
+      ref="emailInputRef"
+      first
+      label="Email"
+      path="email.value"
+    >
+      <n-auto-complete 
+        v-slot="{ handleInput, handleBlur, handleFocus, value }"
+        v-model:value="formData.email.value"
+      >
+        <n-input
+          placeholder=""
+          :value="value"
+          :loading="isEmailValidationPending"
+          @input="handleInput"
+          @focus="handleFocus"
+          @blur="handleBlur"
+        >
+          <template
+            v-if="!formData.email.isValid"
+            #prefix
+          >
+            <question-tooltip>
+              Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый домен должен быть корректным.
+            </question-tooltip>
+          </template>
+        </n-input>
+      </n-auto-complete>
+    </n-form-item>
+    <n-collapse-transition :show="isSubmitCollapseShown">
+      <n-form-item
+        label="Текущий пароль"
+        path="currentPassword.value"
+      >
+        <n-input
+          v-model:value="formData.currentPassword.value"
+          type="password"
+          show-password-on="click"
+          placeholder=""
+        />
+      </n-form-item>
+      <delayed-button 
+        ref="submitButtonRef" 
+        attr-type="submit"
+        type="success" 
+        ghost 
+        style="margin-right: 1rem" 
+        :disabled="isSubmitButtonLoading || isEmailValidationPending || !formData.email.isValid || !formData.currentPassword.value" 
+        :loading="isSubmitButtonLoading"
+        @click="submitForm"
+      >
+        Сохранить
+      </delayed-button>
+      <n-button
+        ghost
+        type="error"
+        @click="undoChanges"
+      >
+        Отменить
+      </n-button>
+    </n-collapse-transition>
+  </n-form>
 </template>
 
 <script setup lang="ts">
@@ -164,6 +193,7 @@ function submitForm(): void {
 			message.error('Данные не являются корректными');
 		}
 		isSubmitButtonLoading.value = false;
+    // @ts-expect-error: vue-next #4397
 		submitButtonRef.value?.holdDisabled();
 	});
 }

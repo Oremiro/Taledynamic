@@ -1,5 +1,10 @@
 <template>
-	<n-menu :value="store.getters['workspaces/currentWorkspace']?.id" :options="menuOptions" :indent="22" style="padding: 0 .25rem;"/>
+  <n-menu
+    :value="store.getters['workspaces/currentWorkspace']?.id"
+    :options="menuOptions"
+    :indent="22"
+    style="padding: 0 .25rem;"
+  />
 </template>
 
 <script setup lang="ts">
@@ -9,7 +14,6 @@ import { Workspace } from '@/interfaces/store';
 import WorkspacesListItem from '@/components/workspaces/WorkspacesListItem.vue';
 import { useStore } from '@/store';
 
-/* global defineProps */
 const props = defineProps({
 	workspaces: {
 		type: Array as PropType<Workspace[]>,

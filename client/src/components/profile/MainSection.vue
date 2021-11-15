@@ -1,13 +1,28 @@
 <template>
   <div class="card-header">
     <div class="user-img-background">
-      <img class="user-img" src="https://picsum.photos/500" alt="">
+      <img
+        class="user-img"
+        src="https://picsum.photos/500"
+        alt=""
+      >
     </div>
     <div class="user-info-background">
-      <n-text type="primary" style="font-size: 1.25rem">{{ store.getters['user/email'] }}</n-text>
+      <n-text
+        type="primary"
+        style="font-size: 1.25rem"
+      >
+        {{ store.getters['user/email'] }}
+      </n-text>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useStore } from '@/store'
+
+const store = useStore();
+</script>
 
 <style lang="scss" scoped>
 .card-header {
@@ -31,9 +46,3 @@
     padding-left: 2rem;
 }
 </style>
-
-<script setup lang="ts">
-import { useStore } from '@/store'
-
-const store = useStore();
-</script>

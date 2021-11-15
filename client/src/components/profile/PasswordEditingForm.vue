@@ -1,55 +1,81 @@
 <template>
-	<n-form ref="formRef" :model="formData" :rules="rules">
-		<n-form-item first label="Новый пароль" path="newPassword.value">
-			<n-input 
-				type="password" 
-				show-password-on="click" 
-				placeholder="" 
-				v-model:value="formData.newPassword.value"
-				@input="handlePasswordInput"
-				:loading="isNewPwdValidationPending"
-			>
-				<template v-if="!formData.newPassword.isValid" #prefix>
-					<question-tooltip>
-						Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
-					</question-tooltip>
-				</template>
-			</n-input>
-		</n-form-item>
-		<n-form-item first ref="confirmedPasswordRef" label="Повторите новый пароль" path="confirmedPassword.value">
-			<n-input 
-				type="password" 
-				show-password-on="click" 
-				placeholder="" 
-				v-model:value="formData.confirmedPassword.value" 
-				:loading="isConfirmedPwdValidationPending" />
-		</n-form-item>
-		<n-collapse-transition :show="formData.newPassword.isValid && formData.confirmedPassword.isValid">
-			<n-form-item first label="Текущий пароль" path="currentPassword.value">
-				<n-input
-					type="password"
-					show-password-on="click"
-					placeholder=""
-					v-model:value="formData.currentPassword.value"
-				/>
-			</n-form-item>
-			<delayed-button 
-				ref="submitButtonRef"
-				attr-type="submit"
-				type="success"
-				ghost
-				style="margin-right: 1rem"
-				@click="submitForm"
-				:loading="isSubmitButtonLoading"
-				:disabled="!formData.currentPassword.value || !formData.newPassword.isValid || !formData.confirmedPassword.isValid ||
-									isSubmitButtonLoading || isNewPwdValidationPending || isConfirmedPwdValidationPending">
-				Сохранить
-			</delayed-button>
-			<n-button ghost type="error" @click="undoChanges">
-				Отменить
-			</n-button>
-		</n-collapse-transition>
-	</n-form>
+  <n-form
+    ref="formRef"
+    :model="formData"
+    :rules="rules"
+  >
+    <n-form-item
+      first
+      label="Новый пароль"
+      path="newPassword.value"
+    >
+      <n-input 
+        v-model:value="formData.newPassword.value" 
+        type="password" 
+        show-password-on="click" 
+        placeholder=""
+        :loading="isNewPwdValidationPending"
+        @input="handlePasswordInput"
+      >
+        <template
+          v-if="!formData.newPassword.isValid"
+          #prefix
+        >
+          <question-tooltip>
+            Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
+          </question-tooltip>
+        </template>
+      </n-input>
+    </n-form-item>
+    <n-form-item
+      ref="confirmedPasswordRef"
+      first
+      label="Повторите новый пароль"
+      path="confirmedPassword.value"
+    >
+      <n-input 
+        v-model:value="formData.confirmedPassword.value" 
+        type="password" 
+        show-password-on="click" 
+        placeholder="" 
+        :loading="isConfirmedPwdValidationPending"
+      />
+    </n-form-item>
+    <n-collapse-transition :show="formData.newPassword.isValid && formData.confirmedPassword.isValid">
+      <n-form-item
+        first
+        label="Текущий пароль"
+        path="currentPassword.value"
+      >
+        <n-input
+          v-model:value="formData.currentPassword.value"
+          type="password"
+          show-password-on="click"
+          placeholder=""
+        />
+      </n-form-item>
+      <delayed-button 
+        ref="submitButtonRef"
+        attr-type="submit"
+        type="success"
+        ghost
+        style="margin-right: 1rem"
+        :loading="isSubmitButtonLoading"
+        :disabled="!formData.currentPassword.value || !formData.newPassword.isValid || !formData.confirmedPassword.isValid ||
+          isSubmitButtonLoading || isNewPwdValidationPending || isConfirmedPwdValidationPending"
+        @click="submitForm"
+      >
+        Сохранить
+      </delayed-button>
+      <n-button
+        ghost
+        type="error"
+        @click="undoChanges"
+      >
+        Отменить
+      </n-button>
+    </n-collapse-transition>
+  </n-form>
 </template>
 
 <script setup lang="ts">
@@ -171,11 +197,13 @@ function submitForm(): void {
 				}
 			} finally {
 				isSubmitButtonLoading.value = false;
+        // @ts-expect-error: vue-next #4397
 				submitButtonRef.value?.holdDisabled();
 			}
 		} else {
 			message.error('Данные не являются корректными');
 			isSubmitButtonLoading.value = false;
+      // @ts-expect-error: vue-next #4397
 			submitButtonRef.value?.holdDisabled();
 		}
 	});

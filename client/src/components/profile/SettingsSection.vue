@@ -1,17 +1,37 @@
 <template>
-	<n-h4><n-text type="primary">Синхронизация с ботом</n-text></n-h4>
-	<n-text code>Тут что-то будет</n-text>
-	<n-h4><n-text type="primary">Удаление аккаунта</n-text></n-h4>
-	<delayed-button 
-		ref="submitButtonRef" 
-		:type="buttonType"
-		ghost
-		@click="showDeletionConfirmation"
-		style="margin-right: 1rem">{{ buttonText }}</delayed-button>
-	<n-button v-show="isDeletionConfirmationShown" @click="cancelDeletion">Нет, я передумал</n-button>
-	<n-collapse-transition :show="isDeletionConfirmationShown">
-		<div style="margin-top: 1rem">Вы уверены, что хотите удалить аккаунт?</div>
-	</n-collapse-transition>
+  <n-h4>
+    <n-text type="primary">
+      Синхронизация с ботом
+    </n-text>
+  </n-h4>
+  <n-text code>
+    Тут что-то будет
+  </n-text>
+  <n-h4>
+    <n-text type="primary">
+      Удаление аккаунта
+    </n-text>
+  </n-h4>
+  <delayed-button 
+    ref="submitButtonRef" 
+    :type="buttonType"
+    ghost
+    style="margin-right: 1rem"
+    @click="showDeletionConfirmation"
+  >
+    {{ buttonText }}
+  </delayed-button>
+  <n-button
+    v-show="isDeletionConfirmationShown"
+    @click="cancelDeletion"
+  >
+    Нет, я передумал
+  </n-button>
+  <n-collapse-transition :show="isDeletionConfirmationShown">
+    <div style="margin-top: 1rem">
+      Вы уверены, что хотите удалить аккаунт?
+    </div>
+  </n-collapse-transition>
 </template>
 
 <script setup lang="ts">
@@ -49,6 +69,7 @@ async function showDeletionConfirmation(): Promise<void> {
 		isDeletionConfirmationShown.value = true;
 		buttonText.value = 'Да';
 		buttonType.value = 'error';
+    // @ts-expect-error: vue-next #4397
 		submitButtonRef.value?.holdDisabled();
 	}
 }
@@ -57,6 +78,7 @@ function cancelDeletion() {
 	isDeletionConfirmationShown.value = false;
 	buttonText.value = 'Удалить';
 	buttonType.value = 'default';
+  // @ts-expect-error: vue-next #4397
 	submitButtonRef.value?.cancelHolding();
 }
 </script>
