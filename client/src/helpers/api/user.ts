@@ -7,7 +7,7 @@ import axios, { AxiosPromise } from "axios";
 
 export class UserApi {
 	private static readonly axiosInstance = axios.create({
-		baseURL: process.env.VUE_APP_API_BASEURL + '/auth/user',
+		baseURL: import.meta.env.VITE_API_BASEURL + '/auth/user',
 		withCredentials: true
 	})
 

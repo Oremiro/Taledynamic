@@ -5,7 +5,7 @@ import axios, { AxiosPromise } from "axios";
 
 export class WorkspaceApi {
 	private static readonly axiosInstance = axios.create({
-		baseURL: process.env.VUE_APP_API_BASEURL + '/data/workspace',
+		baseURL: import.meta.env.VITE_API_BASEURL + '/data/workspace',
 		withCredentials: true
 	})
 

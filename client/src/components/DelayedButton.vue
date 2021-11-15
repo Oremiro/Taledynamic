@@ -1,18 +1,20 @@
 <template>
-	<n-button-group>
-		<n-button
-			:attr-type="attrType"
-			:ghost="ghost"
-			@click="emit('click', $event)"
-			:loading="loading"
-			:disabled="disabled || loading || (disablingDuration != 0)"
-			:type="type"
-			:style="contentStyle"
-			>
-			<slot></slot>
-		</n-button>
-		<n-button v-if="disablingDuration" disabled :type="type" ghost>{{ disablingDuration }}</n-button>
-	</n-button-group>
+  <n-button-group>
+    <n-button
+      :attr-type="attrType"
+      :ghost="ghost"
+      :loading="loading"
+      :disabled="disabled || loading || (disablingDuration != 0)"
+      :type="type"
+      :style="contentStyle"
+      @click="emit('click', $event)"
+    >
+      <slot />
+    </n-button>
+    <n-button v-if="disablingDuration" disabled :type="type" ghost>
+      {{ disablingDuration }}
+    </n-button>
+  </n-button-group>
 </template>
 
 <script setup lang="ts">
@@ -46,13 +48,14 @@ const props = defineProps({
 		default: false
 	},
 	contentStyle: {
-		type: [Object, String]
+		type: [Object, String],
+		default: ''
 	}
 })
 
 const disablingDuration = ref<number>(0);
 
-let disablingTimer: number;
+let disablingTimer: ReturnType<typeof setInterval>;
 
 function holdDisabled(): Promise<void> {
 	return new Promise<void>(resolve => {
