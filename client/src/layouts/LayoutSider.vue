@@ -1,16 +1,17 @@
 <template>
-	<transition name="fade">
-		<n-layout-sider
-			v-if="isLoggedIn"
-			bordered
-			collapse-mode="transform"
-			show-trigger="bar"
-			:collapsed-width="0"
-			:default-collapsed="isDefaultCollapsed"
-			@update:collapsed="collapsedHandler">
-			<workspaces-section v-if="isWorkspaceListShown" />
-		</n-layout-sider>
-	</transition>
+  <transition name="fade">
+    <n-layout-sider
+      v-if="isLoggedIn"
+      bordered
+      collapse-mode="transform"
+      show-trigger="bar"
+      :collapsed-width="0"
+      :default-collapsed="isDefaultCollapsed"
+      @update:collapsed="collapsedHandler"
+    >
+      <workspaces-section v-if="isWorkspaceListShown" />
+    </n-layout-sider>
+  </transition>
 </template>
 
 <script setup lang="ts">
