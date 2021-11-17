@@ -13,5 +13,5 @@ export const getters: GetterTree<UserState, State> = {
   },
   isLoggedIn(state): boolean {
     return state.accessTokenInMemory != "";
-  },
+  }
 };

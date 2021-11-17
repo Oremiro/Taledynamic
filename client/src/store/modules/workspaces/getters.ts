@@ -7,5 +7,5 @@ export const getters: GetterTree<WorkspacesState, State> = {
   },
   currentWorkspace(state: WorkspacesState): Workspace | null {
     return state.currentWorkspace;
-  },
+  }
 };

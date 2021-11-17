@@ -17,8 +17,8 @@ import { useStore } from "@/store";
 const props = defineProps({
   workspaces: {
     type: Array as PropType<Workspace[]>,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const store = useStore();
@@ -27,7 +27,7 @@ const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() =>
   props.workspaces.map((item: Workspace) => {
     return {
       label: () => h(WorkspacesListItem, { id: item.id, name: item.name }),
-      key: item.id,
+      key: item.id
     };
   })
 );

@@ -2,7 +2,7 @@ import { MutationTree } from "vuex";
 import {
   Workspace,
   WorkspacesSortType,
-  WorkspacesState,
+  WorkspacesState
 } from "@/interfaces/store";
 import { Workspace as ReceivedWorkspace } from "@/interfaces/api/responses";
 
@@ -20,7 +20,7 @@ function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace {
         ? workspace.modified.getTime()
         : workspace.modified
     ),
-    userId: workspace.userId,
+    userId: workspace.userId
   };
 }
 
@@ -88,5 +88,5 @@ export const mutations: MutationTree<WorkspacesState> = {
     state.workspaces.sort((itemFirst, itemSecond) =>
       itemSecond.name.localeCompare(itemFirst.name)
     );
-  },
+  }
 };

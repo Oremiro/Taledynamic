@@ -2,21 +2,21 @@ import {
   CreateWorkspaceRequest,
   DeleteWorkspaceRequest,
   GetWorkspaceByIdRequest,
-  UpdateWorkspaceRequest,
+  UpdateWorkspaceRequest
 } from "@/interfaces/api/requests";
 import {
   CreateWorkspaceResponse,
   UpdateWorkspaceResponse,
   DeleteWorkspaceResponse,
   GetWorkspaceByIdResponse,
-  GetWorkspacesByUserResponse,
+  GetWorkspacesByUserResponse
 } from "@/interfaces/api/responses";
 import axios, { AxiosPromise } from "axios";
 
 export class WorkspaceApi {
   private static readonly axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASEURL + "/data/workspace",
-    withCredentials: true,
+    withCredentials: true
   });
 
   static create(
@@ -25,8 +25,8 @@ export class WorkspaceApi {
   ): AxiosPromise<CreateWorkspaceResponse> {
     return this.axiosInstance.post<CreateWorkspaceResponse>("/create", data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -37,8 +37,8 @@ export class WorkspaceApi {
     return this.axiosInstance.delete<DeleteWorkspaceResponse>("/delete", {
       params,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -48,8 +48,8 @@ export class WorkspaceApi {
   ): AxiosPromise<UpdateWorkspaceResponse> {
     return this.axiosInstance.put<UpdateWorkspaceResponse>("/update", data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -60,8 +60,8 @@ export class WorkspaceApi {
     return this.axiosInstance.get<GetWorkspaceByIdResponse>("/get", {
       params,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -72,8 +72,8 @@ export class WorkspaceApi {
       "/get-filtered-by-user",
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+          Authorization: `Bearer ${accessToken}`
+        }
       }
     );
   }

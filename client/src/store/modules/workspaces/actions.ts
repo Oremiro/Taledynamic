@@ -86,7 +86,7 @@ export const actions: ActionTree<WorkspacesState, State> = {
         );
         commit("update", {
           oldWorkspaceIndex: workspaceIndex,
-          newWorkspace: data.workspace,
+          newWorkspace: data.workspace
         });
         if (payload.id === state.currentWorkspace?.id) {
           commit("setCurrent", { workspace: data.workspace });
@@ -130,5 +130,5 @@ export const actions: ActionTree<WorkspacesState, State> = {
         break;
       }
     }
-  },
+  }
 };

@@ -18,8 +18,8 @@ import { ref, PropType } from "vue";
 defineProps({
   type: {
     required: true,
-    type: String as PropType<"success" | "info" | "warning" | "error">,
-  },
+    type: String as PropType<"success" | "info" | "warning" | "error">
+  }
 });
 
 const isHovered = ref<boolean>(false);

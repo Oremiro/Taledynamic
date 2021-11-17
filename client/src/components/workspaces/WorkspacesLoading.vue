@@ -43,8 +43,8 @@ defineEmits<{
 defineProps({
   error: {
     type: Boolean,
-    default: false,
-  },
+    default: false
+  }
 });
 </script>
 

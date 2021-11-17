@@ -70,7 +70,7 @@ signinBC.onmessage = (ev: MessageEvent<UserState>): void => {
     const userState: UserState = ev.data;
     store.commit("user/login", {
       user: userState.user,
-      accessToken: userState.accessTokenInMemory,
+      accessToken: userState.accessTokenInMemory
     });
     if (
       router.currentRoute.value.name === "AuthSignIn" ||

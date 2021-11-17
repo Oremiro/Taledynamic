@@ -40,16 +40,16 @@ const menuOptions: MenuOption[] = [
       h(
         RouterLink,
         {
-          to: "/profile",
+          to: "/profile"
         },
         { default: () => "Профиль" }
       ),
-    key: "/profile",
+    key: "/profile"
   },
   {
     label: () =>
       h(RouterLink, { to: "/profile/data" }, { default: () => "Данные" }),
-    key: "/profile/data",
+    key: "/profile/data"
   },
   {
     label: () =>
@@ -58,7 +58,7 @@ const menuOptions: MenuOption[] = [
         { to: "/profile/settings" },
         { default: () => "Настройки" }
       ),
-    key: "/profile/settings",
+    key: "/profile/settings"
   },
   {
     onClick: async (): Promise<void> => {
@@ -73,7 +73,7 @@ const menuOptions: MenuOption[] = [
       }
     },
     label: "Выйти",
-    key: "/profile/quit",
-  },
+    key: "/profile/quit"
+  }
 ];
 </script>

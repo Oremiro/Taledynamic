@@ -43,5 +43,5 @@ export enum WorkspacesSortType {
   NameAscending,
   NameDescending,
   DateAscending,
-  DateDescending,
+  DateDescending
 }

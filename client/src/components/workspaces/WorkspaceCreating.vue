@@ -84,8 +84,8 @@ import { workspaceNameValidator } from "@/helpers";
 defineProps({
   disabled: {
     type: Boolean,
-    default: false,
-  },
+    default: false
+  }
 });
 
 const newWorkspaceName = ref<string>("");
@@ -102,7 +102,7 @@ const workspaceCreatingRule: FormItemRule = {
         throw error;
       }
     }
-  },
+  }
 };
 
 const isWorkspaceInputShown = ref<boolean>(false);

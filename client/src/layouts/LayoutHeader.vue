@@ -84,7 +84,7 @@ import {
   MenuGroupOption,
   MenuOption,
   useLoadingBar,
-  useMessage,
+  useMessage
 } from "naive-ui";
 import { useStore } from "@/store";
 import { Theme } from "@/interfaces";
@@ -92,8 +92,8 @@ import { Theme } from "@/interfaces";
 const props = defineProps({
   currentTheme: {
     type: Object as PropType<Theme>,
-    required: true,
-  },
+    required: true
+  }
 });
 const emit = defineEmits<{
   (e: "changeTheme", theme: Theme): void;
@@ -109,20 +109,20 @@ const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
   const baseMenuOptions: Array<MenuOption | MenuGroupOption> = [
     {
       label: () => h(RouterLink, { to: "/" }, { default: () => "О проекте" }),
-      key: "",
-    },
+      key: ""
+    }
   ];
 
   if (store.getters["user/isLoggedIn"]) {
     baseMenuOptions.push({
       label: () =>
         h(RouterLink, { to: "/profile" }, { default: () => "Профиль" }),
-      key: "profile",
+      key: "profile"
     });
   } else {
     baseMenuOptions.push({
       label: () => h(RouterLink, { to: "/auth" }, { default: () => "Вход" }),
-      key: "auth",
+      key: "auth"
     });
   }
   return baseMenuOptions;

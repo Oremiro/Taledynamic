@@ -24,34 +24,34 @@ const emit = defineEmits(["click"]);
 const props = defineProps({
   attrType: {
     type: String as PropType<"button" | "submit" | "reset">,
-    default: "button",
+    default: "button"
   },
   loading: {
     type: Boolean,
-    default: false,
+    default: false
   },
   type: {
     type: String as PropType<
       "default" | "primary" | "success" | "info" | "warning" | "error"
     >,
-    default: "default",
+    default: "default"
   },
   duration: {
     type: Number,
-    default: 15,
+    default: 15
   },
   ghost: {
     type: Boolean,
-    default: false,
+    default: false
   },
   disabled: {
     type: Boolean,
-    default: false,
+    default: false
   },
   contentStyle: {
     type: [Object, String],
-    default: "",
-  },
+    default: ""
+  }
 });
 
 const disablingDuration = ref<number>(0);
@@ -78,6 +78,6 @@ function cancelHolding(): void {
 
 defineExpose({
   holdDisabled,
-  cancelHolding,
+  cancelHolding
 });
 </script>

@@ -14,8 +14,8 @@ import { useRouter } from "vue-router";
 const props = defineProps({
   id: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const workspaceId = computed<number>(() => parseInt(props.id));

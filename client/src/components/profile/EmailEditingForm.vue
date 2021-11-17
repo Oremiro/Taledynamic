@@ -71,12 +71,12 @@ const defaultEmailValue = ref<string>(store.getters["user/email"]);
 const formData = reactive<EmailEditFormData>({
   email: {
     value: defaultEmailValue.value,
-    isValid: true,
+    isValid: true
   },
   currentPassword: {
     value: "",
-    isValid: false,
-  },
+    isValid: false
+  }
 });
 
 const isEmailValidationPending = ref<boolean>(false);
@@ -123,22 +123,22 @@ const rules: FormRules = {
             isAwaited: true,
             immediateFunc: () => {
               isEmailValidationPending.value = true;
-            },
+            }
           }
         ),
-        trigger: "input",
-      },
-    ],
+        trigger: "input"
+      }
+    ]
   },
   currentPassword: {
     value: [
       {
         required: true,
         message: "Введите текущий пароль",
-        trigger: "input",
-      },
-    ],
-  },
+        trigger: "input"
+      }
+    ]
+  }
 };
 const emailInputRef = ref<InstanceType<typeof NFormItem>>();
 const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();
@@ -164,7 +164,7 @@ function submitForm(): void {
       try {
         await store.dispatch("user/updateEmail", {
           currentPassword: formData.currentPassword.value,
-          newEmail: formData.email.value,
+          newEmail: formData.email.value
         });
         saveChanges();
         message.success("Вы успешно изменили email");

@@ -13,8 +13,8 @@ export const store = createStore({
   mutations,
   modules: {
     user,
-    workspaces,
-  },
+    workspaces
+  }
 });
 
 export function useStore(): Store<State> {

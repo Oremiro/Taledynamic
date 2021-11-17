@@ -90,7 +90,7 @@ import {
   debounce,
   emailRegex,
   passwordRegex,
-  externalOptions,
+  externalOptions
 } from "@/helpers";
 import { UserApi } from "@/helpers/api/user";
 import { SignUpFormData } from "@/interfaces";
@@ -101,16 +101,16 @@ import axios from "axios";
 const formData = reactive<SignUpFormData>({
   email: {
     value: "",
-    isValid: false,
+    isValid: false
   },
   password: {
     value: "",
-    isValid: false,
+    isValid: false
   },
   confirmedPassword: {
     value: "",
-    isValid: false,
-  },
+    isValid: false
+  }
 });
 const isEmailUsed = ref<boolean>(false);
 const isEmailValidationPending = ref<boolean>(false);
@@ -151,12 +151,12 @@ const rules: FormRules = {
             isAwaited: true,
             immediateFunc: () => {
               isEmailValidationPending.value = true;
-            },
+            }
           }
         ),
-        trigger: "input",
-      },
-    ],
+        trigger: "input"
+      }
+    ]
   },
   password: {
     value: [
@@ -176,12 +176,12 @@ const rules: FormRules = {
           {
             immediateFunc: () => {
               isPasswordValidationPending.value = true;
-            },
+            }
           }
         ),
-        trigger: "input",
-      },
-    ],
+        trigger: "input"
+      }
+    ]
   },
   confirmedPassword: {
     value: [
@@ -201,13 +201,13 @@ const rules: FormRules = {
           {
             immediateFunc: () => {
               isConfirmedPwdValidationPending.value = true;
-            },
+            }
           }
         ),
-        trigger: ["input", "password-input"],
-      },
-    ],
-  },
+        trigger: ["input", "password-input"]
+      }
+    ]
+  }
 };
 const formRef = ref<InstanceType<typeof NForm>>();
 const confirmedPasswordRef = ref<InstanceType<typeof NFormItem>>();

@@ -6,7 +6,7 @@ import {
   GetUserRequest,
   IsEmailUsedRequest,
   RevokeTokenRequest,
-  UpdateUserRequest,
+  UpdateUserRequest
 } from "@/interfaces/api/requests";
 import {
   AuthenticateUserResponse,
@@ -17,14 +17,14 @@ import {
   RefreshTokenResponse,
   RevokeTokenResponse,
   GetByEmailResponse,
-  IsEmailUsedResponse,
+  IsEmailUsedResponse
 } from "@/interfaces/api/responses";
 import axios, { AxiosPromise } from "axios";
 
 export class UserApi {
   private static readonly axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASEURL + "/auth/user",
-    withCredentials: true,
+    withCredentials: true
   });
 
   static authenticate(
@@ -47,8 +47,8 @@ export class UserApi {
     return this.axiosInstance.delete<DeleteUserResponse>("/delete", {
       params,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -59,8 +59,8 @@ export class UserApi {
     return this.axiosInstance.get<GetUserResponse>("/get", {
       params,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -70,8 +70,8 @@ export class UserApi {
   ): AxiosPromise<UpdateUserResponse> {
     return this.axiosInstance.put<UpdateUserResponse>("/update", data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -85,8 +85,8 @@ export class UserApi {
   ): AxiosPromise<RevokeTokenResponse> {
     return this.axiosInstance.post<RevokeTokenResponse>("/revoke-token", data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -97,8 +97,8 @@ export class UserApi {
     return this.axiosInstance.get<GetByEmailResponse>("/get-by-email", {
       params,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
   }
 
@@ -106,7 +106,7 @@ export class UserApi {
     params: IsEmailUsedRequest
   ): AxiosPromise<IsEmailUsedResponse> {
     return this.axiosInstance.get<IsEmailUsedResponse>("/is-email-used", {
-      params,
+      params
     });
   }
 }

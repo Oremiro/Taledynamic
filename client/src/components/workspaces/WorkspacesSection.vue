@@ -48,7 +48,7 @@ import {
   SelectGroupOption,
   SelectOption,
   NPopselect,
-  NScrollbar,
+  NScrollbar
 } from "naive-ui";
 import { useStore } from "@/store";
 import { Workspace, WorkspacesSortType } from "@/interfaces/store";
@@ -69,13 +69,13 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
     children: [
       {
         label: "Сначала новые",
-        value: WorkspacesSortType.DateDescending,
+        value: WorkspacesSortType.DateDescending
       },
       {
         label: "Сначала старые",
-        value: WorkspacesSortType.DateAscending,
-      },
-    ],
+        value: WorkspacesSortType.DateAscending
+      }
+    ]
   },
   {
     type: "group",
@@ -84,14 +84,14 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
     children: [
       {
         label: "От A до Z",
-        value: WorkspacesSortType.NameAscending,
+        value: WorkspacesSortType.NameAscending
       },
       {
         label: "От Z до A",
-        value: WorkspacesSortType.NameDescending,
-      },
-    ],
-  },
+        value: WorkspacesSortType.NameDescending
+      }
+    ]
+  }
 ];
 
 const popSortValueStored: string | null =

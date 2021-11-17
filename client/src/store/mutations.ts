@@ -7,5 +7,5 @@ export const mutations: MutationTree<State> = {
   },
   pageError(state: State): void {
     state.pageStatus = "error";
-  },
+  }
 };

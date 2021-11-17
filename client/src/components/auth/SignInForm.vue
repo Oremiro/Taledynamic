@@ -54,15 +54,15 @@ import { UserState } from "@/interfaces/store";
 const formData = reactive<SignInFormData>({
   email: {
     value: "",
-    isValid: false,
+    isValid: false
   },
   password: {
     value: "",
-    isValid: false,
+    isValid: false
   },
   remembered: {
-    value: false,
-  },
+    value: false
+  }
 });
 const isEmailValidationPending = ref<boolean>(false);
 const rules: FormRules = {
@@ -85,13 +85,13 @@ const rules: FormRules = {
           {
             immediateFunc: () => {
               isEmailValidationPending.value = true;
-            },
+            }
           }
         ),
-        trigger: "input",
-      },
-    ],
-  },
+        trigger: "input"
+      }
+    ]
+  }
 };
 const formRef = ref<InstanceType<typeof NForm>>();
 const submitButtonRef = ref<InstanceType<typeof DelayedButton>>();

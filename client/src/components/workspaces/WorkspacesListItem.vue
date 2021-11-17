@@ -156,7 +156,7 @@ import {
   NInput,
   NPopconfirm,
   useMessage,
-  useThemeVars,
+  useThemeVars
 } from "naive-ui";
 import { useStore } from "@/store";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
@@ -166,12 +166,12 @@ import { workspaceNameValidator } from "@/helpers";
 const props = defineProps({
   id: {
     type: Number,
-    required: true,
+    required: true
   },
   name: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const workspaceName = ref<string>(props.name);
@@ -198,7 +198,7 @@ const workspaceNameRule: FormItemRule = {
         throw error;
       }
     }
-  },
+  }
 };
 
 const isNameInputLoading = ref<boolean>(false);
@@ -215,12 +215,12 @@ async function editWorkspaceName(): Promise<void> {
       store.getters["workspaces/currentWorkspace"]?.id;
     await store.dispatch("workspaces/update", {
       id: props.id,
-      name: workspaceName.value,
+      name: workspaceName.value
     });
     if (props.id === currentWorkspaceId) {
       router.push({
         name: "Workspace",
-        params: { id: store.getters["workspaces/currentWorkspace"]?.id },
+        params: { id: store.getters["workspaces/currentWorkspace"]?.id }
       });
     }
   } catch (error) {

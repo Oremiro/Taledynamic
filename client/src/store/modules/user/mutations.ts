@@ -12,5 +12,5 @@ export const mutations: MutationTree<UserState> = {
   logout(state: UserState): void {
     state.user = { id: null, email: "" };
     state.accessTokenInMemory = "";
-  },
+  }
 };

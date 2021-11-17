@@ -8,7 +8,7 @@ import {
   UserState,
   UpdatedEmailData,
   UpdatedPasswordData,
-  User,
+  User
 } from "@/interfaces/store";
 
 export const actions: ActionTree<UserState, State> = {
@@ -32,7 +32,7 @@ export const actions: ActionTree<UserState, State> = {
     const newUser = {
       email: formData.email.value,
       password: formData.password.value,
-      confirmPassword: formData.confirmedPassword.value,
+      confirmPassword: formData.confirmedPassword.value
     };
     try {
       const { data } = await UserApi.create(newUser);
@@ -56,19 +56,19 @@ export const actions: ActionTree<UserState, State> = {
   async login({ commit }, formData: SignInFormData): Promise<UserState> {
     const requestedUser = {
       email: formData.email.value,
-      password: formData.password.value,
+      password: formData.password.value
     };
     try {
       const { data } = await UserApi.authenticate(requestedUser);
       if (data.statusCode === 200) {
         const responsedUser: User = {
           id: data.id ?? null,
-          email: data.email ?? formData.email.value,
+          email: data.email ?? formData.email.value
         };
         const accessToken: string = data.jwtToken ?? "";
         commit("login", {
           user: responsedUser,
-          accessToken: accessToken,
+          accessToken: accessToken
         });
         const expireValue: string = formData.remembered.value ? "7d" : "0";
         VueCookieNext.setCookie("remembered", "1", { expire: expireValue });
@@ -118,7 +118,7 @@ export const actions: ActionTree<UserState, State> = {
         const token: string = data.jwtToken;
         commit("login", {
           user: user,
-          accessToken: token,
+          accessToken: token
         });
         localStorage.setItem("user", JSON.stringify(user));
         return;
@@ -142,13 +142,13 @@ export const actions: ActionTree<UserState, State> = {
           {
             id: state.user.id,
             password: data.currentPassword,
-            email: data.newEmail,
+            email: data.newEmail
           },
           state.accessTokenInMemory
         );
         const user: User = {
           id: responseData.user.id,
-          email: responseData.user.email,
+          email: responseData.user.email
         };
         commit("setUser", { user });
         localStorage.setItem("user", JSON.stringify(user));
@@ -179,13 +179,13 @@ export const actions: ActionTree<UserState, State> = {
             id: state.user.id,
             password: data.currentPassword,
             newPassword: data.newPassword,
-            confirmNewPassword: data.confirmedNewPassword,
+            confirmNewPassword: data.confirmedNewPassword
           },
           state.accessTokenInMemory
         );
         const user: User = {
           id: responseData.user.id,
-          email: responseData.user.email,
+          email: responseData.user.email
         };
         commit("setUser", { user });
         localStorage.setItem("user", JSON.stringify(user));
@@ -231,5 +231,5 @@ export const actions: ActionTree<UserState, State> = {
     } else {
       throw new Error("Отсутствует ID пользователя");
     }
-  },
+  }
 };

@@ -5,7 +5,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Home",
-    component: () => import("@/views/HomeView.vue"),
+    component: () => import("@/views/HomeView.vue")
   },
   {
     path: "/auth",
@@ -16,14 +16,14 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "signin",
         name: "AuthSignIn",
-        component: () => import("@/components/auth/SignInForm.vue"),
+        component: () => import("@/components/auth/SignInForm.vue")
       },
       {
         path: "signup",
         name: "AuthSignUp",
-        component: () => import("@/components/auth/SignUpForm.vue"),
-      },
-    ],
+        component: () => import("@/components/auth/SignUpForm.vue")
+      }
+    ]
   },
   {
     path: "/profile",
@@ -34,37 +34,37 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "",
         name: "ProfileIndex",
-        component: () => import("@/components/profile/MainSection.vue"),
+        component: () => import("@/components/profile/MainSection.vue")
       },
       {
         path: "settings",
         name: "ProfileSettings",
-        component: () => import("@/components/profile/SettingsSection.vue"),
+        component: () => import("@/components/profile/SettingsSection.vue")
       },
       {
         path: "data",
         name: "ProfileData",
-        component: () => import("@/components/profile/DataSection.vue"),
-      },
-    ],
+        component: () => import("@/components/profile/DataSection.vue")
+      }
+    ]
   },
   {
     path: "/workspace/:id",
     name: "Workspace",
     props: true,
     meta: { requiresAuth: true },
-    component: () => import("@/views/WorkspaceView.vue"),
+    component: () => import("@/views/WorkspaceView.vue")
   },
   {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
-    component: () => import("@/views/NotFoundView.vue"),
-  },
+    component: () => import("@/views/NotFoundView.vue")
+  }
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  routes
 });
 
 router.beforeResolve(async (to) => {
@@ -76,14 +76,14 @@ router.beforeResolve(async (to) => {
     store.commit("pageError");
     return {
       name: "Auth",
-      query: { redirect: to.fullPath },
+      query: { redirect: to.fullPath }
     };
   } else if (
     (to.name === "AuthSignIn" || to.name === "AuthSignUp") &&
     isLoggedIn
   ) {
     return {
-      name: "ProfileIndex",
+      name: "ProfileIndex"
     };
   }
   store.commit("pageReady");

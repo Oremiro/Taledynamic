@@ -13,7 +13,7 @@ export function externalOptions(value: string): AutoCompleteOption[] {
     "aol.com",
     "list.ru",
     "bk.ru",
-    "inbox.ru",
+    "inbox.ru"
   ];
   const [prefix, suffix]: string[] = value.split("@");
   let filteredBase: string[];
@@ -25,7 +25,7 @@ export function externalOptions(value: string): AutoCompleteOption[] {
   return filteredBase.map((suffix) => {
     return {
       label: `${prefix}@${suffix}`,
-      value: `${prefix}@${suffix}`,
+      value: `${prefix}@${suffix}`
     };
   });
 }

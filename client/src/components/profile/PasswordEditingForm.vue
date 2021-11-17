@@ -79,16 +79,16 @@ const formRef = ref<InstanceType<typeof NForm>>();
 const formData = reactive<PasswordEditFormData>({
   currentPassword: {
     value: "",
-    isValid: false,
+    isValid: false
   },
   newPassword: {
     value: "",
-    isValid: false,
+    isValid: false
   },
   confirmedPassword: {
     value: "",
-    isValid: false,
-  },
+    isValid: false
+  }
 });
 
 const isNewPwdValidationPending = ref<boolean>(false);
@@ -99,9 +99,9 @@ const rules: FormRules = {
       {
         required: true,
         message: "Пожалуйста, введите текущий пароль",
-        trigger: "input",
-      },
-    ],
+        trigger: "input"
+      }
+    ]
   },
   newPassword: {
     value: [
@@ -121,12 +121,12 @@ const rules: FormRules = {
           {
             immediateFunc: () => {
               isNewPwdValidationPending.value = true;
-            },
+            }
           }
         ),
-        trigger: "input",
-      },
-    ],
+        trigger: "input"
+      }
+    ]
   },
   confirmedPassword: {
     value: [
@@ -146,13 +146,13 @@ const rules: FormRules = {
           {
             immediateFunc: () => {
               isConfirmedPwdValidationPending.value = true;
-            },
+            }
           }
         ),
-        trigger: ["input", "password-input"],
-      },
-    ],
-  },
+        trigger: ["input", "password-input"]
+      }
+    ]
+  }
 };
 const store = useStore();
 const message = useMessage();
@@ -185,7 +185,7 @@ function submitForm(): void {
         await store.dispatch("user/updatePassword", {
           currentPassword: formData.currentPassword.value,
           newPassword: formData.newPassword.value,
-          confirmedNewPassword: formData.confirmedPassword.value,
+          confirmedNewPassword: formData.confirmedPassword.value
         });
         undoChanges();
         message.success("Вы успешно изменили пароль");
