@@ -1,6 +1,6 @@
 FROM node:latest as build-stage
 WORKDIR /app
-ENV VUE_APP_API_BASEURL=http://localhost:5000
+ENV VITE_API_BASEURL=http://localhost:5000
 COPY package*.json ./
 RUN npm install
 COPY ./ .

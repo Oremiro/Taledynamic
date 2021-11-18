@@ -1,34 +1,34 @@
 export interface AuthenticateUserRequest {
-	email: string,
-	password: string
+  email: string;
+  password: string;
 }
 
 export interface CreateUserRequest extends AuthenticateUserRequest {
-	confirmPassword: string
+  confirmPassword: string;
 }
 
 export interface DeleteUserRequest {
-	userId: number
+  userId: number;
 }
 
 export interface GetUserRequest {
-	id: number
+  id: number;
 }
 
 export interface UpdateUserRequest {
-	id: number,
-	password: string,
-	email?: string,
-	newPassword?: string,
-	confirmNewPassword?: string
+  id: number;
+  password: string;
+  email?: string;
+  newPassword?: string;
+  confirmNewPassword?: string;
 }
 
 export interface RevokeTokenRequest {
-	refreshToken?: string
+  refreshToken?: string;
 }
 
 export interface GetByEmailRequest {
-	email: string
+  email: string;
 }
 
 export interface IsEmailUsedRequest extends GetByEmailRequest {}
