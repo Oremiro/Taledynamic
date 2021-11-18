@@ -65,16 +65,14 @@
       v-else
       style="display: flex; justify-content: space-between; align-items: center"
     >
-      <div>
-        <n-ellipsis :tooltip="{ delay: 500, placement: 'top-end' }">
-          <router-link :to="toLink">
-            {{ name }}
-          </router-link>
-          <template #tooltip>
-            {{ name }}
-          </template>
-        </n-ellipsis>
-      </div>
+      <n-ellipsis :tooltip="{ delay: 500, placement: 'top-end' }">
+        <router-link :to="toLink">
+          {{ name }}
+        </router-link>
+        <template #tooltip>
+          {{ name }}
+        </template>
+      </n-ellipsis>
       <div style="display: flex; align-items: center; margin-left: 1rem">
         <n-button
           text
