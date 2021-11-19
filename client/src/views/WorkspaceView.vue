@@ -1,22 +1,38 @@
 <template>
-  <div class="container">
-    <n-card style="max-width: 40rem" >
-      <n-page-header>
-        <template #title>
-          <div>{{ currentWorkspace?.name }}</div>
-        </template>
-        <template #subtitle>
-          <div>{{ currentWorkspace?.created }}</div>
-        </template>
-      </n-page-header>
-      <table-creating-item />
-    </n-card>
+  <div class="container" style="padding: 4rem 0">
+    <n-grid :cols="4" style="max-width: 50rem; column-gap: 2rem;">
+      <n-grid-item :span="3">
+        <n-card>
+          <template #header>
+            <n-page-header>
+              <template #title>
+                <div>{{ currentWorkspace?.name }}</div>
+              </template>
+              <template #subtitle>
+                <div>Дата изменения: {{ currentWorkspace?.modified.toLocaleString() }}</div>
+              </template>
+            </n-page-header>
+          </template>
+          <template #default>
+            <n-scrollbar>
+              <n-button v-for="item in 100" :key="item" style="margin: .5rem 1rem">Таблица #{{ item }}</n-button>
+            </n-scrollbar>
+            <table-creating-item />
+          </template>
+        </n-card>
+      </n-grid-item>
+      <n-grid-item :span="1">
+        <n-card>
+          Сортировка
+        </n-card>
+      </n-grid-item>
+    </n-grid>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
-import { NPageHeader } from "naive-ui";
+import { computed, watch, onMounted } from "vue";
+import { NPageHeader, NScrollbar } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
 import { Workspace, WorkspacesInitStatus } from "@/interfaces/store";
@@ -52,13 +68,19 @@ async function setCurrentWorkspace(id: number): Promise<void> {
   }
 }
 
+/* Setting current workspace */
 const workspacesInitStatus = computed<WorkspacesInitStatus>(() => store.getters["workspaces/initStatus"]);
-watch(workspacesInitStatus, (value) => {
-  if (value === WorkspacesInitStatus.Success) {
-    setCurrentWorkspace(workspaceId.value);
+onMounted(async () => {
+  if (workspacesInitStatus.value === WorkspacesInitStatus.Success) {
+    await setCurrentWorkspace(workspaceId.value)
   }
 })
-watch(workspaceId, (value) => {
-  setCurrentWorkspace(value);
+watch(workspacesInitStatus, async (value) => {
+  if (value === WorkspacesInitStatus.Success) {
+    await setCurrentWorkspace(workspaceId.value);
+  }
+})
+watch(workspaceId, async (value) => {
+  await setCurrentWorkspace(value);
 });
 </script>

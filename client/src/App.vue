@@ -11,7 +11,7 @@
         </n-loading-bar-provider>
         <n-layout has-sider position="absolute" style="top: 3.3rem">
           <layout-sider />
-          <n-layout-content embedded>
+          <n-layout-content embedded :native-scrollbar="false">
             <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
                 <component :is="Component" />

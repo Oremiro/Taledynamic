@@ -132,6 +132,10 @@ watch(workspacesInitStatus, async (value) => {
     isListLoadingError.value = true;
   }
 })
+
+watch(workspaces, async () => {
+  await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
+})
 </script>
 
 <style lang="scss" scoped>
