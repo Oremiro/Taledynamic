@@ -1,6 +1,7 @@
 import { MutationTree } from "vuex";
 import {
   Workspace,
+  WorkspacesInitStatus,
   WorkspacesSortType,
   WorkspacesState
 } from "@/interfaces/store";
@@ -42,6 +43,9 @@ export const mutations: MutationTree<WorkspacesState> = {
     payload: { sortType: WorkspacesSortType }
   ) {
     state.sortType = payload.sortType;
+  },
+  setInitStatus(state: WorkspacesState, payload: { initStatus: WorkspacesInitStatus }) {
+    state.initStatus = payload.initStatus;
   },
   add(
     state: WorkspacesState,

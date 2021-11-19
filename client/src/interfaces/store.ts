@@ -37,6 +37,7 @@ export interface WorkspacesState {
   workspaces: Workspace[];
   currentWorkspace: Workspace | null;
   sortType: WorkspacesSortType;
+  initStatus: WorkspacesInitStatus
 }
 
 export enum WorkspacesSortType {
@@ -44,4 +45,10 @@ export enum WorkspacesSortType {
   NameDescending,
   DateAscending,
   DateDescending
+}
+
+export enum WorkspacesInitStatus {
+  Pending,
+  Success,
+  Error
 }

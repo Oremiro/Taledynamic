@@ -1,15 +1,26 @@
 <template>
-  <div>
-    {{ store.getters["workspaces/currentWorkspace"] }}
+  <div class="container">
+    <n-card style="max-width: 40rem" >
+      <n-page-header>
+        <template #title>
+          <div>{{ currentWorkspace?.name }}</div>
+        </template>
+        <template #subtitle>
+          <div>{{ currentWorkspace?.created }}</div>
+        </template>
+      </n-page-header>
+      <table-creating-item />
+    </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { Workspace } from "@/interfaces/store";
-import { useStore } from "@/store";
-import { useMessage } from "naive-ui";
+import { NPageHeader } from "naive-ui";
 import { useRouter } from "vue-router";
+import { useStore } from "@/store";
+import { Workspace, WorkspacesInitStatus } from "@/interfaces/store";
+import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
 
 const props = defineProps({
   id: {
@@ -21,16 +32,8 @@ const props = defineProps({
 const workspaceId = computed<number>(() => parseInt(props.id));
 
 const store = useStore();
-const message = useMessage();
-async function getWorkspaces(): Promise<void> {
-  try {
-    await store.dispatch("workspaces/init");
-  } catch (error) {
-    if (error instanceof Error) {
-      message.error(error.message);
-    }
-  }
-}
+const workspaces = computed<Workspace[]>(() => store.getters["workspaces/workspaces"]);
+const currentWorkspace = computed<Workspace | null>(() => store.getters["workspaces/currentWorkspace"]);
 
 const router = useRouter();
 
@@ -39,12 +42,7 @@ async function setCurrentWorkspace(id: number): Promise<void> {
     router.push({ name: "NotFound" });
     return;
   }
-  let workspaces: Workspace[] = store.getters["workspaces/workspaces"];
-  if (!workspaces.length) {
-    await getWorkspaces();
-    workspaces = store.getters["workspaces/workspaces"];
-  }
-  const currentWorkspace: Workspace | undefined = workspaces.find(
+  const currentWorkspace: Workspace | undefined = workspaces.value.find(
     (item) => item.id === id
   );
   if (currentWorkspace) {
@@ -54,7 +52,12 @@ async function setCurrentWorkspace(id: number): Promise<void> {
   }
 }
 
-setCurrentWorkspace(workspaceId.value);
+const workspacesInitStatus = computed<WorkspacesInitStatus>(() => store.getters["workspaces/initStatus"]);
+watch(workspacesInitStatus, (value) => {
+  if (value === WorkspacesInitStatus.Success) {
+    setCurrentWorkspace(workspaceId.value);
+  }
+})
 watch(workspaceId, (value) => {
   setCurrentWorkspace(value);
 });

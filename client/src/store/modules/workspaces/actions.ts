@@ -1,5 +1,5 @@
 import { WorkspaceApi } from "@/helpers/api/workspace";
-import { State, WorkspacesState, WorkspacesSortType } from "@/interfaces/store";
+import { State, WorkspacesState, WorkspacesSortType, WorkspacesInitStatus } from "@/interfaces/store";
 import { ActionTree } from "vuex";
 import axios from "axios";
 
@@ -10,7 +10,9 @@ export const actions: ActionTree<WorkspacesState, State> = {
         rootGetters["user/accessToken"]
       );
       commit("setWorkspaces", { workspaces: data.workspaces });
+      commit("setInitStatus", { initStatus: WorkspacesInitStatus.Success });
     } catch (error) {
+      commit("setInitStatus", { initStatus: WorkspacesInitStatus.Error });
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
           // TODO: 401 handler

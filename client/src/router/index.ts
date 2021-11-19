@@ -89,4 +89,17 @@ router.beforeResolve(async (to) => {
   store.commit("pageReady");
 });
 
+router.afterEach(async () => {
+  const isLoggedIn: boolean = store.getters["user/isLoggedIn"];
+  if (isLoggedIn) {
+    try {
+      setTimeout(async () => {
+        await store.dispatch("workspaces/init");
+      }, 500);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+})
+
 export default router;
