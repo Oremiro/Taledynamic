@@ -1,7 +1,14 @@
 <template>
   <transition name="fade" mode="out-in">
     <div v-if="isInitializationSuccess && tables.length">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+        "
+      >
         <n-text>Ваши таблицы</n-text>
         <n-tag>{{ tables.length }} / 100</n-tag>
       </div>
@@ -17,9 +24,14 @@
             <add-icon />
           </n-icon>
         </table-creating-item>
-        <n-button v-for="table of tables" :key="table.id">{{
-          table.name
-        }}</n-button>
+        <tables-list-item
+          v-for="table of tables"
+          :id="table.id"
+          :key="table.id"
+          :name="table.name"
+          :editable="editable"
+          @update="updateListItem"
+        />
       </div>
     </div>
     <n-empty
@@ -58,10 +70,12 @@ import { debounce } from "@/helpers";
 import { InitializationStatus } from "@/interfaces";
 import TablesLoadingItem from "@/components/tables/TablesLoadingItem.vue";
 import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
-import AddIcon from "@/components/icons/AddIcon.vue";
+import TablesListItem from "@/components/tables/TablesListItem.vue";
+import { AddIcon } from "@/components/icons";
 
 const props = defineProps<{
   workspaceId: number;
+  editable?: boolean;
 }>();
 
 const tables = ref<TableDto[]>([]);
@@ -95,6 +109,13 @@ async function initializeTablesList(): Promise<void> {
 
 function pushTableToList(table: TableDto) {
   tables.value.push(table);
+}
+
+function updateListItem(oldId: number, table: TableDto) {
+  const indexFound = tables.value.findIndex((item) => item.id === oldId)
+  if (~indexFound) {
+    tables.value[indexFound] = table;
+  }
 }
 
 const isInitializationError = computed<boolean>(

@@ -13,7 +13,7 @@
           </template>
           <template #extra>
             <div style="display: flex; gap: .5rem">
-              <n-button text>
+              <n-button text @click="isTablesEditable = !isTablesEditable">
                 <n-icon size="1.2rem">
                   <edit-icon />
                 </n-icon>
@@ -30,14 +30,14 @@
         <n-divider style="margin-bottom: 0" />
       </template>
       <template #default>
-        <tables-list :workspace-id="workspaceId" />
+        <tables-list :workspace-id="workspaceId" :editable="isTablesEditable" />
       </template>
     </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted } from "vue";
+import { computed, watch, onMounted, ref } from "vue";
 import { NPageHeader, NDivider, NSkeleton } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
@@ -79,6 +79,8 @@ async function setCurrentWorkspace(id: number): Promise<void> {
     router.push({ name: "NotFound" });
   }
 }
+
+const isTablesEditable = ref<boolean>(false);
 
 const isInitializationSuccess = computed<boolean>(() => workspacesInitStatus.value === InitializationStatus.Success)
 
