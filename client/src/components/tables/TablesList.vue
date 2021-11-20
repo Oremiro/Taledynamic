@@ -32,6 +32,7 @@
         <table-creating-item
           :workspace-id="props.workspaceId"
           :tables-count="tables.length"
+          @create="pushTableToList"
         >
           Создать таблицу
         </table-creating-item>

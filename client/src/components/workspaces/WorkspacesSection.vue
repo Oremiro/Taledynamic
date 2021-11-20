@@ -1,49 +1,57 @@
 <template>
   <transition name="fade" mode="out-in">
-    <workspace-loading
-      v-if="isListLoading"
-      :error="isListLoadingError"
-      @repeat-loading="getWorkspaces"
-    />
-    <div v-else class="workspaces-section-content">
-      <div class="workspaces-section-content-header">
-        <n-text depth="3"> Ваши рабочие пространства </n-text>
-        <n-popselect
-          v-model:value="popSortValue"
-          trigger="click"
-          :options="popOptions"
-          @update:value="updateHandler"
-        >
-          <n-button text>
-            <n-icon size="1.2rem">
-              <arrow-sort-icon />
-            </n-icon>
-          </n-button>
-        </n-popselect>
-      </div>
-      <n-scrollbar style="height: 100%">
-        <workspaces-list :workspaces="workspaces" />
-      </n-scrollbar>
+    <div v-if="isInitializationSuccess" class="workspaces-section-content">
+      <transition name="fade" mode="out-in">
+        <div v-if="workspaces.length" style="height: 100%">
+          <div class="workspaces-section-content-header">
+            <n-text depth="3"> Ваши рабочие пространства </n-text>
+            <n-popselect
+              v-model:value="popSortValue"
+              trigger="click"
+              :options="popOptions"
+              @update:value="updateHandler"
+            >
+              <n-button text>
+                <n-icon size="1.2rem">
+                  <arrow-sort-icon />
+                </n-icon>
+              </n-button>
+            </n-popselect>
+          </div>
+          <n-scrollbar style="height: 100%">
+            <workspaces-list :workspaces="workspaces" />
+          </n-scrollbar>
+        </div>
+        <n-empty
+          v-else
+          size="large"
+          description="Рабочих пространств нет"
+          class="workspaces-section-content-empty"
+        />
+      </transition>
       <div class="workspaces-section-content-footer">
         <workspace-creating-button />
       </div>
     </div>
+    <workspace-loading
+      v-else
+      :error="isInitializationError"
+      @repeat-loading="getWorkspaces"
+    />
   </transition>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import {
   SelectGroupOption,
   SelectOption,
   NPopselect,
-  NScrollbar
+  NScrollbar,
+  NEmpty
 } from "naive-ui";
 import { useStore } from "@/store";
-import {
-  Workspace,
-  WorkspacesSortType
-} from "@/interfaces/store";
+import { Workspace, WorkspacesSortType } from "@/interfaces/store";
 import { InitializationStatus } from "@/interfaces";
 import WorkspaceCreatingButton from "@/components/workspaces/WorkspaceCreating.vue";
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
@@ -99,8 +107,12 @@ const popSortValue = ref<WorkspacesSortType>(
     : WorkspacesSortType.DateDescending
 );
 
-const isListLoading = ref<boolean>(workspaces.value.length ? false : true);
-const isListLoadingError = ref<boolean>(false);
+const isInitializationSuccess = computed<boolean>(
+  () => workspacesInitStatus.value === InitializationStatus.Success
+);
+const isInitializationError = computed<boolean>(
+  () => workspacesInitStatus.value === InitializationStatus.Error
+);
 
 async function updateHandler(value: number): Promise<void> {
   localStorage.setItem("workspacesSort", value.toString());
@@ -117,25 +129,20 @@ async function getWorkspaces(): Promise<void> {
   }
 }
 
+/* Setting workspaces sort */
 const workspacesInitStatus = computed<InitializationStatus>(
   () => store.getters["workspaces/initStatus"]
 );
+
+onMounted(async () => {
+  if (workspacesInitStatus.value === InitializationStatus.Success) {
+    await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
+  }
+});
+
 watch(workspacesInitStatus, async (value) => {
-  switch (value) {
-    case InitializationStatus.Success: {
-      await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-      isListLoading.value = false;
-      break;
-    }
-    case InitializationStatus.Error: {
-      isListLoadingError.value = true;
-      break;
-    }
-    case InitializationStatus.Pending: {
-      isListLoadingError.value = false;
-      isListLoading.value = true;
-      break;
-    }
+  if (value === InitializationStatus.Success) {
+    await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
   }
 });
 
@@ -162,5 +169,11 @@ watch(workspaces, async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.workspaces-section-content-empty {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
