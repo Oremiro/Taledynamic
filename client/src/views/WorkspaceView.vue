@@ -1,42 +1,41 @@
 <template>
   <div class="container" style="padding: 4rem 0">
-    <n-grid :cols="4" style="max-width: 50rem; column-gap: 2rem;">
-      <n-grid-item :span="3">
-        <n-card>
-          <template #header>
-            <n-page-header>
-              <template #title>
-                <div>{{ currentWorkspace?.name }}</div>
-              </template>
-              <template #subtitle>
-                <div>Дата изменения: {{ currentWorkspace?.modified.toLocaleString() }}</div>
-              </template>
-            </n-page-header>
+    <n-card style="max-width: 40rem;">
+      <template #header>
+        <n-page-header>
+          <template #title>
+            <div>{{ currentWorkspace?.name }}</div>
           </template>
-          <template #default>
-            <n-scrollbar>
-              <n-button v-for="item in 100" :key="item" style="margin: .5rem 1rem">Таблица #{{ item }}</n-button>
-            </n-scrollbar>
-            <table-creating-item />
+          <template #subtitle>
+            <div>Дата изменения: {{ currentWorkspace?.modified.toLocaleString() }}</div>
           </template>
-        </n-card>
-      </n-grid-item>
-      <n-grid-item :span="1">
-        <n-card>
-          Сортировка
-        </n-card>
-      </n-grid-item>
-    </n-grid>
+          <template #extra>
+            <n-button text>
+              <n-icon size="1.2rem">
+                <arrow-sort-icon />
+              </n-icon>
+            </n-button>
+          </template>
+        </n-page-header>
+      </template>
+      <template #default>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
+          <table-creating-item />
+          <n-button v-for="item in 100" :key="item">Таблица #{{ item }}</n-button>
+        </div>          
+      </template>
+    </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, watch, onMounted } from "vue";
-import { NPageHeader, NScrollbar } from "naive-ui";
+import { NPageHeader } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
 import { Workspace, WorkspacesInitStatus } from "@/interfaces/store";
 import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
+import ArrowSortIcon from "@/components/icons/ArrowSortIcon.vue";
 
 const props = defineProps({
   id: {
