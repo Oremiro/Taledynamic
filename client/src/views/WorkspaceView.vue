@@ -4,7 +4,7 @@
       <template #header>
         <n-page-header>
           <template #title>
-            <div>{{ currentWorkspace?.name }}</div>
+            <n-text type="success">{{ currentWorkspace?.name }}</n-text>
           </template>
           <template #subtitle>
             <div>Дата изменения: {{ currentWorkspace?.modified.toLocaleString() }}</div>
@@ -17,6 +17,7 @@
             </n-button>
           </template>
         </n-page-header>
+        <n-divider style="margin-bottom: 0;" />
       </template>
       <template #default>
         <tables-list :workspace-id="workspaceId" /> 
@@ -27,7 +28,7 @@
 
 <script setup lang="ts">
 import { computed, watch, onMounted } from "vue";
-import { NPageHeader } from "naive-ui";
+import { NPageHeader, NDivider } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
 import { Workspace } from "@/interfaces/store";

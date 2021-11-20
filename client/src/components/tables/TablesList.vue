@@ -1,19 +1,45 @@
 <template>
   <transition name="fade" mode="out-in">
-    <div
-      v-if="isInitializationSuccess"
-      style="display: flex; gap: 1rem; flex-wrap: wrap"
-    >
-      <table-creating-item
-        :workspace-id="props.workspaceId"
-        :tables-count="tables.length"
-      />
-      <n-button v-for="table of tables" :key="table.id">{{
-        table.name
-      }}</n-button>
+    <div v-if="isInitializationSuccess && tables.length">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <n-text>Ваши таблицы</n-text>
+        <n-tag>{{ tables.length }} / 100</n-tag>
+      </div>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap">
+        <table-creating-item
+          v-if="tables.length < 100"
+          :workspace-id="props.workspaceId"
+          :tables-count="tables.length"
+          type="primary"
+          @create="pushTableToList"
+        >
+          <n-icon size="1.2rem">
+            <add-icon />
+          </n-icon>
+        </table-creating-item>
+        <n-button v-for="table of tables" :key="table.id">{{
+          table.name
+        }}</n-button>
+      </div>
     </div>
+    <n-empty
+      v-else-if="isInitializationSuccess && !tables.length"
+      size="large"
+      description="Здесь пока что нет таблиц"
+      style="height: 15rem; display: flex; justify-content: center"
+    >
+      <template #extra>
+        <table-creating-item
+          :workspace-id="props.workspaceId"
+          :tables-count="tables.length"
+        >
+          Создать таблицу
+        </table-creating-item>
+      </template>
+    </n-empty>
     <tables-loading-item
       v-else
+      style="height: 15rem"
       :error="isInitializationError"
       @repeat-initialization="initializeTablesList"
     />
@@ -23,14 +49,15 @@
 <script setup lang="ts">
 import axios from "axios";
 import { ref, onMounted, watch, computed } from "vue";
-import { useMessage } from "naive-ui";
+import { useMessage, NEmpty, NTag } from "naive-ui";
 import { TableDto } from "@/interfaces/api/responses";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
 import { debounce } from "@/helpers";
+import { InitializationStatus } from "@/interfaces";
 import TablesLoadingItem from "@/components/tables/TablesLoadingItem.vue";
 import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
-import { InitializationStatus } from "@/interfaces";
+import AddIcon from "@/components/icons/AddIcon.vue";
 
 const props = defineProps<{
   workspaceId: number;
@@ -65,8 +92,16 @@ async function initializeTablesList(): Promise<void> {
   }
 }
 
-const isInitializationError = computed<boolean>(() => tablesInitializationStatus.value === InitializationStatus.Error);
-const isInitializationSuccess = computed<boolean>(() => tablesInitializationStatus.value === InitializationStatus.Success);
+function pushTableToList(table: TableDto) {
+  tables.value.push(table);
+}
+
+const isInitializationError = computed<boolean>(
+  () => tablesInitializationStatus.value === InitializationStatus.Error
+);
+const isInitializationSuccess = computed<boolean>(
+  () => tablesInitializationStatus.value === InitializationStatus.Success
+);
 
 const initializeTableListDebounced = debounce(initializeTablesList, 1000);
 onMounted(async () => {

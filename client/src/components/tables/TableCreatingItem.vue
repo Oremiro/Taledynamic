@@ -3,12 +3,10 @@
     <n-button
       v-if="!isInputShown"
       ghost
-      type="primary"
+      :type="type"
       @click="showTableNameInput"
     >
-      <n-icon size="1.2rem">
-        <add-icon />
-      </n-icon>
+      <slot />
     </n-button>
     <n-form-item
       v-else
@@ -53,16 +51,25 @@ import {
   NInput,
   useMessage
 } from "naive-ui";
-import AddIcon from "@/components/icons/AddIcon.vue";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
 import { stringValidator } from "@/helpers";
 import CheckmarkIcon from "@/components/icons/CheckmarkIcon.vue";
+import { TableDto } from "@/interfaces/api/responses";
 
-const props = defineProps<{
+interface Props {
   workspaceId: number;
   tablesCount: number;
+  type?: 'default' | 'primary' | 'success' | 'info' | 'warning' | 'error'
+}
+
+const emit = defineEmits<{
+  (e: "create", table: TableDto): void
 }>();
+
+const props = withDefaults(defineProps<Props>(), {
+  type: 'default'
+})
 
 const tableNameInput = ref<InstanceType<typeof NInput>>();
 const isInputShown = ref<boolean>(false);
@@ -70,7 +77,7 @@ const defaultTableName = computed<string>(() => `Table #${ props.tablesCount + 1
 const tableName = ref<string>(defaultTableName.value);
 
 const tableNameFormItem = ref<InstanceType<typeof NFormItem>>();
-const isTableNameValid = ref<boolean>(false);
+const isTableNameValid = ref<boolean>(true);
 const tableNameRule: FormItemRule = {
   trigger: "input",
   asyncValidator: async (): Promise<void> => {
@@ -93,18 +100,22 @@ function focusTableNameInput(): void {
 }
 
 function showTableNameInput(): void {
+  tableName.value = defaultTableName.value;
   isInputShown.value = true;
 }
 
 function hideTableNameInput(): void {
   isInputShown.value = false;
-  tableName.value = defaultTableName.value;
 }
 
 const store = useStore();
 const message = useMessage();
 
 async function createTable(): Promise<void> {
+  if(props.tablesCount >= 100) {
+    message.error("В одном рабочем пространстве не может быть более 100 таблиц")
+    return;
+  }
   try {
     await tableNameFormItem.value?.validate();
     try {
@@ -115,14 +126,15 @@ async function createTable(): Promise<void> {
         },
         store.getters["user/accessToken"]
       );
-      console.log(data.table);
+      emit("create", data.table);
+      message.success("Таблица успешно создана")
     } catch (error) {
       // TODO: 401 Handler
       if (axios.isAxiosError(error)) {
         console.log(error.message);
       }
     }
-    tableNameInput.value?.blur();
+    hideTableNameInput();
   } catch (error) {
     message.error("Некорректные данные");
   }
