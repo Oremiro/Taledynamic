@@ -1,10 +1,10 @@
 <template>
-  <div class="workspaces-list-loading">
+  <div class="tables-list-loading">
     <div class="flex-column-center">
       <transition name="fade" mode="out-in">
         <div v-if="!error" class="flex-column-center">
           <n-spin size="large" />
-          <div style="margin-top: 1rem">Рабочие пространства загружаются</div>
+          <div style="margin-top: 1rem">Список таблиц загружается</div>
         </div>
         <div v-else class="flex-column-center">
           <n-text type="error" tag="div">
@@ -12,8 +12,8 @@
               <error-circle-icon />
             </n-icon>
           </n-text>
-          <n-text type="error"> Ошибка загрузки пространств </n-text>
-          <n-button style="margin-top: 1rem" @click="$emit('repeatLoading')">
+          <n-text type="error">Ошибка загрузки списка таблиц</n-text>
+          <n-button style="margin-top: 1rem" @click="$emit('repeatInitialization')">
             Попробовать снова
           </n-button>
         </div>
@@ -27,7 +27,7 @@ import { NSpin } from "naive-ui";
 import ErrorCircleIcon from "@/components/icons/ErrorCircleIcon.vue";
 
 defineEmits<{
-  (e: "repeatLoading"): void;
+  (e: "repeatInitialization"): void;
 }>();
 
 defineProps({
@@ -44,7 +44,7 @@ defineProps({
   flex-direction: column;
   align-items: center;
 }
-.workspaces-list-loading {
+.tables-list-loading {
   display: flex;
   align-items: center;
   justify-content: center;

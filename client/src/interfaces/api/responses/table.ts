@@ -1,6 +1,6 @@
 import BaseResponse from "@/interfaces/api/responses/base";
 
-interface TableDto {
+export interface TableDto {
   id: number;
   name: string;
 }

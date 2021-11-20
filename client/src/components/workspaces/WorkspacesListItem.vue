@@ -159,7 +159,7 @@ import {
 import { useStore } from "@/store";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { Workspace } from "@/interfaces/store";
-import { workspaceNameValidator } from "@/helpers";
+import { stringValidator } from "@/helpers";
 
 const props = defineProps({
   id: {
@@ -189,7 +189,7 @@ const workspaceNameRule: FormItemRule = {
   asyncValidator: async (): Promise<void> => {
     isWorkspaceNameValid.value = false;
     try {
-      await workspaceNameValidator(workspaceName.value);
+      await stringValidator(workspaceName.value);
       isWorkspaceNameValid.value = true;
     } catch (error) {
       if (error instanceof Error) {

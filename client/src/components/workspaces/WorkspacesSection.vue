@@ -40,7 +40,11 @@ import {
   NScrollbar
 } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace, WorkspacesInitStatus, WorkspacesSortType } from "@/interfaces/store";
+import {
+  Workspace,
+  WorkspacesSortType
+} from "@/interfaces/store";
+import { InitializationStatus } from "@/interfaces";
 import WorkspaceCreatingButton from "@/components/workspaces/WorkspaceCreating.vue";
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
 import WorkspaceLoading from "@/components/workspaces/WorkspacesLoading.vue";
@@ -108,24 +112,36 @@ async function getWorkspaces(): Promise<void> {
     await store.dispatch("workspaces/init");
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error);
+      console.log(error.message);
     }
   }
 }
 
-const workspacesInitStatus = computed<WorkspacesInitStatus>(() => store.getters["workspaces/initStatus"]);
+const workspacesInitStatus = computed<InitializationStatus>(
+  () => store.getters["workspaces/initStatus"]
+);
 watch(workspacesInitStatus, async (value) => {
-  if (value === WorkspacesInitStatus.Success) {
-    await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-    isListLoading.value = false;
-  } else if (value === WorkspacesInitStatus.Error) {
-    isListLoadingError.value = true;
+  switch (value) {
+    case InitializationStatus.Success: {
+      await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
+      isListLoading.value = false;
+      break;
+    }
+    case InitializationStatus.Error: {
+      isListLoadingError.value = true;
+      break;
+    }
+    case InitializationStatus.Pending: {
+      isListLoadingError.value = false;
+      isListLoading.value = true;
+      break;
+    }
   }
-})
+});
 
 watch(workspaces, async () => {
   await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-})
+});
 </script>
 
 <style lang="scss" scoped>

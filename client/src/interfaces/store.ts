@@ -1,3 +1,5 @@
+import { InitializationStatus } from "@/interfaces";
+
 export interface User {
   id: number | null;
   email: string;
@@ -37,7 +39,7 @@ export interface WorkspacesState {
   workspaces: Workspace[];
   currentWorkspace: Workspace | null;
   sortType: WorkspacesSortType;
-  initStatus: WorkspacesInitStatus
+  initStatus: InitializationStatus
 }
 
 export enum WorkspacesSortType {
@@ -45,10 +47,4 @@ export enum WorkspacesSortType {
   NameDescending,
   DateAscending,
   DateDescending
-}
-
-export enum WorkspacesInitStatus {
-  Pending,
-  Success,
-  Error
 }

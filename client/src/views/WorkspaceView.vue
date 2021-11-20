@@ -19,10 +19,7 @@
         </n-page-header>
       </template>
       <template #default>
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
-          <table-creating-item />
-          <n-button v-for="item in 100" :key="item">Таблица #{{ item }}</n-button>
-        </div>          
+        <tables-list :workspace-id="workspaceId" /> 
       </template>
     </n-card>
   </div>
@@ -33,9 +30,10 @@ import { computed, watch, onMounted } from "vue";
 import { NPageHeader } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
-import { Workspace, WorkspacesInitStatus } from "@/interfaces/store";
-import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
+import { Workspace } from "@/interfaces/store";
+import { InitializationStatus } from "@/interfaces";
 import ArrowSortIcon from "@/components/icons/ArrowSortIcon.vue";
+import TablesList from "@/components/tables/TablesList.vue";
 
 const props = defineProps({
   id: {
@@ -68,14 +66,14 @@ async function setCurrentWorkspace(id: number): Promise<void> {
 }
 
 /* Setting current workspace */
-const workspacesInitStatus = computed<WorkspacesInitStatus>(() => store.getters["workspaces/initStatus"]);
+const workspacesInitStatus = computed<InitializationStatus>(() => store.getters["workspaces/initStatus"]);
 onMounted(async () => {
-  if (workspacesInitStatus.value === WorkspacesInitStatus.Success) {
+  if (workspacesInitStatus.value === InitializationStatus.Success) {
     await setCurrentWorkspace(workspaceId.value)
   }
 })
 watch(workspacesInitStatus, async (value) => {
-  if (value === WorkspacesInitStatus.Success) {
+  if (value === InitializationStatus.Success) {
     await setCurrentWorkspace(workspaceId.value);
   }
 })

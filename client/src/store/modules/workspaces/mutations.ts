@@ -1,10 +1,10 @@
 import { MutationTree } from "vuex";
 import {
   Workspace,
-  WorkspacesInitStatus,
   WorkspacesSortType,
   WorkspacesState
 } from "@/interfaces/store";
+import { InitializationStatus } from "@/interfaces";
 import { Workspace as ReceivedWorkspace } from "@/interfaces/api/responses";
 
 function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace {
@@ -44,7 +44,7 @@ export const mutations: MutationTree<WorkspacesState> = {
   ) {
     state.sortType = payload.sortType;
   },
-  setInitStatus(state: WorkspacesState, payload: { initStatus: WorkspacesInitStatus }) {
+  setInitStatus(state: WorkspacesState, payload: { initStatus: InitializationStatus }) {
     state.initStatus = payload.initStatus;
   },
   add(

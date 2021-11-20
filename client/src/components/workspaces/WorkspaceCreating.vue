@@ -55,7 +55,7 @@
 import { ref, watch } from "vue";
 import { FormItemRule, NInput, NInputGroup, useMessage } from "naive-ui";
 import { useStore } from "@/store";
-import { workspaceNameValidator } from "@/helpers";
+import { stringValidator } from "@/helpers";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import DelayedButton from "@/components/DelayedButton.vue";
 import CheckmarkIcon from "@/components/icons/CheckmarkIcon.vue";
@@ -75,7 +75,7 @@ const workspaceCreatingRule: FormItemRule = {
   asyncValidator: async (): Promise<void> => {
     isWorkspaceInputValid.value = false;
     try {
-      await workspaceNameValidator(newWorkspaceName.value);
+      await stringValidator(newWorkspaceName.value);
       isWorkspaceInputValid.value = true;
     } catch (error) {
       if (error instanceof Error) {

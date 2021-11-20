@@ -1,4 +1,5 @@
-import { State, Workspace, WorkspacesInitStatus, WorkspacesState } from "@/interfaces/store";
+import { InitializationStatus } from "@/interfaces";
+import { State, Workspace, WorkspacesState } from "@/interfaces/store";
 import { GetterTree } from "vuex";
 
 export const getters: GetterTree<WorkspacesState, State> = {
@@ -8,7 +9,7 @@ export const getters: GetterTree<WorkspacesState, State> = {
   currentWorkspace(state: WorkspacesState): Workspace | null {
     return state.currentWorkspace;
   },
-  initStatus(state: WorkspacesState): WorkspacesInitStatus {
+  initStatus(state: WorkspacesState): InitializationStatus {
     return state.initStatus;
   }
 };

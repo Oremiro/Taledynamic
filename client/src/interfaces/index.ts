@@ -39,3 +39,9 @@ export interface WorkspaceItem {
   created?: Date;
   modified: Date;
 }
+
+export enum InitializationStatus {
+  Pending,
+  Success,
+  Error
+}
