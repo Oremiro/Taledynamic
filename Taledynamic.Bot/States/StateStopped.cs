@@ -33,7 +33,7 @@ namespace TaleDynamicBot.States
             );
         }
 
-        public override void DefaultAction(ITelegramBotClient botClient, Message message)
+        public override async void DefaultAction(ITelegramBotClient botClient, Message message)
         {
             botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
