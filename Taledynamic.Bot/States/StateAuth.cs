@@ -16,7 +16,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "You already logging...."
+                text: "Вы уже авторизованы. Чтобы начать обработку сообщений, введите команду /sending ."
             );
         }
 
@@ -24,7 +24,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "Start handling...."
+                text: "Начинаю обработку..."
             );
             this._user.ChangeState(new StateMessageHandling());
         }
@@ -33,7 +33,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "Вы ещё не начали обработку сообщений"
+                text: "Вы ещё не начали обработку сообщений."
             );
         }
 
@@ -41,7 +41,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "Чтобы начать обработку сообщений, введите команду /sending"
+                text: "Чтобы начать обработку сообщений, введите команду /sending ."
             );
         }
     }
