@@ -41,7 +41,6 @@ import { CheckmarkIcon } from "@/components/icons";
 const props = defineProps<{
   defaultName: string;
   loading?: boolean;
-  compare?: boolean
 }>();
 
 const emit = defineEmits<{
@@ -71,10 +70,6 @@ const tableNameRule: FormItemRule = {
 const message = useMessage();
 
 async function validate(): Promise<void> {
-  if (props.compare && tableName.value === props.defaultName) {
-    emit("blur");
-    return;
-  }
   try {
     await tableNameFormItem.value?.validate();
     emit("valid", tableName.value);

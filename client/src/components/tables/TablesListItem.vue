@@ -5,29 +5,45 @@
       <n-button
         v-if="editable"
         style="padding: 0.5rem"
-        @click="isInputShown = true;"
+        @click="isInputShown = true"
       >
         <n-icon size="1.2rem">
           <edit-icon />
         </n-icon>
       </n-button>
-      <dynamically-typed-button
-        v-if="editable"
-        style="padding: 0.5rem"
-        type="error"
-        ghost
-      >
-        <n-icon size="1.2rem">
-          <delete-icon />
-        </n-icon>
-      </dynamically-typed-button>
+      <n-popconfirm v-if="editable" v-model:show="isDeleteConfirmationShown">
+        <template #icon>
+          <n-icon :color="errorColor">
+            <error-circle-icon />
+          </n-icon>
+        </template>
+        <template #action>
+          <n-button ghost type="error" size="small" @click="deleteTable">
+            Да
+          </n-button>
+          <n-button
+            ghost
+            size="small"
+            @click="isDeleteConfirmationShown = false"
+          >
+            Нет
+          </n-button>
+        </template>
+        <template #trigger>
+          <dynamically-typed-button style="padding: 0.5rem" type="error" ghost>
+            <n-icon size="1.2rem">
+              <delete-icon />
+            </n-icon>
+          </dynamically-typed-button>
+        </template>
+        <div>Удалить таблицу?</div>
+      </n-popconfirm>
     </n-button-group>
     <table-name-item
       v-else
       :default-name="props.name"
       :loading="isInputLoading"
-      compare
-      @blur="isInputShown = false;"
+      @blur="isInputShown = false"
       @valid="editTableName"
     />
   </transition>
@@ -36,10 +52,11 @@
 <script setup lang="ts">
 import axios from "axios";
 import { ref } from "vue";
+import { useMessage, useThemeVars } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
 import { TableDto } from "@/interfaces/api/responses";
-import { DeleteIcon, EditIcon } from "@/components/icons";
+import { DeleteIcon, EditIcon, ErrorCircleIcon } from "@/components/icons";
 import TableNameItem from "@/components/tables/TableNameItem.vue";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 
@@ -51,6 +68,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update", oldId: number, table: TableDto): void;
+  (e: "delete", id: number): void;
 }>();
 
 const isInputShown = ref<boolean>(false);
@@ -58,6 +76,10 @@ const isInputLoading = ref<boolean>(false);
 const store = useStore();
 
 async function editTableName(name: string): Promise<void> {
+  if (name === props.name) {
+    isInputShown.value = false;
+    return;
+  }
   try {
     isInputLoading.value = true;
     const { data } = await TableApi.update(
@@ -75,7 +97,24 @@ async function editTableName(name: string): Promise<void> {
     }
   } finally {
     isInputLoading.value = false;
-    isInputShown.value = false
+    isInputShown.value = false;
+  }
+}
+
+const message = useMessage();
+const { errorColor } = useThemeVars().value;
+const isDeleteConfirmationShown = ref<boolean>(false);
+
+async function deleteTable(): Promise<void> {
+  try {
+    await TableApi.delete({ id: props.id }, store.getters["user/accessToken"]);
+    emit("delete", props.id);
+    message.success("Таблица удалена");
+  } catch (error) {
+    // TODO: 401 Handler
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+    }
   }
 }
 </script>

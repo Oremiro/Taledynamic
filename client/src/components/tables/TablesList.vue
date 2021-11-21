@@ -13,6 +13,15 @@
         <n-tag>{{ tables.length }} / 100</n-tag>
       </div>
       <div style="display: flex; gap: 1rem; flex-wrap: wrap">
+        <tables-list-item
+          v-for="table of tables"
+          :id="table.id"
+          :key="table.id"
+          :name="table.name"
+          :editable="editable"
+          @update="updateListItem"
+          @delete="deleteListItem"
+        />
         <table-creating-item
           v-if="tables.length < 100"
           :workspace-id="props.workspaceId"
@@ -24,14 +33,6 @@
             <add-icon />
           </n-icon>
         </table-creating-item>
-        <tables-list-item
-          v-for="table of tables"
-          :id="table.id"
-          :key="table.id"
-          :name="table.name"
-          :editable="editable"
-          @update="updateListItem"
-        />
       </div>
     </div>
     <n-empty
@@ -112,9 +113,16 @@ function pushTableToList(table: TableDto) {
 }
 
 function updateListItem(oldId: number, table: TableDto) {
-  const indexFound = tables.value.findIndex((item) => item.id === oldId)
+  const indexFound = tables.value.findIndex((item) => item.id === oldId);
   if (~indexFound) {
     tables.value[indexFound] = table;
+  }
+}
+
+function deleteListItem(id: number) {
+  const indexFound = tables.value.findIndex((item) => item.id === id);
+  if (~indexFound) {
+    tables.value.splice(indexFound, 1);
   }
 }
 

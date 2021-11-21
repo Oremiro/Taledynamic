@@ -66,6 +66,7 @@ async function createTable(name: string): Promise<void> {
       },
       store.getters["user/accessToken"]
     );
+    isInputLoading.value = false;
     emit("create", data.table);
     message.success("Таблица успешно создана");
   } catch (error) {

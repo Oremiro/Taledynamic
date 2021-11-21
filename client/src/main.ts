@@ -37,7 +37,8 @@ import {
   NCollapseTransition,
   NButtonGroup,
   NLoadingBarProvider,
-  NLayoutSider
+  NLayoutSider,
+  NPopconfirm
 } from "naive-ui";
 
 const naive = create({
@@ -74,7 +75,8 @@ const naive = create({
     NCollapseTransition,
     NButtonGroup,
     NLoadingBarProvider,
-    NLayoutSider
+    NLayoutSider,
+    NPopconfirm
   ]
 });
 
