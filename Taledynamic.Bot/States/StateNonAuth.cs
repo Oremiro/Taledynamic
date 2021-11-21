@@ -9,22 +9,22 @@ namespace TaleDynamicBot.States
 {
     public class StateNonAuth:State
     {
-        public override void Auth(ITelegramBotClient botClient, Update update)
+        public override async void Auth(ITelegramBotClient botClient, Update update)
         {
             //авторизация в проекте.
 
             Log.Information($"Username {update.Message.Chat.Username} has logged");
-            botClient.SendTextMessageAsync(
+            await botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 text: "....."
             );
-            //if auth successed
+            //if auth successed and await moments
             this._user.ChangeState(new StateAuth());
         }
         
         public override void SendingData(ITelegramBotClient botClient, Message message)
         {
-             botClient.SendTextMessageAsync(
+            botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Пожалуйста, авторизуйтесь с помощью команды /auth ."
             );
@@ -38,9 +38,9 @@ namespace TaleDynamicBot.States
             );
         }
 
-        public override void DefaultAction(ITelegramBotClient botClient, Message message)
-        {
-            botClient.SendTextMessageAsync(
+        public override async void DefaultAction(ITelegramBotClient botClient, Message message)
+        { 
+            await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Пожалуйста, авторизуйтесь с помощью команды /auth ."
             );
