@@ -14,7 +14,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "Вы уже авторизованы"
+                text: "Вы уже авторизованы."
             );
         }
 
@@ -22,7 +22,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "Обработка уже запущена"
+                text: "Обработка уже запущена."
             );
         }
 
@@ -30,7 +30,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "Остановка...."
+                text: "Останавливаю обработку..."
             );
             this._user.ChangeState(new StateStopped());
         }
@@ -38,6 +38,7 @@ namespace TaleDynamicBot.States
         public override void DefaultAction(ITelegramBotClient botClient, Message message)
         {
             string json = JsonSerializer.Serialize<Message>(message);
+            Log.Information(json);
         }
     }
 }

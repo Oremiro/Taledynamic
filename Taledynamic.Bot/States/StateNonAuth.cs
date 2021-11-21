@@ -16,7 +16,7 @@ namespace TaleDynamicBot.States
             Log.Information($"Username {update.Message.Chat.Username} has logged");
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "..."
+                text: "....."
             );
             //if auth successed
             this._user.ChangeState(new StateAuth());
@@ -26,7 +26,7 @@ namespace TaleDynamicBot.States
         {
              botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "You are not logged in the system"
+                text: "Пожалуйста, авторизуйтесь с помощью команды /auth ."
             );
         }
 
@@ -34,7 +34,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "You are not logged in the system"
+                text: "Пожалуйста, авторизуйтесь с помощью команды /auth ."
             );
         }
 
@@ -42,7 +42,7 @@ namespace TaleDynamicBot.States
         {
             botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "Пожалуйста, авторизуйтесь с помощью команды /auth"
+                text: "Пожалуйста, авторизуйтесь с помощью команды /auth ."
             );
         }
     }
