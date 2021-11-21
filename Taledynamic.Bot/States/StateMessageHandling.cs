@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Net;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Serilog;
 using Telegram.Bot;
@@ -35,10 +37,29 @@ namespace TaleDynamicBot.States
             this._user.ChangeState(new StateStopped());
         }
 
-        public override void DefaultAction(ITelegramBotClient botClient, Message message)
+        public override async void DefaultAction(ITelegramBotClient botClient, Message message)
         {
-            string json = JsonSerializer.Serialize<Message>(message);
-            Log.Information(json);
+            if (message.Type == MessageType.Text)
+            {
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    WriteIndented = true
+                };
+                string json = JsonSerializer.Serialize<Message>(message,options);
+                Log.Information(json);
+            }
+            else if (message.Type == MessageType.Photo)
+            {
+                await botClient.GetFileAsync(message.Photo[message.Photo.Length - 1].FileId);
+            }
         }
+        
+        /*var test =  botClient.GetFileAsync(e.Message.Photo[e.Message.Photo.Count() - 1].FileId);
+        var download_url = @"https://api.telegram.org/file/bot<token>/" + test.Result.FilePath;
+            using (WebClient client = new WebClient())
+        {
+            client.DownloadFile(new Uri(download_url), @"c:\temp\NewCompanyPicure.png");
+        }*/
     }
 }
