@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import axios from "axios";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useMessage, useThemeVars } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
@@ -106,7 +106,7 @@ async function editTableName(name: string): Promise<void> {
 }
 
 const message = useMessage();
-const { errorColor } = useThemeVars().value;
+const errorColor = computed<string>(() => useThemeVars().value.errorColor);
 const isDeleteConfirmationShown = ref<boolean>(false);
 
 async function deleteTable(): Promise<void> {

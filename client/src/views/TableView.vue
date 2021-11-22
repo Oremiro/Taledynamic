@@ -4,25 +4,14 @@
       <thead>
         <tr>
           <th v-for="header of tableHeaders" :key="header.id">
-            <div style="display: flex; gap: 1rem; align-items: center">
-              <div>{{ header.name }}</div>
-              <n-button quaternary size="tiny">
-                <n-icon size="1.1rem">
-                  <arrow-sort-icon></arrow-sort-icon>
-                </n-icon>
-              </n-button>
-            </div>
+            <table-header-vue :name="header.name" />
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="row in tableRows" :key="row.id">
           <td v-for="cell in row.cells" :key="cell.id" style="padding: 0">
-            <n-input
-              v-model:value="cell.data"
-              :style="{ 'background-color': tableColor, padding: '.2rem 0' }"
-              placeholder=""
-            />
+            <table-cell-vue :data="cell.data" :type="cell.type" />
           </td>
         </tr>
         <tr>
@@ -31,10 +20,7 @@
             :key="cell"
             style="padding: 0"
           >
-            <n-input
-              :style="{ 'background-color': tableColor, padding: '.2rem 0' }"
-              placeholder=""
-            />
+            <table-cell-vue :type="0" />
           </td>
         </tr>
       </tbody>
@@ -44,14 +30,15 @@
 
 <script setup lang="ts">
 import { reactive, computed } from "vue";
-import { NTable, useThemeVars } from "naive-ui";
+import { NTable } from "naive-ui";
 import {
   TableRow,
   TableHeader,
   TableDataType,
   TableCell
 } from "@/models/table";
-import { ArrowSortIcon } from "@/components/icons";
+import TableCellVue from "@/components/table/TableCell.vue";
+import TableHeaderVue from "@/components/table/TableHeader.vue";
 
 const props = defineProps<{
   workspaceId: string;
@@ -65,16 +52,14 @@ const tableHeaders = reactive<Array<TableHeader>>([
   new TableHeader("Товар", TableDataType.Text),
   new TableHeader("Стоимость", TableDataType.Number),
   new TableHeader("Количество", TableDataType.Number),
-  new TableHeader("Сумма", TableDataType.Number)
+  new TableHeader("Дата производства", TableDataType.Date)
 ]);
 const tableRows = reactive<Array<TableRow>>([
   new TableRow([
     new TableCell("Пылесос", TableDataType.Text),
     new TableCell(20000, TableDataType.Number),
     new TableCell(3, TableDataType.Number),
-    new TableCell(60000, TableDataType.Number)
+    new TableCell(new Date(Date.now()), TableDataType.Date)
   ])
 ]);
-
-const tableColor = computed<string>(() => useThemeVars().value.tableColor);
 </script>

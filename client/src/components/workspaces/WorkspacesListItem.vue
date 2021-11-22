@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import {
   FormItemRule,
@@ -187,7 +187,7 @@ async function editWorkspaceName(): Promise<void> {
   }
 }
 
-const { errorColor } = useThemeVars().value;
+const errorColor = computed<string>(() => useThemeVars().value.errorColor);
 const confirmShow = ref<boolean>(false);
 
 const toLink = `/workspace/${props.id}`;
