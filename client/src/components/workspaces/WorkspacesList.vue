@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { computed, h, PropType } from "vue";
 import { MenuGroupOption, MenuOption } from "naive-ui";
-import { Workspace } from "@/interfaces/store";
+import { Workspace } from "@/models/store";
 import WorkspacesListItem from "@/components/workspaces/WorkspacesListItem.vue";
 
 const props = defineProps({

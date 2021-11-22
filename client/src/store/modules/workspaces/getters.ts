@@ -1,5 +1,5 @@
-import { InitializationStatus } from "@/interfaces";
-import { State, Workspace, WorkspacesState } from "@/interfaces/store";
+import { InitializationStatus } from "@/models";
+import { State, Workspace, WorkspacesState } from "@/models/store";
 import { GetterTree } from "vuex";
 
 export const getters: GetterTree<WorkspacesState, State> = {

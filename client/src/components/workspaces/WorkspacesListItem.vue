@@ -112,7 +112,7 @@ import {
   useThemeVars
 } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace } from "@/interfaces/store";
+import { Workspace } from "@/models/store";
 import { stringValidator } from "@/helpers";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { CheckmarkIcon, EditIcon, DeleteIcon, ErrorCircleIcon } from "@/components/icons";

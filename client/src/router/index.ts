@@ -1,4 +1,4 @@
-import { InitializationStatus } from "@/interfaces";
+import { InitializationStatus } from "@/models";
 import { store } from "@/store";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 

@@ -3,9 +3,9 @@ import {
   Workspace,
   WorkspacesSortType,
   WorkspacesState
-} from "@/interfaces/store";
-import { InitializationStatus } from "@/interfaces";
-import { Workspace as ReceivedWorkspace } from "@/interfaces/api/responses";
+} from "@/models/store";
+import { InitializationStatus } from "@/models";
+import { Workspace as ReceivedWorkspace } from "@/models/api/responses";
 
 function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace {
   return {

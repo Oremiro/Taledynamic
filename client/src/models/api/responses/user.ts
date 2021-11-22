@@ -1,4 +1,4 @@
-import BaseResponse from "@/interfaces/api/responses/base";
+import BaseResponse from "@/models/api/responses/base";
 
 export interface User {
   id: number;

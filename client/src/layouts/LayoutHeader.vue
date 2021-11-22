@@ -87,7 +87,7 @@ import {
   useMessage
 } from "naive-ui";
 import { useStore } from "@/store";
-import { Theme } from "@/interfaces";
+import { Theme } from "@/models";
 
 const props = defineProps({
   currentTheme: {

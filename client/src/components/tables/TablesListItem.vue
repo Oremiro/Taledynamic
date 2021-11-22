@@ -58,7 +58,7 @@ import { useRouter } from "vue-router";
 import { useMessage, useThemeVars } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
-import { TableDto } from "@/interfaces/api/responses";
+import { TableDto } from "@/models/api/responses";
 import { DeleteIcon, EditIcon, ErrorCircleIcon } from "@/components/icons";
 import TableNameItem from "@/components/tables/TableNameItem.vue";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";

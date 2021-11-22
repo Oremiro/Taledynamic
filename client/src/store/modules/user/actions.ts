@@ -2,14 +2,14 @@ import axios from "axios";
 import { ActionTree } from "vuex";
 import { VueCookieNext } from "vue-cookie-next";
 import { UserApi } from "@/helpers/api/user";
-import { SignUpFormData, SignInFormData } from "@/interfaces";
+import { SignUpFormData, SignInFormData } from "@/models";
 import {
   State,
   UserState,
   UpdatedEmailData,
   UpdatedPasswordData,
   User
-} from "@/interfaces/store";
+} from "@/models/store";
 
 export const actions: ActionTree<UserState, State> = {
   async init({ dispatch }): Promise<boolean> {

@@ -1,5 +1,5 @@
 import { MutationTree } from "vuex";
-import { User, UserState } from "@/interfaces/store";
+import { User, UserState } from "@/models/store";
 
 export const mutations: MutationTree<UserState> = {
   setUser(state: UserState, payload: { user: User }): void {

@@ -60,8 +60,8 @@ import {
 } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
-import { Workspace } from "@/interfaces/store";
-import { InitializationStatus, TablesSortType } from "@/interfaces";
+import { Workspace } from "@/models/store";
+import { InitializationStatus, TablesSortType } from "@/models";
 import TablesList from "@/components/tables/TablesList.vue";
 import { ArrowSortIcon, EditIcon } from "@/components/icons";
 

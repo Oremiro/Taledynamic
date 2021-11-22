@@ -51,8 +51,8 @@ import {
   NEmpty
 } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace, WorkspacesSortType } from "@/interfaces/store";
-import { InitializationStatus } from "@/interfaces";
+import { Workspace, WorkspacesSortType } from "@/models/store";
+import { InitializationStatus } from "@/models";
 import WorkspaceCreatingButton from "@/components/workspaces/WorkspaceCreating.vue";
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
 import WorkspaceLoading from "@/components/workspaces/WorkspacesLoading.vue";

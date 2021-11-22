@@ -3,14 +3,14 @@ import {
   DeleteWorkspaceRequest,
   GetWorkspaceByIdRequest,
   UpdateWorkspaceRequest
-} from "@/interfaces/api/requests";
+} from "@/models/api/requests";
 import {
   CreateWorkspaceResponse,
   UpdateWorkspaceResponse,
   DeleteWorkspaceResponse,
   GetWorkspaceByIdResponse,
   GetWorkspacesByUserResponse
-} from "@/interfaces/api/responses";
+} from "@/models/api/responses";
 import axios, { AxiosPromise } from "axios";
 
 export class WorkspaceApi {
