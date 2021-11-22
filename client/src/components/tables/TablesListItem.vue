@@ -1,7 +1,9 @@
 <template>
   <transition name="fade" mode="out-in">
     <n-button-group v-if="!isInputShown">
-      <n-button> {{ name }} </n-button>
+      <n-button @click="navigateToTable">
+        {{ name }}
+      </n-button>
       <n-button
         v-if="editable"
         style="padding: 0.5rem"
@@ -52,6 +54,7 @@
 <script setup lang="ts">
 import axios from "axios";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useMessage, useThemeVars } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
@@ -62,6 +65,7 @@ import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 
 const props = defineProps<{
   id: number;
+  workspaceId: number;
   name: string;
   editable?: boolean;
 }>();
@@ -116,5 +120,14 @@ async function deleteTable(): Promise<void> {
       console.log(error.message);
     }
   }
+}
+
+const router = useRouter();
+
+function navigateToTable() {
+  router.push({
+    name: "Table",
+    params: { workspaceId: props.workspaceId, tableId: props.id }
+  });
 }
 </script>

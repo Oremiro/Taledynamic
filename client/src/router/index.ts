@@ -57,6 +57,13 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/WorkspaceView.vue")
   },
   {
+    path: "/table/:workspaceId/:tableId",
+    name: "Table",
+    props: true,
+    meta: { requiresAuth: true },
+    component: () => import("@/views/TableView.vue")
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: () => import("@/views/NotFoundView.vue")

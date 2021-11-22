@@ -17,6 +17,7 @@
           v-for="table of tables"
           :id="table.id"
           :key="table.id"
+          :workspace-id="workspaceId"
           :name="table.name"
           :editable="editable"
           @update="updateListItem"
