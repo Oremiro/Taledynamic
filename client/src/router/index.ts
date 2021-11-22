@@ -1,3 +1,4 @@
+import { InitializationStatus } from "@/interfaces";
 import { store } from "@/store";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
@@ -88,5 +89,26 @@ router.beforeResolve(async (to) => {
   }
   store.commit("pageReady");
 });
+
+router.afterEach(
+  () =>
+    new Promise<void>((resolve) => {
+      const isLoggedIn: boolean = store.getters["user/isLoggedIn"];
+      const workspacesInitStatus: InitializationStatus =
+        store.getters["workspaces/initStatus"];
+      if (isLoggedIn && workspacesInitStatus !== InitializationStatus.Success) {
+        setTimeout(async () => {
+          try {
+            await store.dispatch("workspaces/init");
+            resolve();
+          } catch (error) {
+            if (error instanceof Error) {
+              console.log(error.message);
+            }
+          }
+        }, 500);
+      }
+    })
+);
 
 export default router;

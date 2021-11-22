@@ -15,6 +15,7 @@ import {
   NForm,
   NFormItem,
   NInput,
+  NInputGroup,
   NCheckbox,
   NCard,
   NTabs,
@@ -36,7 +37,8 @@ import {
   NCollapseTransition,
   NButtonGroup,
   NLoadingBarProvider,
-  NLayoutSider
+  NLayoutSider,
+  NPopconfirm
 } from "naive-ui";
 
 const naive = create({
@@ -51,6 +53,7 @@ const naive = create({
     NForm,
     NFormItem,
     NInput,
+    NInputGroup,
     NCheckbox,
     NCard,
     NTabs,
@@ -72,7 +75,8 @@ const naive = create({
     NCollapseTransition,
     NButtonGroup,
     NLoadingBarProvider,
-    NLayoutSider
+    NLayoutSider,
+    NPopconfirm
   ]
 });
 

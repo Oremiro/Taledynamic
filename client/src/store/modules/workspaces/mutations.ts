@@ -4,6 +4,7 @@ import {
   WorkspacesSortType,
   WorkspacesState
 } from "@/interfaces/store";
+import { InitializationStatus } from "@/interfaces";
 import { Workspace as ReceivedWorkspace } from "@/interfaces/api/responses";
 
 function cloneWorkspace(workspace: Workspace | ReceivedWorkspace): Workspace {
@@ -42,6 +43,9 @@ export const mutations: MutationTree<WorkspacesState> = {
     payload: { sortType: WorkspacesSortType }
   ) {
     state.sortType = payload.sortType;
+  },
+  setInitStatus(state: WorkspacesState, payload: { initStatus: InitializationStatus }) {
+    state.initStatus = payload.initStatus;
   },
   add(
     state: WorkspacesState,

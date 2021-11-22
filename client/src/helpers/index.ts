@@ -30,7 +30,7 @@ export function externalOptions(value: string): AutoCompleteOption[] {
   });
 }
 
-export async function workspaceNameValidator(
+export async function stringValidator(
   targetValue: string
 ): Promise<void> {
   const trimmedValue: string = targetValue.trim();

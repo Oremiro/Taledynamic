@@ -33,18 +33,7 @@
           @click="createWorkspace"
         >
           <n-icon size="1.2rem">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              viewBox="0 0 24 24"
-            >
-              <g fill="none">
-                <path
-                  d="M4.53 12.97a.75.75 0 0 0-1.06 1.06l4.5 4.5a.75.75 0 0 0 1.06 0l11-11a.75.75 0 0 0-1.06-1.06L8.5 16.94l-3.97-3.97z"
-                  fill="currentColor"
-                />
-              </g>
-            </svg>
+            <checkmark-icon />
           </n-icon>
         </n-button>
         <dynamically-typed-button
@@ -54,18 +43,7 @@
           @click="clearNameInput"
         >
           <n-icon size="1.2rem">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              viewBox="0 0 24 24"
-            >
-              <g fill="none">
-                <path
-                  d="M4.397 4.554l.073-.084a.75.75 0 0 1 .976-.073l.084.073L12 10.939l6.47-6.47a.75.75 0 1 1 1.06 1.061L13.061 12l6.47 6.47a.75.75 0 0 1 .072.976l-.073.084a.75.75 0 0 1-.976.073l-.084-.073L12 13.061l-6.47 6.47a.75.75 0 0 1-1.06-1.061L10.939 12l-6.47-6.47a.75.75 0 0 1-.072-.976l.073-.084l-.073.084z"
-                  fill="currentColor"
-                />
-              </g>
-            </svg>
+            <dismiss-icon />
           </n-icon>
         </dynamically-typed-button>
       </n-input-group>
@@ -77,9 +55,11 @@
 import { ref, watch } from "vue";
 import { FormItemRule, NInput, NInputGroup, useMessage } from "naive-ui";
 import { useStore } from "@/store";
+import { stringValidator } from "@/helpers";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import DelayedButton from "@/components/DelayedButton.vue";
-import { workspaceNameValidator } from "@/helpers";
+import CheckmarkIcon from "@/components/icons/CheckmarkIcon.vue";
+import DismissIcon from "@/components/icons/DismissIcon.vue";
 
 defineProps({
   disabled: {
@@ -95,7 +75,7 @@ const workspaceCreatingRule: FormItemRule = {
   asyncValidator: async (): Promise<void> => {
     isWorkspaceInputValid.value = false;
     try {
-      await workspaceNameValidator(newWorkspaceName.value);
+      await stringValidator(newWorkspaceName.value);
       isWorkspaceInputValid.value = true;
     } catch (error) {
       if (error instanceof Error) {

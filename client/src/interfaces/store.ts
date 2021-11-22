@@ -1,3 +1,5 @@
+import { InitializationStatus } from "@/interfaces";
+
 export interface User {
   id: number | null;
   email: string;
@@ -37,6 +39,7 @@ export interface WorkspacesState {
   workspaces: Workspace[];
   currentWorkspace: Workspace | null;
   sortType: WorkspacesSortType;
+  initStatus: InitializationStatus
 }
 
 export enum WorkspacesSortType {

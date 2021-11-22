@@ -251,9 +251,3 @@ function submitForm(): void {
   });
 }
 </script>
-
-<style lang="scss" scoped>
-.n-input-question:hover {
-  color: var(--icon-color-hover);
-}
-</style>

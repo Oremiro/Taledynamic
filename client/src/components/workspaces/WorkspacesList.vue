@@ -1,6 +1,6 @@
 <template>
   <n-menu
-    :value="store.getters['workspaces/currentWorkspace']?.id"
+    :value="$route.path"
     :options="menuOptions"
     :indent="22"
     style="padding: 0 0.25rem"
@@ -12,7 +12,6 @@ import { computed, h, PropType } from "vue";
 import { MenuGroupOption, MenuOption } from "naive-ui";
 import { Workspace } from "@/interfaces/store";
 import WorkspacesListItem from "@/components/workspaces/WorkspacesListItem.vue";
-import { useStore } from "@/store";
 
 const props = defineProps({
   workspaces: {
@@ -21,13 +20,11 @@ const props = defineProps({
   }
 });
 
-const store = useStore();
-
 const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() =>
   props.workspaces.map((item: Workspace) => {
     return {
       label: () => h(WorkspacesListItem, { id: item.id, name: item.name }),
-      key: item.id
+      key: `/workspace/${item.id}`
     };
   })
 );
