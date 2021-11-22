@@ -2,9 +2,9 @@
   <transition name="fade" mode="out-in">
     <n-button
       v-if="!isInputShown"
-      ghost
+      :tertiary="tertiary"
       :type="type"
-      @click="isInputShown = true;"
+      @click="isInputShown = true"
     >
       <slot />
     </n-button>
@@ -31,6 +31,7 @@ interface Props {
   workspaceId: number;
   tablesCount: number;
   type?: "default" | "primary" | "success" | "info" | "warning" | "error";
+  tertiary?: boolean;
 }
 
 const emit = defineEmits<{

@@ -26,6 +26,7 @@
           v-if="tables.length < 100"
           :workspace-id="props.workspaceId"
           :tables-count="tables.length"
+          tertiary
           type="primary"
           @create="pushTableToList"
         >
@@ -68,7 +69,7 @@ import { TableDto } from "@/interfaces/api/responses";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
 import { debounce } from "@/helpers";
-import { InitializationStatus } from "@/interfaces";
+import { InitializationStatus, TablesSortType } from "@/interfaces";
 import TablesLoadingItem from "@/components/tables/TablesLoadingItem.vue";
 import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
 import TablesListItem from "@/components/tables/TablesListItem.vue";
@@ -77,6 +78,7 @@ import { AddIcon } from "@/components/icons";
 const props = defineProps<{
   workspaceId: number;
   editable?: boolean;
+  sortType?: TablesSortType
 }>();
 
 const tables = ref<TableDto[]>([]);
@@ -108,14 +110,16 @@ async function initializeTablesList(): Promise<void> {
   }
 }
 
-function pushTableToList(table: TableDto) {
+async function pushTableToList(table: TableDto) {
   tables.value.push(table);
+  await sortList(props.sortType ?? TablesSortType.NameAscending);
 }
 
-function updateListItem(oldId: number, table: TableDto) {
+async function updateListItem(oldId: number, table: TableDto) {
   const indexFound = tables.value.findIndex((item) => item.id === oldId);
   if (~indexFound) {
     tables.value[indexFound] = table;
+    await sortList(props.sortType ?? TablesSortType.NameAscending);
   }
 }
 
@@ -123,6 +127,18 @@ function deleteListItem(id: number) {
   const indexFound = tables.value.findIndex((item) => item.id === id);
   if (~indexFound) {
     tables.value.splice(indexFound, 1);
+  }
+}
+
+async function sortList(sortType: TablesSortType) {
+  if (sortType === TablesSortType.NameAscending) {
+    tables.value.sort((itemFirst, itemSecond) =>
+      itemFirst.name.localeCompare(itemSecond.name)
+    );
+  } else if (sortType === TablesSortType.NameDescending) {
+    tables.value.sort((itemFirst, itemSecond) =>
+      itemSecond.name.localeCompare(itemFirst.name)
+    );
   }
 }
 
@@ -136,6 +152,7 @@ const isInitializationSuccess = computed<boolean>(
 const initializeTableListDebounced = debounce(initializeTablesList, 1000);
 onMounted(async () => {
   await initializeTableListDebounced();
+  await sortList(props.sortType ?? TablesSortType.NameAscending);
 });
 
 watch(
@@ -143,6 +160,11 @@ watch(
   async () => {
     tablesInitializationStatus.value = InitializationStatus.Pending;
     await initializeTableListDebounced();
+    await sortList(props.sortType ?? TablesSortType.NameAscending);
   }
 );
+
+defineExpose({
+  sortList
+});
 </script>

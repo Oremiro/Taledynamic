@@ -45,3 +45,8 @@ export enum InitializationStatus {
   Success,
   Error
 }
+
+export enum TablesSortType {
+  NameAscending,
+  NameDescending
+}
