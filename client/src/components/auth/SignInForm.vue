@@ -47,9 +47,9 @@ import { NForm, useMessage, FormRules } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
 import { debounce, emailRegex, externalOptions } from "@/helpers";
-import { SignInFormData } from "@/interfaces";
+import { SignInFormData } from "@/models";
 import DelayedButton from "@/components/DelayedButton.vue";
-import { UserState } from "@/interfaces/store";
+import { UserState } from "@/models/store";
 
 const formData = reactive<SignInFormData>({
   email: {

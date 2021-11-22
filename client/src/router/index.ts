@@ -1,4 +1,4 @@
-import { InitializationStatus } from "@/interfaces";
+import { InitializationStatus } from "@/models";
 import { store } from "@/store";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
@@ -55,6 +55,13 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
     meta: { requiresAuth: true },
     component: () => import("@/views/WorkspaceView.vue")
+  },
+  {
+    path: "/table/:workspaceId/:tableId",
+    name: "Table",
+    props: true,
+    meta: { requiresAuth: true },
+    component: () => import("@/views/TableView.vue")
   },
   {
     path: "/:pathMatch(.*)*",

@@ -4,14 +4,14 @@ import {
   TableGetListRequest,
   TableGetRequest,
   TableUpdateRequest
-} from "@/interfaces/api/requests";
+} from "@/models/api/requests";
 import {
   TableCreateResponse,
   TableDeleteResponse,
   TableGetListResponse,
   TableGetResponse,
   TableUpdateResponse
-} from "@/interfaces/api/responses";
+} from "@/models/api/responses";
 import axios, { AxiosPromise } from "axios";
 
 export class TableApi {

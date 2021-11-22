@@ -59,7 +59,7 @@ import { debounce, emailRegex } from "@/helpers";
 import { FormRules, NForm, NFormItem, useMessage } from "naive-ui";
 import { reactive, ref } from "vue";
 import { useStore } from "@/store";
-import { EmailEditFormData } from "@/interfaces";
+import { EmailEditFormData } from "@/models";
 import QuestionTooltip from "@/components/QuestionTooltip.vue";
 import DelayedButton from "@/components/DelayedButton.vue";
 import { UserApi } from "@/helpers/api/user";

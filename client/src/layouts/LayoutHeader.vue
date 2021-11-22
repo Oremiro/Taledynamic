@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, watch, PropType } from "vue";
+import { computed, h, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import {
   darkTheme,
@@ -87,14 +87,11 @@ import {
   useMessage
 } from "naive-ui";
 import { useStore } from "@/store";
-import { Theme } from "@/interfaces";
+import { Theme } from "@/models";
 
-const props = defineProps({
-  currentTheme: {
-    type: Object as PropType<Theme>,
-    required: true
-  }
-});
+const props = defineProps<{
+  currentTheme: Theme
+}>();
 const emit = defineEmits<{
   (e: "changeTheme", theme: Theme): void;
 }>();

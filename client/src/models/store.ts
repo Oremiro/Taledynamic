@@ -1,4 +1,4 @@
-import { InitializationStatus } from "@/interfaces";
+import { InitializationStatus } from "@/models";
 
 export interface User {
   id: number | null;

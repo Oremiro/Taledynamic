@@ -31,9 +31,9 @@ import { useRouter } from "vue-router";
 import { darkTheme, useOsTheme } from "naive-ui";
 import LayoutHeader from "@/layouts/LayoutHeader.vue";
 import LayoutSider from "@/layouts/LayoutSider.vue";
-import { Theme } from "@/interfaces";
+import { Theme } from "@/models";
 import { useStore } from "@/store";
-import { UserState } from "@/interfaces/store";
+import { UserState } from "@/models/store";
 
 const currentTheme = ref<Theme>(darkTheme);
 const storedTheme: string | null = localStorage.getItem("theme");
@@ -103,7 +103,6 @@ onUnmounted(() => {
 }
 
 .container {
-  width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;

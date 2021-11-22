@@ -71,7 +71,7 @@ import { reactive, ref } from "vue";
 import { FormRules, NForm, NFormItem, useMessage } from "naive-ui";
 import { useStore } from "@/store";
 import { debounce, passwordRegex } from "@/helpers";
-import { PasswordEditFormData } from "@/interfaces";
+import { PasswordEditFormData } from "@/models";
 import QuestionTooltip from "@/components/QuestionTooltip.vue";
 import DelayedButton from "@/components/DelayedButton.vue";
 

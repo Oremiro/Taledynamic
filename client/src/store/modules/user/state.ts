@@ -1,4 +1,4 @@
-import { UserState } from "@/interfaces/store";
+import { UserState } from "@/models/store";
 
 export const state: UserState = {
   user: {

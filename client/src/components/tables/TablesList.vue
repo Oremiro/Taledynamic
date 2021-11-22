@@ -17,6 +17,7 @@
           v-for="table of tables"
           :id="table.id"
           :key="table.id"
+          :workspace-id="workspaceId"
           :name="table.name"
           :editable="editable"
           @update="updateListItem"
@@ -65,11 +66,11 @@
 import axios from "axios";
 import { ref, onMounted, watch, computed } from "vue";
 import { useMessage, NEmpty, NTag } from "naive-ui";
-import { TableDto } from "@/interfaces/api/responses";
+import { TableDto } from "@/models/api/responses";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
 import { debounce } from "@/helpers";
-import { InitializationStatus, TablesSortType } from "@/interfaces";
+import { InitializationStatus, TablesSortType } from "@/models";
 import TablesLoadingItem from "@/components/tables/TablesLoadingItem.vue";
 import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
 import TablesListItem from "@/components/tables/TablesListItem.vue";

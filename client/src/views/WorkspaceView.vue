@@ -37,19 +37,31 @@
         <n-divider style="margin-bottom: 0" />
       </template>
       <template #default>
-        <tables-list ref="tablesListRef" :workspace-id="workspaceId" :editable="isTablesEditable" :sort-type="popSortValue" />
+        <tables-list
+          ref="tablesListRef"
+          :workspace-id="workspaceId"
+          :editable="isTablesEditable"
+          :sort-type="popSortValue"
+        />
       </template>
     </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, ref } from "vue";
-import { NPageHeader, NDivider, NSkeleton, SelectOption, SelectGroupOption, NPopselect } from "naive-ui";
+import { computed, watch, ref } from "vue";
+import {
+  NPageHeader,
+  NDivider,
+  NSkeleton,
+  SelectOption,
+  SelectGroupOption,
+  NPopselect
+} from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
-import { Workspace } from "@/interfaces/store";
-import { InitializationStatus, TablesSortType } from "@/interfaces";
+import { Workspace } from "@/models/store";
+import { InitializationStatus, TablesSortType } from "@/models";
 import TablesList from "@/components/tables/TablesList.vue";
 import { ArrowSortIcon, EditIcon } from "@/components/icons";
 
@@ -106,8 +118,7 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
     ]
   }
 ];
-const popSortValueStored: string | null =
-  localStorage.getItem("tablesSort");
+const popSortValueStored: string | null = localStorage.getItem("tablesSort");
 const popSortValueParsed: number = popSortValueStored
   ? parseInt(popSortValueStored)
   : TablesSortType.NameAscending;
@@ -133,16 +144,15 @@ const isInitializationSuccess = computed<boolean>(
 const workspacesInitStatus = computed<InitializationStatus>(
   () => store.getters["workspaces/initStatus"]
 );
-onMounted(async () => {
-  if (isInitializationSuccess.value) {
-    await setCurrentWorkspace(workspaceId.value);
-  }
-});
-watch(workspacesInitStatus, async (value) => {
-  if (value === InitializationStatus.Success) {
-    await setCurrentWorkspace(workspaceId.value);
-  }
-});
+watch(
+  workspacesInitStatus,
+  async () => {
+    if (isInitializationSuccess.value) {
+      await setCurrentWorkspace(workspaceId.value);
+    }
+  },
+  { immediate: true }
+);
 watch(workspaceId, async (value) => {
   await setCurrentWorkspace(value);
 });

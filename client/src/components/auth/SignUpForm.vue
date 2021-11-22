@@ -93,7 +93,7 @@ import {
   externalOptions
 } from "@/helpers";
 import { UserApi } from "@/helpers/api/user";
-import { SignUpFormData } from "@/interfaces";
+import { SignUpFormData } from "@/models";
 import QuestionTooltip from "@/components/QuestionTooltip.vue";
 import DelayedButton from "@/components/DelayedButton.vue";
 import axios from "axios";

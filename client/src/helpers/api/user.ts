@@ -7,7 +7,7 @@ import {
   IsEmailUsedRequest,
   RevokeTokenRequest,
   UpdateUserRequest
-} from "@/interfaces/api/requests";
+} from "@/models/api/requests";
 import {
   AuthenticateUserResponse,
   CreateUserResponse,
@@ -18,7 +18,7 @@ import {
   RevokeTokenResponse,
   GetByEmailResponse,
   IsEmailUsedResponse
-} from "@/interfaces/api/responses";
+} from "@/models/api/responses";
 import axios, { AxiosPromise } from "axios";
 
 export class UserApi {

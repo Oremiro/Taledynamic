@@ -1,6 +1,6 @@
 import { WorkspaceApi } from "@/helpers/api/workspace";
-import { State, WorkspacesState, WorkspacesSortType } from "@/interfaces/store";
-import { InitializationStatus } from "@/interfaces";
+import { State, WorkspacesState, WorkspacesSortType } from "@/models/store";
+import { InitializationStatus } from "@/models";
 import { ActionTree } from "vuex";
 import axios from "axios";
 

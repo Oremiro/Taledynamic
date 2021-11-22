@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import {
   FormItemRule,
@@ -112,7 +112,7 @@ import {
   useThemeVars
 } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace } from "@/interfaces/store";
+import { Workspace } from "@/models/store";
 import { stringValidator } from "@/helpers";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { CheckmarkIcon, EditIcon, DeleteIcon, ErrorCircleIcon } from "@/components/icons";
@@ -187,7 +187,7 @@ async function editWorkspaceName(): Promise<void> {
   }
 }
 
-const { errorColor } = useThemeVars().value;
+const errorColor = computed<string>(() => useThemeVars().value.errorColor);
 const confirmShow = ref<boolean>(false);
 
 const toLink = `/workspace/${props.id}`;

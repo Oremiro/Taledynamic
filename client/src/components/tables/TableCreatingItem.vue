@@ -24,7 +24,7 @@ import { ref, computed } from "vue";
 import { useMessage } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
-import { TableDto } from "@/interfaces/api/responses";
+import { TableDto } from "@/models/api/responses";
 import TableNameItem from "@/components/tables/TableNameItem.vue";
 
 interface Props {

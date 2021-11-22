@@ -1,4 +1,4 @@
-import { State, UserState } from "@/interfaces/store";
+import { State, UserState } from "@/models/store";
 import { GetterTree } from "vuex";
 
 export const getters: GetterTree<UserState, State> = {
