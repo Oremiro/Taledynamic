@@ -10,9 +10,9 @@
           over: index === dragOverIndex
         }"
         :draggable="true"
-        @dragstart.self="dragStartHandler($event, index)"
+        @dragstart="dragStartHandler($event, index)"
         @dragend="dragEndHandler"
-        @drop="dropHandler($event, index)"
+        @drop.prevent="dropHandler($event, index)"
         @dragover.prevent
         @dragenter.prevent="dragEnterHandler($event, index)"
       >
@@ -29,54 +29,58 @@ import { TableHeader } from "@/models/table";
 import TableHeaderVue from "@/components/table/TableHeader.vue";
 
 const props = defineProps<{
-  data: TableHeader[]
+  data: TableHeader[];
 }>();
 
 const emit = defineEmits<{
-  (e: "swap", indexFirst: number, indexSecond: number): void
+  (e: "swap", indexFirst: number, indexSecond: number): void;
 }>();
 
-const tableHeaders = computed(() => props.data)
+const tableHeaders = computed<TableHeader[]>(() => props.data);
 
 const dragStartIndex = ref<number>();
 const dragOverIndex = ref<number>();
 
+function getDataIndex(dataTransfer: DataTransfer): number | undefined {
+  const dataItemIndex: string = dataTransfer?.getData("itemIndex");
+  const itemIndex: number = parseInt(dataItemIndex);
+  if (!isNaN(itemIndex)) {
+    return itemIndex;
+  }
+}
+
 function dragStartHandler(e: DragEvent, index: number) {
   dragStartIndex.value = index;
   if (e.dataTransfer) {
-    e.dataTransfer.dropEffect = "copy";
-    e.dataTransfer.effectAllowed = "copy";
     e.dataTransfer.setData("itemIndex", index.toString());
   }
 }
 
-function dragEnterHandler(e: DragEvent, index: number) {
+function dragEnterHandler(e: DragEvent, index: number): void {
   if (e.dataTransfer) {
-    const dataItemIndex: string = e.dataTransfer?.getData("itemIndex");
-    const itemIndex: number = parseInt(dataItemIndex);
-    if (!isNaN(itemIndex)) {
-      if (index !== itemIndex) {
-        dragOverIndex.value = index;
-      } else {
-        dragOverIndex.value = undefined;
-      }
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.dropEffect = "move";
+    const itemIndex = getDataIndex(e.dataTransfer);
+    if (itemIndex === undefined) return;
+    if (index !== itemIndex) {
+      dragOverIndex.value = index;
+    } else {
+      dragOverIndex.value = undefined;
     }
   }
 }
 
-function dragEndHandler() {
+function dragEndHandler(): void {
   dragStartIndex.value = undefined;
   dragOverIndex.value = undefined;
 }
 
 function dropHandler(e: DragEvent, index: number) {
   if (e.dataTransfer) {
-    const dataItemIndex: string = e.dataTransfer?.getData("itemIndex");
-    const itemIndex: number = parseInt(dataItemIndex);
-    if (!isNaN(itemIndex)) {
-      if (index !== itemIndex) {
-        emit("swap", index, itemIndex);
-      }
+    const itemIndex = getDataIndex(e.dataTransfer);
+    if (itemIndex === undefined) return;
+    if (index !== itemIndex) {
+      emit("swap", index, itemIndex);
     }
   }
 }
@@ -85,6 +89,9 @@ const themeVars = useThemeVars();
 </script>
 
 <style scoped lang="scss">
+th {
+  padding: 0;
+}
 .draggable {
   cursor: move;
 }

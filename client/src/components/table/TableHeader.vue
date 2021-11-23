@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; gap: 1rem; align-items: center">
+  <div style="display: flex; gap: 1rem; align-items: center; padding: .8rem;">
     <n-input v-model:value="headerName" autosize size="small" :style="{ 'background-color': tableHeaderColor }" />
     <n-button quaternary size="tiny">
       <n-icon size="1.1rem">
