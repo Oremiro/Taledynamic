@@ -104,6 +104,7 @@ onUnmounted(() => {
 
 .container {
   height: 100%;
+  padding-top: 4rem;
   display: flex;
   justify-content: center;
   align-items: center;

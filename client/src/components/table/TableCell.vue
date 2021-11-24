@@ -3,18 +3,21 @@
     <n-input
       v-if="type === 0"
       v-model:value="cellDataText"
+      :bordered="false"
       placeholder=""
       size="large"
     />
     <n-input-number
       v-if="type === 1"
       v-model:value="cellDataNumber"
+      :bordered="false"
       placeholder="0"
       size="large"
     />
     <n-date-picker
       v-if="type === 2"
       v-model:value="cellDataDate"
+      :bordered="false"
       :placeholder="currentDate"
       format="dd.MM.yyyy"
       size="large"
