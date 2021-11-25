@@ -1,29 +1,12 @@
 <template>
   <div class="container" style="padding: 2rem">
     <n-table :single-line="false">
-      <thead>
-        <tr>
-          <th v-for="header of tableHeaders" :key="header.id">
-            <table-header-vue :name="header.name" />
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="row in tableRows" :key="row.id">
-          <td v-for="cell in row.cells" :key="cell.id" style="padding: 0">
-            <table-cell-vue :data="cell.data" :type="cell.type" />
-          </td>
-        </tr>
-        <tr>
-          <td
-            v-for="cell of tableHeaders.length"
-            :key="cell"
-            style="padding: 0"
-          >
-            <table-cell-vue :type="0" />
-          </td>
-        </tr>
-      </tbody>
+      <table-head-vue :data="tableHeaders" @swap="swapTableHeadersItems" />
+      <table-body-vue
+        :data="tableRows"
+        :row-length="tableHeaders.length"
+        @swap="swapTableBodyItems"
+      />
     </n-table>
   </div>
 </template>
@@ -37,8 +20,8 @@ import {
   TableDataType,
   TableCell
 } from "@/models/table";
-import TableCellVue from "@/components/table/TableCell.vue";
-import TableHeaderVue from "@/components/table/TableHeader.vue";
+import TableHeadVue from "@/components/table/TableHead.vue";
+import TableBodyVue from "@/components/table/TableBody.vue";
 
 const props = defineProps<{
   workspaceId: string;
@@ -60,6 +43,44 @@ const tableRows = reactive<Array<TableRow>>([
     new TableCell(20000, TableDataType.Number),
     new TableCell(3, TableDataType.Number),
     new TableCell(new Date(Date.now()), TableDataType.Date)
+  ]),
+  new TableRow([
+    new TableCell("Ноутбук", TableDataType.Text),
+    new TableCell(100000, TableDataType.Number),
+    new TableCell(1, TableDataType.Number),
+    new TableCell(new Date(Date.now()), TableDataType.Date)
+  ]),
+  new TableRow([
+    new TableCell("", TableDataType.Text),
+    new TableCell("", TableDataType.Number),
+    new TableCell("", TableDataType.Number),
+    new TableCell("", TableDataType.Date)
   ])
 ]);
+
+async function swapTableHeadersItems(
+  indexFirst: number,
+  indexSecond: number
+): Promise<void> {
+  [tableHeaders[indexFirst], tableHeaders[indexSecond]] = [
+    tableHeaders[indexSecond],
+    tableHeaders[indexFirst]
+  ];
+  for (let tableRow of tableRows) {
+    [tableRow.cells[indexFirst], tableRow.cells[indexSecond]] = [
+      tableRow.cells[indexSecond],
+      tableRow.cells[indexFirst]
+    ];
+  }
+}
+
+async function swapTableBodyItems(
+  indexFirst: number,
+  indexSecond: number
+): Promise<void> {
+  [tableRows[indexFirst], tableRows[indexSecond]] = [
+    tableRows[indexSecond],
+    tableRows[indexFirst]
+  ];
+}
 </script>

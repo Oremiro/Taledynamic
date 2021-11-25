@@ -3,19 +3,24 @@
     <n-input
       v-if="type === 0"
       v-model:value="cellDataText"
+      :bordered="false"
       placeholder=""
       size="large"
     />
     <n-input-number
       v-if="type === 1"
       v-model:value="cellDataNumber"
-      placeholder="0"
+      :bordered="false"
+      :show-button="cellDataNumber !== undefined"
+      placeholder=""
       size="large"
     />
     <n-date-picker
       v-if="type === 2"
       v-model:value="cellDataDate"
-      :placeholder="currentDate"
+      :bordered="false"
+      :first-day-of-week="0"
+      placeholder=""
       format="dd.MM.yyyy"
       size="large"
     />
@@ -42,10 +47,10 @@ const cellDataNumber = ref<number | undefined>(
     ? props.data
     : undefined
 );
-const cellDataDate = ref<number>(
+const cellDataDate = ref<number | undefined>(
   props.type === TableDataType.Date && props.data instanceof Date
     ? props.data.getTime()
-    : 0
+    : undefined
 );
 // const cellDataAttachment = ref<string>();
 
@@ -61,9 +66,6 @@ const lightThemeOverrides = reactive<GlobalThemeOverrides>({
     border: 'none'
   }
 });
-
-const dateTimeFormat = Intl.DateTimeFormat();
-const currentDate = ref<string>(dateTimeFormat.format(Date.now()));
 
 const themeVars = useThemeVars();
 </script>
