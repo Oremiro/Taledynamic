@@ -3,7 +3,7 @@
     <transition-group
       v-for="(row, index) in tableRows"
       :key="row.id"
-      :draggable="true"
+      :draggable="index !== tableRows.length - 1"
       tag="tr"
       name="list-complete"
       class="list-complete-item"
@@ -16,12 +16,23 @@
       <th
         :key="0"
         scope="row"
-        class="list-complete-item draggable"
+        class="list-complete-item"
         :class="{
+          draggable: index !== tableRows.length - 1,
           start: index === draggableList.dragStartIndex,
-          enter: index === draggableList.dragEnterIndex
+          enter: index === draggableList.dragEnterIndex && index !== tableRows.length - 1
         }"
-      ></th>
+        style="padding: 0 0.3rem"
+      >
+        <div
+          style="display: flex; align-items: center; justify-content: center"
+        >
+          <span v-if="index !== tableRows.length - 1">{{ index + 1 }}</span>
+          <n-icon v-else size="1rem">
+            <add-icon />
+          </n-icon>
+        </div>
+      </th>
       <td
         v-for="cell in row.cells"
         :key="cell.id"
@@ -30,7 +41,7 @@
         :draggable="true"
         @dragstart.prevent
       >
-        <table-cell-vue :data="cell.data" :type="cell.type" />
+        <table-cell-vue :data="cell.data" :type="cell.type" @update="cellUpdateHandler(index)" />
       </td>
       <td :key="1"></td>
     </transition-group>
@@ -39,10 +50,11 @@
 
 <script setup lang="ts">
 import { reactive, computed } from "vue";
+import { useThemeVars } from "naive-ui";
 import TableCellVue from "@/components/table/TableCell.vue";
 import { TableRow } from "@/models/table";
-import { useThemeVars } from "naive-ui";
 import { DraggableList } from "@/components/table/draggable";
+import { AddIcon } from "@/components/icons";
 
 const props = defineProps<{
   data: TableRow[];
@@ -51,13 +63,21 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "swap", indexFirst: number, indexSecond: number): void;
+  (e: "create"): void;
 }>();
 
 const tableRows = computed<TableRow[]>(() => props.data);
 
 const draggableList = reactive<DraggableList>(new DraggableList("rows"));
 function dropCallback(index: number, itemIndex: number) {
+  if (index === tableRows.value.length - 1) return;
   emit("swap", index, itemIndex);
+}
+
+function cellUpdateHandler(rowIndex: number) {
+  if (rowIndex === tableRows.value.length - 1) {
+    emit("create");
+  }
 }
 
 const themeVars = useThemeVars();

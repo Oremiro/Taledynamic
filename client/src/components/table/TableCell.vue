@@ -5,7 +5,7 @@
       v-model:value="cellDataText"
       :bordered="false"
       placeholder=""
-      size="large"
+      @update:value="emit('update', cellDataText)"
     />
     <n-input-number
       v-if="type === 1"
@@ -13,7 +13,7 @@
       :bordered="false"
       :show-button="cellDataNumber !== undefined"
       placeholder=""
-      size="large"
+      @update:value="emit('update', cellDataNumber)"
     />
     <n-date-picker
       v-if="type === 2"
@@ -22,7 +22,7 @@
       :first-day-of-week="0"
       placeholder=""
       format="dd.MM.yyyy"
-      size="large"
+      @update:value="emit('update', cellDataDate)"
     />
   </n-config-provider>
 </template>
@@ -31,6 +31,10 @@
 import { ref, reactive } from "vue";
 import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars  } from "naive-ui";
 import { TableDataType } from "@/models/table";
+
+const emit = defineEmits<{
+  (e: "update", data?: string | number | Date): void
+}>();
 
 const props = defineProps<{
   data?: string | number | Date;

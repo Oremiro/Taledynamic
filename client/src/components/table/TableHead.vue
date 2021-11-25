@@ -30,7 +30,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.8rem 0.5rem;
+            width: 2.75rem;
           "
         >
           <n-form-item
@@ -55,7 +55,7 @@
             v-else
             circle
             size="small"
-            secondary
+            quaternary
             @click="showCreatingInput"
           >
             <n-icon size="1.2rem">

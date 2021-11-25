@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <n-table style="width: auto;"  :single-line="false">
+    <n-table style="width: auto" :single-line="false">
       <table-head-vue
         :data="tableHeaders"
         @swap="swapTableHeadersItems"
@@ -11,13 +11,14 @@
         :data="tableRows"
         :row-length="tableHeaders.length"
         @swap="swapTableBodyItems"
+        @create="addRow"
       />
     </n-table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from "vue";
+import { reactive } from "vue";
 import { NTable } from "naive-ui";
 import {
   TableRow,
@@ -28,13 +29,13 @@ import {
 import TableHeadVue from "@/components/table/TableHead.vue";
 import TableBodyVue from "@/components/table/TableBody.vue";
 
-const props = defineProps<{
+defineProps<{
   workspaceId: string;
   tableId: string;
 }>();
 
-const workspaceId = computed<number>(() => parseInt(props.workspaceId));
-const tableId = computed<number>(() => parseInt(props.tableId));
+// const workspaceId = computed<number>(() => parseInt(props.workspaceId));
+// const tableId = computed<number>(() => parseInt(props.tableId));
 
 const tableHeaders = reactive<Array<TableHeader>>([
   new TableHeader("Товар", TableDataType.Text),
@@ -104,5 +105,13 @@ function deleteColumn(index: number) {
   for (let tableRow of tableRows) {
     tableRow.cells.splice(index, 1);
   }
+}
+
+function addRow() {
+  const cells: TableCell[] = [];
+  for (let header of tableHeaders) {
+    cells.push(new TableCell("", header.type));
+  }
+  tableRows.push(new TableRow(cells));
 }
 </script>
