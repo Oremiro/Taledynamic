@@ -1,7 +1,11 @@
 <template>
   <div class="container" style="padding: 2rem">
     <n-table :single-line="false">
-      <table-head-vue :data="tableHeaders" @swap="swapTableHeadersItems" />
+      <table-head-vue
+        :data="tableHeaders"
+        @swap="swapTableHeadersItems"
+        @create="addColumn"
+      />
       <table-body-vue
         :data="tableRows"
         :row-length="tableHeaders.length"
@@ -82,5 +86,12 @@ async function swapTableBodyItems(
     tableRows[indexSecond],
     tableRows[indexFirst]
   ];
+}
+
+async function addColumn(name: string) {
+  tableHeaders.push(new TableHeader(name, TableDataType.Text));
+  for (let tableRow of tableRows) {
+    tableRow.cells.push(new TableCell("", TableDataType.Text));
+  }
 }
 </script>

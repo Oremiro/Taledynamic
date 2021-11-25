@@ -75,13 +75,13 @@ const themeVars = useThemeVars();
 }
 
 .list-complete-item {
-  transition: all 0.8s ease;
+  transition: all 0.5s ease;
 }
 
 .list-complete-enter-from,
 .list-complete-leave-to {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateX(30px);
 }
 
 .list-complete-leave-active {

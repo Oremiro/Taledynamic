@@ -12,7 +12,8 @@
         v-model:value="headerName"
         autosize
         size="small"
-        :style="{ 'background-color': tableHeaderColor }"
+        placeholder=""
+        :style="{ 'background-color': tableHeaderColor, 'max-width': '10rem' }"
       />
       <n-button quaternary size="tiny">
         <n-icon size="1.1rem">
