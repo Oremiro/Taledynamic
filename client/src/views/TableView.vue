@@ -1,10 +1,11 @@
 <template>
-  <div class="container" style="padding: 2rem">
-    <n-table :single-line="false">
+  <div class="container">
+    <n-table style="width: auto;"  :single-line="false">
       <table-head-vue
         :data="tableHeaders"
         @swap="swapTableHeadersItems"
         @create="addColumn"
+        @delete="deleteColumn"
       />
       <table-body-vue
         :data="tableRows"
@@ -92,6 +93,16 @@ async function addColumn(name: string) {
   tableHeaders.push(new TableHeader(name, TableDataType.Text));
   for (let tableRow of tableRows) {
     tableRow.cells.push(new TableCell("", TableDataType.Text));
+  }
+}
+
+function deleteColumn(index: number) {
+  if (tableHeaders.length <= 1) {
+    return;
+  }
+  tableHeaders.splice(index, 1);
+  for (let tableRow of tableRows) {
+    tableRow.cells.splice(index, 1);
   }
 }
 </script>

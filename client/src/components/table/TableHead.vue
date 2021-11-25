@@ -18,27 +18,38 @@
         @dragover.prevent
         @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
       >
-        <table-header-vue :name="header.name" />
+        <table-header-vue
+          :name="header.name"
+          :is-last="tableHeaders.length <= 1"
+          @delete="emit('delete', index)"
+        />
       </th>
       <th :key="1">
-        <div style="display: flex; align-items: center; justify-content: center; padding: 0.8rem .5rem;">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 0.5rem;
+          "
+        >
           <n-form-item
             v-if="isCreatingInputShown"
             :show-label="false"
             :show-feedback="false"
             :rule="headerNameRule"
           >
-          <n-input
-            ref="creatingInput"
-            v-model:value="newHeaderName"
-            placeholder=""
-            autosize
-            size="small"
-            :maxlength="50"
-            style="max-width: 10rem;"
-            @blur="hideCreatingInput"
-            @keyup.enter="createColumn"
-          />
+            <n-input
+              ref="creatingInput"
+              v-model:value="newHeaderName"
+              placeholder=""
+              autosize
+              size="small"
+              :maxlength="50"
+              style="max-width: 10rem"
+              @blur="hideCreatingInput"
+              @keyup.enter="createColumn"
+            />
           </n-form-item>
           <n-button
             v-else
@@ -73,6 +84,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "swap", indexFirst: number, indexSecond: number): void;
   (e: "create", name: string): void;
+  (e: "delete", index: number): void;
 }>();
 
 const tableHeaders = computed<TableHeader[]>(() => props.data);
@@ -81,7 +93,6 @@ const draggableList = reactive<DraggableList>(new DraggableList("headers"));
 function dropCallback(index: number, itemIndex: number) {
   emit("swap", index, itemIndex);
 }
-
 
 const newHeaderName = ref<string>("");
 const isHeaderNameValid = ref<boolean>(false);

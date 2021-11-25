@@ -13,15 +13,33 @@
         autosize
         size="small"
         placeholder=""
-        :style="{ 'background-color': tableHeaderColor, 'max-width': '10rem' }"
+        :style="{ 'background-color': themeVars.tableHeaderColor, 'max-width': '10rem' }"
       />
-      <n-button quaternary size="tiny">
-        <n-icon size="1.1rem">
-          <delete-icon />
-        </n-icon>
-      </n-button>
+      <n-popconfirm v-if="!isLast" v-model:show="isConfirmShown">
+        <template #icon>
+          <n-icon :color="themeVars.errorColor">
+            <error-circle-icon />
+          </n-icon>
+        </template>
+        <template #action>
+          <n-button ghost type="error" size="small" @click="emit('delete')">
+            Да
+          </n-button>
+          <n-button ghost size="small" @click="isConfirmShown = false">
+            Нет
+          </n-button>
+        </template>
+        <template #trigger>
+          <dynamically-typed-button type="error" size="small" quaternary @click.stop>
+            <n-icon size="1.1rem">
+              <delete-icon />
+            </n-icon>
+          </dynamically-typed-button>
+        </template>
+        <div>Удалить колонку?</div>
+      </n-popconfirm>
     </div>
-    <n-button quaternary size="tiny">
+    <n-button quaternary size="small">
       <n-icon size="1.1rem">
         <arrow-sort-icon></arrow-sort-icon>
       </n-icon>
@@ -30,17 +48,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useThemeVars } from "naive-ui";
-import { ArrowSortIcon, DeleteIcon } from "@/components/icons";
+import { ref } from "vue";
+import { useThemeVars, NPopconfirm } from "naive-ui";
+import { ArrowSortIcon, DeleteIcon, ErrorCircleIcon } from "@/components/icons";
+import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 
 const props = defineProps<{
   name: string;
+  isLast: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "delete"): void
 }>();
 
 const headerName = ref<string>(props.name);
 
-const tableHeaderColor = computed<string>(
-  () => useThemeVars().value.tableHeaderColor
-);
+const isConfirmShown = ref<boolean>(false);
+
+const themeVars = useThemeVars();
 </script>
