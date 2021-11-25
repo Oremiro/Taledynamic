@@ -13,15 +13,15 @@
       @dragover.prevent
       @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
     >
-      <td
+      <th
         :key="0"
+        scope="row"
         class="list-complete-item draggable"
         :class="{
           start: index === draggableList.dragStartIndex,
           enter: index === draggableList.dragEnterIndex
         }"
-      >
-      </td>
+      ></th>
       <td
         v-for="cell in row.cells"
         :key="cell.id"
@@ -32,6 +32,7 @@
       >
         <table-cell-vue :data="cell.data" :type="cell.type" />
       </td>
+      <td :key="1"></td>
     </transition-group>
   </transition-group>
 </template>

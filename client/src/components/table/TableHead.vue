@@ -1,10 +1,11 @@
 <template>
   <thead>
     <transition-group name="list-complete" tag="tr">
-      <th :key="0" class="list-complete-item" />
+      <th :key="0" scope="col" class="list-complete-item" />
       <th
         v-for="(header, index) of tableHeaders"
         :key="header.id"
+        scope="col"
         class="list-complete-item draggable"
         :class="{
           start: index === draggableList.dragStartIndex,
@@ -19,6 +20,15 @@
       >
         <table-header-vue :name="header.name" />
       </th>
+      <th :key="1">
+        <div style="display: flex; align-items: center; justify-content: center;">
+          <n-button circle size="small" secondary>
+            <n-icon size="1.2rem">
+              <add-icon />
+            </n-icon>
+          </n-button>
+        </div>
+      </th>
     </transition-group>
   </thead>
 </template>
@@ -29,6 +39,7 @@ import { useThemeVars } from "naive-ui";
 import { TableHeader } from "@/models/table";
 import TableHeaderVue from "@/components/table/TableHeader.vue";
 import { DraggableList } from "@/components/table/draggable";
+import { AddIcon } from "@/components/icons";
 
 const props = defineProps<{
   data: TableHeader[];
