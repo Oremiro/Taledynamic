@@ -1,45 +1,43 @@
 <template>
   <transition-group name="list-complete" tag="tbody">
-    <tr
+    <transition-group
       v-for="(row, index) in tableRows"
       :key="row.id"
       :draggable="true"
+      tag="tr"
+      name="list-complete"
       class="list-complete-item"
       @dragstart="draggableList.dragStartHandler($event, index)"
-      @dragend="draggableList.dragEndHandler"
-      @drop="draggableList.dropHandler($event, index, dropCallback)"
+      @dragend="draggableList.dragEndHandler($event)"
+      @drop.prevent="draggableList.dropHandler($event, index, dropCallback)"
       @dragover.prevent
       @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
     >
       <td
-        style="width: 0; padding: 0"
-        class="draggable"
+        :key="0"
+        class="list-complete-item draggable"
         :class="{
           start: index === draggableList.dragStartIndex,
           enter: index === draggableList.dragEnterIndex
         }"
-      ></td>
+      >
+      </td>
       <td
         v-for="cell in row.cells"
         :key="cell.id"
+        class="list-complete-item"
         style="padding: 0"
         :draggable="true"
         @dragstart.prevent
       >
         <table-cell-vue :data="cell.data" :type="cell.type" />
       </td>
-    </tr>
-    <tr :key="0" class="list-complete-item">
-      <td></td>
-      <td v-for="cell of rowLength" :key="cell" style="padding: 0">
-        <table-cell-vue :type="0" />
-      </td>
-    </tr>
+    </transition-group>
   </transition-group>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, watch } from "vue";
+import { reactive, computed } from "vue";
 import TableCellVue from "@/components/table/TableCell.vue";
 import { TableRow } from "@/models/table";
 import { useThemeVars } from "naive-ui";
@@ -60,10 +58,6 @@ const draggableList = reactive<DraggableList>(new DraggableList("rows"));
 function dropCallback(index: number, itemIndex: number) {
   emit("swap", index, itemIndex);
 }
-
-watch(draggableList, (value) => {
-  console.log(value.dragEnterIndex)
-})
 
 const themeVars = useThemeVars();
 </script>

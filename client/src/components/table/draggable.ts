@@ -53,7 +53,7 @@ export class DraggableList {
     }
   }
 
-  dragEndHandler(): void {
+  dragEndHandler(e: DragEvent): void {
     this.dragStartIndex = undefined;
     this.dragEnterIndex = undefined;
   }
@@ -71,12 +71,7 @@ export class DraggableList {
         return;
       }
       if (this.dropZoneName !== transferObject.dropZoneName) {
-        console.log(this.dragEnterIndex)
-        if (this.dragEnterIndex) {
-          callback(index, this.dragEnterIndex);
-        } else {
-          return;
-        }
+        return;
       }
       if (index !== transferObject.itemIndex) {
         callback(index, transferObject.itemIndex);

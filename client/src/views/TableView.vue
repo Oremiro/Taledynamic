@@ -49,6 +49,12 @@ const tableRows = reactive<Array<TableRow>>([
     new TableCell(100000, TableDataType.Number),
     new TableCell(1, TableDataType.Number),
     new TableCell(new Date(Date.now()), TableDataType.Date)
+  ]),
+  new TableRow([
+    new TableCell("", TableDataType.Text),
+    new TableCell("", TableDataType.Number),
+    new TableCell("", TableDataType.Number),
+    new TableCell("", TableDataType.Date)
   ])
 ]);
 
@@ -60,6 +66,12 @@ async function swapTableHeadersItems(
     tableHeaders[indexSecond],
     tableHeaders[indexFirst]
   ];
+  for (let tableRow of tableRows) {
+    [tableRow.cells[indexFirst], tableRow.cells[indexSecond]] = [
+      tableRow.cells[indexSecond],
+      tableRow.cells[indexFirst]
+    ];
+  }
 }
 
 async function swapTableBodyItems(
