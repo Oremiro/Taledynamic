@@ -1,39 +1,51 @@
+interface ListTransferObject {
+  itemIndex: number;
+  dropZoneName: string;
+}
+
+function isListTransferObject(item: ListTransferObject): item is ListTransferObject {
+  return (
+    (item as ListTransferObject).itemIndex !== undefined &&
+    (item as ListTransferObject).dropZoneName !== undefined
+  );
+}
+
 export class DraggableList {
   dragStartIndex?: number;
   dragEnterIndex?: number;
+  dropZoneName: string;
 
-  constructor() {
+  constructor(dropZoneName: string) {
     this.dragStartIndex = undefined;
     this.dragEnterIndex = undefined;
-  }
-
-  getDataIndex(dataTransfer: DataTransfer): number | undefined {
-    const dataItemIndex: string = dataTransfer?.getData("itemIndex");
-    const itemIndex: number = parseInt(dataItemIndex);
-    if (!isNaN(itemIndex)) {
-      return itemIndex;
-    }
+    this.dropZoneName = dropZoneName;
   }
 
   dragStartHandler(e: DragEvent, index: number): void {
-    console.log('start')
     this.dragStartIndex = index;
     if (e.dataTransfer) {
-      e.dataTransfer.setData("itemIndex", index.toString());
+      e.dataTransfer.effectAllowed = "move";
+      const transferObject: ListTransferObject = {
+        itemIndex: index,
+        dropZoneName: this.dropZoneName
+      };
+      e.dataTransfer.setData("transferString", JSON.stringify(transferObject));
     }
-  }
-
-  dragOverHandler(e: MouseEvent): void {
-    console.log(e.offsetX, e.offsetY);
   }
 
   dragEnterHandler(e: DragEvent, index: number): void {
     if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.dropEffect = "move";
-      const itemIndex = this.getDataIndex(e.dataTransfer);
-      if (itemIndex === undefined) return;
-      if (index !== itemIndex) {
+      const transferObject: ListTransferObject = JSON.parse(
+        e.dataTransfer.getData("transferString")
+      );
+      if (!isListTransferObject(transferObject)) {
+        return;
+      }
+      if (this.dropZoneName !== transferObject.dropZoneName) {
+        return;
+      }
+      if (index !== transferObject.itemIndex) {
         this.dragEnterIndex = index;
       } else {
         this.dragEnterIndex = undefined;
@@ -46,12 +58,28 @@ export class DraggableList {
     this.dragEnterIndex = undefined;
   }
 
-  dropHandler(e: DragEvent, index: number, callback: (index: number, itemIndex: number) => void) {
+  dropHandler(
+    e: DragEvent,
+    index: number,
+    callback: (index: number, itemIndex: number) => void
+  ) {
     if (e.dataTransfer) {
-      const itemIndex = this.getDataIndex(e.dataTransfer);
-      if (itemIndex === undefined) return;
-      if (index !== itemIndex) {
-        callback(index, itemIndex);
+      const transferObject: ListTransferObject = JSON.parse(
+        e.dataTransfer.getData("transferString")
+      );
+      if (!isListTransferObject(transferObject)) {
+        return;
+      }
+      if (this.dropZoneName !== transferObject.dropZoneName) {
+        console.log(this.dragEnterIndex)
+        if (this.dragEnterIndex) {
+          callback(index, this.dragEnterIndex);
+        } else {
+          return;
+        }
+      }
+      if (index !== transferObject.itemIndex) {
+        callback(index, transferObject.itemIndex);
       }
     }
   }

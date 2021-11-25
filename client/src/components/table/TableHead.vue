@@ -1,7 +1,7 @@
 <template>
   <thead>
     <transition-group name="list-complete" tag="tr">
-      <th :key="0" />
+      <th :key="0" class="list-complete-item" />
       <th
         v-for="(header, index) of tableHeaders"
         :key="header.id"
@@ -28,7 +28,7 @@ import { reactive, computed } from "vue";
 import { useThemeVars } from "naive-ui";
 import { TableHeader } from "@/models/table";
 import TableHeaderVue from "@/components/table/TableHeader.vue";
-import { DraggableList } from "./draggable";
+import { DraggableList } from "@/components/table/draggable";
 
 const props = defineProps<{
   data: TableHeader[];
@@ -40,13 +40,10 @@ const emit = defineEmits<{
 
 const tableHeaders = computed<TableHeader[]>(() => props.data);
 
-const draggableList = reactive<DraggableList>(new DraggableList());
+const draggableList = reactive<DraggableList>(new DraggableList("headers"));
 function dropCallback(index: number, itemIndex: number) {
   emit("swap", index, itemIndex);
 }
-
-
-
 
 const themeVars = useThemeVars();
 </script>
