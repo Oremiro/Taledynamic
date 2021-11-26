@@ -86,7 +86,7 @@ const tableHeaders = computed<TableHeader[]>(
 const draggableList = reactive<DraggableList>(new DraggableList("headers"));
 async function dropCallback(index: number, itemIndex: number) {
   try {
-    await store.dispatch("table/swapColumns", { index, itemIndex });
+    await store.dispatch("table/swapColumns", { indexFirst: index, indexSecond: itemIndex });
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);

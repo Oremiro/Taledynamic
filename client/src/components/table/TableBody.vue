@@ -1,10 +1,9 @@
 <template>
   <transition-group name="list-complete" tag="tbody">
-    <transition-group
+    <tr
       v-for="(row, index) in tableRows"
       :key="row.id"
       :draggable="index !== tableRows.length - 1"
-      tag="tr"
       name="list-complete"
       class="list-complete-item"
       @dragstart="draggableList.dragStartHandler($event, index)"
@@ -26,13 +25,12 @@
         :data="row.cells"
         @update="rowUpdateHandler(index)"
       />
-    </transition-group>
+    </tr>
   </transition-group>
 </template>
 
 <script setup lang="ts">
 import { reactive, computed } from "vue";
-import { useThemeVars } from "naive-ui";
 import { TableRow } from "@/models/table";
 import { DraggableList } from "@/components/table/draggable";
 import TableRowVue from "@/components/table/TableRow.vue";
@@ -43,8 +41,9 @@ const tableRows = computed<TableRow[]>(() => store.getters["table/rows"]);
 
 const draggableList = reactive<DraggableList>(new DraggableList("rows"));
 async function dropCallback(index: number, itemIndex: number) {
+  if (index === tableRows.value.length - 1) return;
   try {
-    await store.dispatch("table/swapRows", { index, itemIndex });
+    await store.dispatch("table/swapRows", { indexFirst: index, indexSecond: itemIndex });
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -58,20 +57,9 @@ async function rowUpdateHandler(rowIndex: number) {
   }
 }
 
-const themeVars = useThemeVars();
 </script>
 
 <style scoped lang="scss">
-.draggable {
-  cursor: move;
-}
-.draggable.start {
-  opacity: 0.8;
-}
-.draggable.enter {
-  border-left: 1px solid v-bind("themeVars.primaryColor");
-}
-
 .list-complete-item {
   transition: all 0.5s ease;
 }

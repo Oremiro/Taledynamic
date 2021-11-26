@@ -36,11 +36,11 @@ export const actions: ActionTree<TableState, State> = {
     }
   },
   async deleteColumn({ commit, state }, payload: { index: number }) {
-    if (payload.index < 0 || payload.index > state.rows.length - 1) {
+    if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Column index is out of range");
     }
-    if (payload.index === 0) {
-      throw new Error("Can't delete first column");
+    if (state.headers.length <= 1) {
+      throw new Error("Table must contain at least one column");
     }
     commit("deleteHeader", payload);
     for (let rowIndex = 0; rowIndex < state.rows.length; rowIndex++) {
@@ -53,9 +53,9 @@ export const actions: ActionTree<TableState, State> = {
   ) {
     if (
       payload.indexFirst < 0 ||
-      payload.indexFirst > state.rows.length - 1 ||
+      payload.indexFirst > state.headers.length - 1 ||
       payload.indexSecond < 0 ||
-      payload.indexSecond > state.rows.length - 1
+      payload.indexSecond > state.headers.length - 1
     ) {
       throw new Error("Index is out of range");
     }

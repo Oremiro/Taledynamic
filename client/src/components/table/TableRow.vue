@@ -1,6 +1,5 @@
 <template>
   <th
-    :key="0"
     scope="row"
     class="list-complete-item"
     :class="{
@@ -17,21 +16,23 @@
       </n-icon>
     </div>
   </th>
-  <td
-    v-for="cell in data"
-    :key="cell.id"
-    class="list-complete-item"
-    style="padding: 0"
-    :draggable="true"
-    @dragstart.prevent
-  >
-    <table-cell-vue
-      :data="cell.data"
-      :type="cell.type"
-      @update="emit('update')"
-    />
-  </td>
-  <td :key="1" style="padding: 0">
+  <transition-group name="list-complete">
+    <td
+      v-for="cell in data"
+      :key="cell.id"
+      class="list-complete-item"
+      style="padding: 0"
+      :draggable="true"
+      @dragstart.prevent
+    >
+      <table-cell-vue
+        :data="cell.data"
+        :type="cell.type"
+        @update="emit('update')"
+      />
+    </td>
+  </transition-group>
+  <td style="padding: 0">
     <div
       v-if="!last"
       style="display: flex; align-items: center; justify-content: center"
@@ -91,3 +92,28 @@ async function deleteRow() {
 const isConfirmDeletionShown = ref<boolean>(false);
 const themeVars = useThemeVars();
 </script>
+
+<style scoped lang="scss">
+.draggable {
+  cursor: move;
+}
+.draggable.start {
+  opacity: 0.8;
+}
+.draggable.enter {
+  border-left: 1px solid v-bind("themeVars.primaryColor");
+}
+.list-complete-item {
+  transition: all 0.5s ease;
+}
+
+.list-complete-enter-from,
+.list-complete-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-complete-leave-active {
+  position: absolute;
+}
+</style>
