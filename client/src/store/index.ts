@@ -5,6 +5,7 @@ import { state } from "@/store/state";
 import { mutations } from "@/store/mutations";
 import user from "@/store/modules/user";
 import workspaces from "@/store/modules/workspaces";
+import table from "@/store/modules/table";
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -13,7 +14,8 @@ export const store = createStore({
   mutations,
   modules: {
     user,
-    workspaces
+    workspaces,
+    table
   }
 });
 

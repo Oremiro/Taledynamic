@@ -1,24 +1,13 @@
 <template>
   <div class="container">
     <n-table style="width: auto" :single-line="false">
-      <table-head-vue
-        :data="tableHeaders"
-        @swap="swapTableHeadersItems"
-        @create="addColumn"
-        @delete="deleteColumn"
-      />
-      <table-body-vue
-        :data="tableRows"
-        :row-length="tableHeaders.length"
-        @swap="swapTableBodyItems"
-        @create="addRow"
-      />
+      <table-head-vue />
+      <table-body-vue />
     </n-table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
 import { NTable } from "naive-ui";
 import {
   TableRow,
@@ -28,6 +17,7 @@ import {
 } from "@/models/table";
 import TableHeadVue from "@/components/table/TableHead.vue";
 import TableBodyVue from "@/components/table/TableBody.vue";
+import { useStore } from "@/store";
 
 defineProps<{
   workspaceId: string;
@@ -37,13 +27,13 @@ defineProps<{
 // const workspaceId = computed<number>(() => parseInt(props.workspaceId));
 // const tableId = computed<number>(() => parseInt(props.tableId));
 
-const tableHeaders = reactive<Array<TableHeader>>([
+const tableHeaders: TableHeader[] = [
   new TableHeader("Товар", TableDataType.Text),
   new TableHeader("Стоимость", TableDataType.Number),
   new TableHeader("Количество", TableDataType.Number),
   new TableHeader("Дата производства", TableDataType.Date)
-]);
-const tableRows = reactive<Array<TableRow>>([
+];
+const tableRows: TableRow[] = [
   new TableRow([
     new TableCell("Пылесос", TableDataType.Text),
     new TableCell(20000, TableDataType.Number),
@@ -62,56 +52,9 @@ const tableRows = reactive<Array<TableRow>>([
     new TableCell("", TableDataType.Number),
     new TableCell("", TableDataType.Date)
   ])
-]);
+];
 
-async function swapTableHeadersItems(
-  indexFirst: number,
-  indexSecond: number
-): Promise<void> {
-  [tableHeaders[indexFirst], tableHeaders[indexSecond]] = [
-    tableHeaders[indexSecond],
-    tableHeaders[indexFirst]
-  ];
-  for (let tableRow of tableRows) {
-    [tableRow.cells[indexFirst], tableRow.cells[indexSecond]] = [
-      tableRow.cells[indexSecond],
-      tableRow.cells[indexFirst]
-    ];
-  }
-}
+const store = useStore();
+store.commit("table/setTable", { headers: tableHeaders, rows: tableRows });
 
-async function swapTableBodyItems(
-  indexFirst: number,
-  indexSecond: number
-): Promise<void> {
-  [tableRows[indexFirst], tableRows[indexSecond]] = [
-    tableRows[indexSecond],
-    tableRows[indexFirst]
-  ];
-}
-
-async function addColumn(name: string) {
-  tableHeaders.push(new TableHeader(name, TableDataType.Text));
-  for (let tableRow of tableRows) {
-    tableRow.cells.push(new TableCell("", TableDataType.Text));
-  }
-}
-
-function deleteColumn(index: number) {
-  if (tableHeaders.length <= 1) {
-    return;
-  }
-  tableHeaders.splice(index, 1);
-  for (let tableRow of tableRows) {
-    tableRow.cells.splice(index, 1);
-  }
-}
-
-function addRow() {
-  const cells: TableCell[] = [];
-  for (let header of tableHeaders) {
-    cells.push(new TableCell("", header.type));
-  }
-  tableRows.push(new TableRow(cells));
-}
 </script>

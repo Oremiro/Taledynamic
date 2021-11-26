@@ -21,7 +21,7 @@
         <table-header-vue
           :name="header.name"
           :is-last="tableHeaders.length <= 1"
-          @delete="emit('delete', index)"
+          @delete="deleteColumn(index)"
         />
       </th>
       <th :key="1">
@@ -48,7 +48,7 @@
               :maxlength="50"
               style="max-width: 10rem"
               @blur="hideCreatingInput"
-              @keyup.enter="createColumn"
+              @keyup.enter="addColumn"
             />
           </n-form-item>
           <n-button
@@ -71,27 +71,27 @@
 <script setup lang="ts">
 import { ref, reactive, computed, nextTick } from "vue";
 import { FormItemRule, NInput, useThemeVars } from "naive-ui";
-import { TableHeader } from "@/models/table";
+import { TableDataType, TableHeader } from "@/models/table";
 import TableHeaderVue from "@/components/table/TableHeader.vue";
 import { DraggableList } from "@/components/table/draggable";
 import { AddIcon } from "@/components/icons";
 import { stringValidator } from "@/helpers";
+import { useStore } from "@/store";
 
-const props = defineProps<{
-  data: TableHeader[];
-}>();
-
-const emit = defineEmits<{
-  (e: "swap", indexFirst: number, indexSecond: number): void;
-  (e: "create", name: string): void;
-  (e: "delete", index: number): void;
-}>();
-
-const tableHeaders = computed<TableHeader[]>(() => props.data);
+const store = useStore();
+const tableHeaders = computed<TableHeader[]>(
+  () => store.getters["table/headers"]
+);
 
 const draggableList = reactive<DraggableList>(new DraggableList("headers"));
-function dropCallback(index: number, itemIndex: number) {
-  emit("swap", index, itemIndex);
+async function dropCallback(index: number, itemIndex: number) {
+  try {
+    await store.dispatch("table/swapColumns", { index, itemIndex });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+  }
 }
 
 const newHeaderName = ref<string>("");
@@ -123,11 +123,24 @@ function hideCreatingInput() {
   isHeaderNameValid.value = false;
 }
 
-function createColumn() {
+async function addColumn() {
   if (isHeaderNameValid.value) {
-    emit("create", newHeaderName.value);
+    await store.dispatch("table/addColumn", {
+      name: newHeaderName.value,
+      type: TableDataType.Text
+    });
   }
   hideCreatingInput();
+}
+
+async function deleteColumn(index: number) {
+  try {
+    await store.dispatch("table/deleteColumn", { index: index });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+  }
 }
 
 const themeVars = useThemeVars();

@@ -1,4 +1,5 @@
 import { InitializationStatus } from "@/models";
+import { TableHeader, TableRow } from "@/models/table";
 
 export interface User {
   id: number | null;
@@ -47,4 +48,9 @@ export enum WorkspacesSortType {
   NameDescending,
   DateAscending,
   DateDescending
+}
+
+export interface TableState {
+  headers: TableHeader[]
+  rows: TableRow[]
 }

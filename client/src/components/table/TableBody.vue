@@ -13,37 +13,19 @@
       @dragover.prevent
       @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
     >
-      <th
-        :key="0"
-        scope="row"
-        class="list-complete-item"
-        :class="{
-          draggable: index !== tableRows.length - 1,
-          start: index === draggableList.dragStartIndex,
-          enter: index === draggableList.dragEnterIndex && index !== tableRows.length - 1
-        }"
-        style="padding: 0 0.3rem"
-      >
-        <div
-          style="display: flex; align-items: center; justify-content: center"
-        >
-          <span v-if="index !== tableRows.length - 1">{{ index + 1 }}</span>
-          <n-icon v-else size="1rem">
-            <add-icon />
-          </n-icon>
-        </div>
-      </th>
-      <td
-        v-for="cell in row.cells"
-        :key="cell.id"
-        class="list-complete-item"
-        style="padding: 0"
-        :draggable="true"
-        @dragstart.prevent
-      >
-        <table-cell-vue :data="cell.data" :type="cell.type" @update="cellUpdateHandler(index)" />
-      </td>
-      <td :key="1"></td>
+      <table-row-vue
+        :index="index"
+        :last="index === tableRows.length - 1"
+        :draggable="
+          index === draggableList.dragStartIndex
+            ? 'start'
+            : index === draggableList.dragEnterIndex
+            ? 'enter'
+            : undefined
+        "
+        :data="row.cells"
+        @update="rowUpdateHandler(index)"
+      />
     </transition-group>
   </transition-group>
 </template>
@@ -51,32 +33,28 @@
 <script setup lang="ts">
 import { reactive, computed } from "vue";
 import { useThemeVars } from "naive-ui";
-import TableCellVue from "@/components/table/TableCell.vue";
 import { TableRow } from "@/models/table";
 import { DraggableList } from "@/components/table/draggable";
-import { AddIcon } from "@/components/icons";
+import TableRowVue from "@/components/table/TableRow.vue";
+import { useStore } from "@/store";
 
-const props = defineProps<{
-  data: TableRow[];
-  rowLength: number;
-}>();
-
-const emit = defineEmits<{
-  (e: "swap", indexFirst: number, indexSecond: number): void;
-  (e: "create"): void;
-}>();
-
-const tableRows = computed<TableRow[]>(() => props.data);
+const store = useStore();
+const tableRows = computed<TableRow[]>(() => store.getters["table/rows"]);
 
 const draggableList = reactive<DraggableList>(new DraggableList("rows"));
-function dropCallback(index: number, itemIndex: number) {
-  if (index === tableRows.value.length - 1) return;
-  emit("swap", index, itemIndex);
+async function dropCallback(index: number, itemIndex: number) {
+  try {
+    await store.dispatch("table/swapRows", { index, itemIndex });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+  }
 }
 
-function cellUpdateHandler(rowIndex: number) {
+async function rowUpdateHandler(rowIndex: number) {
   if (rowIndex === tableRows.value.length - 1) {
-    emit("create");
+    await store.dispatch("table/addRow");
   }
 }
 
