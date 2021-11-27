@@ -15,24 +15,21 @@
       </n-icon>
     </div>
   </th>
-  <transition-group name="list-complete">
-    <td
-      v-for="cell in data"
-      :key="cell.id"
-      class="list-complete-item"
-      style="padding: 0"
-      :draggable="store.getters['table/editableRowIndex'] !== index"
-      @dragstart.prevent
-    >
-      <table-cell-vue
-        :data="cell.data"
-        :type="cell.type"
-        @update="emit('update')"
-        @mouse-enter-cell="store.commit('table/setEditableRowIndex', { index: index })"
-        @mouse-leave-cell="store.commit('table/clearEditableRowIndex')"
-      />
-    </td>
-  </transition-group>
+  <td
+    v-for="cell in data"
+    :key="cell.id"
+    style="padding: 0"
+    :draggable="store.getters['table/editableRowIndex'] !== index"
+    @dragstart.prevent
+  >
+    <table-cell-vue
+      :data="cell.data"
+      :type="cell.type"
+      @update="emit('update')"
+      @mouse-enter-cell="store.commit('table/setEditableRowIndex', { index: index })"
+      @mouse-leave-cell="store.commit('table/clearEditableRowIndex')"
+    />
+  </td>
   <td style="padding: 0">
     <div
       v-if="!last"
@@ -95,26 +92,8 @@ const themeVars = useThemeVars();
 </script>
 
 <style scoped lang="scss">
-.draggable {
-  cursor: move;
-}
-.draggable.start {
-  opacity: 0.8;
-}
+@import "@/components/table/style.scss";
 .draggable.enter {
   border-left: 1px solid v-bind("themeVars.primaryColor");
-}
-.list-complete-item {
-  transition: all 0.5s ease;
-}
-
-.list-complete-enter-from,
-.list-complete-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.list-complete-leave-active {
-  position: absolute;
 }
 </style>

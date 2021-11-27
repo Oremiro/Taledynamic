@@ -1,12 +1,12 @@
 <template>
   <thead>
-    <transition-group name="list-complete" tag="tr">
-      <th :key="0" scope="col" class="list-complete-item" />
+    <tr>
+      <th scope="col" />
       <th
         v-for="(header, index) of tableHeaders"
         :key="header.id"
         scope="col"
-        class="list-complete-item draggable"
+        class="draggable"
         :class="{
           start: index === draggableList.dragStartIndex,
           enter: index === draggableList.dragEnterIndex
@@ -18,12 +18,9 @@
         @dragover.prevent
         @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
       >
-        <table-header-vue
-          :index="index"
-          @delete="deleteColumn(index)"
-        />
+        <table-header-vue :index="index" @delete="deleteColumn(index)" />
       </th>
-      <th :key="1">
+      <th>
         <div
           style="
             display: flex;
@@ -63,7 +60,7 @@
           </n-button>
         </div>
       </th>
-    </transition-group>
+    </tr>
   </thead>
 </template>
 
@@ -85,7 +82,10 @@ const tableHeaders = computed<TableHeader[]>(
 const draggableList = reactive<DraggableList>(new DraggableList("headers"));
 async function dropCallback(index: number, itemIndex: number) {
   try {
-    await store.dispatch("table/swapColumns", { indexFirst: index, indexSecond: itemIndex });
+    await store.dispatch("table/swapColumns", {
+      indexFirst: index,
+      indexSecond: itemIndex
+    });
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -146,28 +146,11 @@ const themeVars = useThemeVars();
 </script>
 
 <style scoped lang="scss">
+@import "@/components/table/style.scss";
 th {
   padding: 0;
 }
-.draggable {
-  cursor: move;
-}
-.draggable.start {
-  opacity: 0.8;
-}
 .draggable.enter {
   border-bottom: 1px solid v-bind("themeVars.primaryColor");
-}
-
-.list-complete-item {
-  transition: all 0.5s ease;
-}
-.list-complete-enter-from,
-.list-complete-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-.list-complete-leave-active {
-  position: absolute;
 }
 </style>

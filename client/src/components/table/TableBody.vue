@@ -1,35 +1,32 @@
 <template>
   <tbody>
-    <transition-group name="list-complete">
-      <tr
-        v-for="(row, index) in tableRows"
-        :key="row.id"
-        :draggable="
-          index !== tableRows.length - 1 &&
-          store.getters['table/editableRowIndex'] !== index
+    <tr
+      v-for="(row, index) in tableRows"
+      :key="row.id"
+      :draggable="
+        index !== tableRows.length - 1 &&
+        store.getters['table/editableRowIndex'] !== index
+      "
+      @dragstart="draggableList.dragStartHandler($event, index)"
+      @dragend="draggableList.dragEndHandler($event)"
+      @drop.prevent="draggableList.dropHandler($event, index, dropCallback)"
+      v-on="{ dragover: index !== tableRows.length - 1 ? (event: Event) => event.preventDefault() : null }"
+      @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
+    >
+      <table-row-vue
+        :index="index"
+        :last="index === tableRows.length - 1"
+        :draggable-status="
+          index === draggableList.dragStartIndex
+            ? 'start'
+            : index === draggableList.dragEnterIndex
+            ? 'enter'
+            : undefined
         "
-        class="list-complete-item"
-        @dragstart="draggableList.dragStartHandler($event, index)"
-        @dragend="draggableList.dragEndHandler($event)"
-        @drop.prevent="draggableList.dropHandler($event, index, dropCallback)"
-        v-on="{ dragover: index !== tableRows.length - 1 ? (event: Event) => event.preventDefault() : null }"
-        @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
-      >
-        <table-row-vue
-          :index="index"
-          :last="index === tableRows.length - 1"
-          :draggable-status="
-            index === draggableList.dragStartIndex
-              ? 'start'
-              : index === draggableList.dragEnterIndex
-              ? 'enter'
-              : undefined
-          "
-          :data="row.cells"
-          @update="rowUpdateHandler(index)"
-        />
-      </tr>
-    </transition-group>
+        :data="row.cells"
+        @update="rowUpdateHandler(index)"
+      />
+    </tr>
   </tbody>
 </template>
 
@@ -66,17 +63,5 @@ async function rowUpdateHandler(rowIndex: number) {
 </script>
 
 <style scoped lang="scss">
-.list-complete-item {
-  transition: all 0.5s ease;
-}
-
-.list-complete-enter-from,
-.list-complete-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.list-complete-leave-active {
-  position: absolute;
-}
+@import "@/components/table/style.scss";
 </style>
