@@ -4,8 +4,8 @@
     class="list-complete-item"
     :class="{
       draggable: !last,
-      start: draggable === 'start',
-      enter: draggable === 'enter' && !last
+      start: draggableStatus === 'start',
+      enter: draggableStatus === 'enter' && !last
     }"
     style="padding: 0 0.3rem"
   >
@@ -22,13 +22,15 @@
       :key="cell.id"
       class="list-complete-item"
       style="padding: 0"
-      :draggable="true"
+      :draggable="store.getters['table/editableRowIndex'] !== index"
       @dragstart.prevent
     >
       <table-cell-vue
         :data="cell.data"
         :type="cell.type"
         @update="emit('update')"
+        @mouse-enter-cell="store.commit('table/setEditableRowIndex', { index: index })"
+        @mouse-leave-cell="store.commit('table/clearEditableRowIndex')"
       />
     </td>
   </transition-group>
@@ -76,7 +78,7 @@ import { useStore } from "@/store";
 const props = defineProps<{
   index: number;
   last: boolean;
-  draggable?: "enter" | "start";
+  draggableStatus?: "enter" | "start";
   data: TableCell[];
 }>();
 

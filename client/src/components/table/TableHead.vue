@@ -11,7 +11,7 @@
           start: index === draggableList.dragStartIndex,
           enter: index === draggableList.dragEnterIndex
         }"
-        :draggable="true"
+        :draggable="index !== store.getters['table/editableHeaderIndex']"
         @dragstart="draggableList.dragStartHandler($event, index)"
         @dragend="draggableList.dragEndHandler"
         @drop.prevent="draggableList.dropHandler($event, index, dropCallback)"
@@ -20,7 +20,7 @@
       >
         <table-header-vue
           :name="header.name"
-          :is-last="tableHeaders.length <= 1"
+          :index="index"
           @delete="deleteColumn(index)"
         />
       </th>

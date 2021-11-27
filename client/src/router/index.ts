@@ -60,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/table/:workspaceId/:tableId",
     name: "Table",
     props: true,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: false },
     component: () => import("@/views/TableView.vue")
   },
   {

@@ -3,7 +3,7 @@
     <tr
       v-for="(row, index) in tableRows"
       :key="row.id"
-      :draggable="index !== tableRows.length - 1"
+      :draggable="(index !== tableRows.length - 1) && (store.getters['table/editableRowIndex'] !== index)"
       name="list-complete"
       class="list-complete-item"
       @dragstart="draggableList.dragStartHandler($event, index)"
@@ -15,7 +15,7 @@
       <table-row-vue
         :index="index"
         :last="index === tableRows.length - 1"
-        :draggable="
+        :draggable-status="
           index === draggableList.dragStartIndex
             ? 'start'
             : index === draggableList.dragEnterIndex

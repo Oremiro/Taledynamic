@@ -63,5 +63,17 @@ export const mutations: MutationTree<TableState> = {
       state.rows[payload.rowIndex].cells[payload.indexSecond],
       state.rows[payload.rowIndex].cells[payload.indexFirst]
     ];
+  },
+  setEditableRowIndex(state: TableState, payload: { index: number }) {
+    state.editableRowIndex = payload.index;
+  },
+  clearEditableRowIndex(state: TableState) {
+    state.editableRowIndex = undefined;
+  },
+  setEditableHeaderIndex(state: TableState, payload: { index: number }) {
+    state.editableHeaderIndex = payload.index;
+  },
+  clearEditableHeaderIndex(state: TableState) {
+    state.editableHeaderIndex = undefined;
   }
 };

@@ -40,7 +40,7 @@ export interface WorkspacesState {
   workspaces: Workspace[];
   currentWorkspace: Workspace | null;
   sortType: WorkspacesSortType;
-  initStatus: InitializationStatus
+  initStatus: InitializationStatus;
 }
 
 export enum WorkspacesSortType {
@@ -51,6 +51,8 @@ export enum WorkspacesSortType {
 }
 
 export interface TableState {
-  headers: TableHeader[]
-  rows: TableRow[]
+  headers: TableHeader[];
+  rows: TableRow[];
+  editableRowIndex?: number;
+  editableHeaderIndex?: number;
 }

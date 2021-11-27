@@ -9,4 +9,10 @@ export const getters: GetterTree<TableState, State> = {
   rows(state: TableState): TableRow[] {
     return state.rows;
   },
+  editableRowIndex(state: TableState): number | undefined {
+    return state.editableRowIndex;
+  },
+  editableHeaderIndex(state: TableState): number | undefined {
+    return state.editableHeaderIndex;
+  }
 };

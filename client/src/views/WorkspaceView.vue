@@ -12,7 +12,7 @@
             </div>
           </template>
           <template #extra>
-            <div style="display: flex; gap: 0.5rem">
+            <div v-if="tablesListRef?.tables.length !== 0" style="display: flex; gap: 0.5rem">
               <n-button text @click="isTablesEditable = !isTablesEditable">
                 <n-icon size="1.2rem">
                   <edit-icon />
