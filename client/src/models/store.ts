@@ -1,5 +1,5 @@
 import { InitializationStatus } from "@/models";
-import { TableHeader, TableRow } from "@/models/table";
+import { TableHeader, TableRow, TableRowsSortType } from "@/models/table";
 
 export interface User {
   id: number | null;
@@ -50,9 +50,15 @@ export enum WorkspacesSortType {
   DateDescending
 }
 
+export interface TableSortStatus {
+  index: number;
+  type: TableRowsSortType;
+}
+
 export interface TableState {
   headers: TableHeader[];
   rows: TableRow[];
   editableRowIndex?: number;
   editableHeaderIndex?: number;
+  sortStatus?: TableSortStatus
 }

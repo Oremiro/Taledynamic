@@ -46,7 +46,6 @@ import { ref, computed, watch, onMounted } from "vue";
 import {
   SelectGroupOption,
   SelectOption,
-  NPopselect,
   NScrollbar,
   NEmpty
 } from "naive-ui";

@@ -20,13 +20,12 @@
       >
         <table-header-vue :index="index" @delete="deleteColumn(index)" />
       </th>
-      <th>
+      <th :style="!isCreatingInputShown ? { width: '3rem'} : {}">
         <div
           style="
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 2.75rem;
           "
         >
           <n-form-item
@@ -49,9 +48,9 @@
           </n-form-item>
           <n-button
             v-else
-            circle
+            style="padding: 0 0.3rem"
             size="small"
-            quaternary
+            ghost
             @click="showCreatingInput"
           >
             <n-icon size="1.2rem">

@@ -87,6 +87,7 @@ export const actions: ActionTree<TableState, State> = {
       throw new Error("Indexes are the same");
     }
     commit("swapRows", payload);
+    commit("clearSortStatus");
   },
   async sortRows(
     { commit, state },
@@ -96,6 +97,7 @@ export const actions: ActionTree<TableState, State> = {
       throw new Error("Index is out of range");
     }
     commit("sortRows", payload);
+    commit("setSortStatus", { index: payload.index, type: payload.sortType });
   }
   // async updateHeader() {}
 };

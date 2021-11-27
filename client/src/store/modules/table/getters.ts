@@ -1,4 +1,4 @@
-import { State, TableState } from "@/models/store";
+import { State, TableSortStatus, TableState } from "@/models/store";
 import { TableHeader, TableRow } from "@/models/table";
 import { GetterTree } from "vuex";
 
@@ -14,5 +14,8 @@ export const getters: GetterTree<TableState, State> = {
   },
   editableHeaderIndex(state: TableState): number | undefined {
     return state.editableHeaderIndex;
+  },
+  sortStatus(state: TableState): TableSortStatus | undefined {
+    return state.sortStatus;
   }
 };

@@ -45,7 +45,7 @@
             style="padding: 0 0.3rem"
             type="error"
             size="small"
-            quaternary
+            secondary
           >
             <n-icon size="1.1rem">
               <delete-icon />
@@ -56,13 +56,30 @@
       </n-popconfirm>
     </div>
     <n-button
-      style="padding: 0 0.3rem"
-      quaternary
       size="small"
+      secondary
+      :type="tableSortStatus?.index === index ? 'success' : 'default'"
+      style="padding: 0 0.3rem"
       @click="sortRows"
     >
-      <n-icon size="1.1rem">
-        <arrow-sort-icon />
+      <n-icon
+        v-if="tableSortStatus?.index === index"
+        size="1.1rem"
+        :style="{
+          transform:
+            tableSortStatus?.type === 0 ? 'scale(-1, -1)' : 'scale(-1, 1)'
+        }"
+      >
+        <lines-sort-icon />
+      </n-icon>
+      <n-icon
+        v-else
+        size="1.1rem"
+        :style="{
+          transform: `scale(-1, -1)`
+        }"
+      >
+        <lines-unsort-icon />
       </n-icon>
     </n-button>
   </div>
@@ -71,10 +88,16 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useThemeVars, NPopconfirm } from "naive-ui";
-import { ArrowSortIcon, DeleteIcon, ErrorCircleIcon } from "@/components/icons";
+import {
+  DeleteIcon,
+  ErrorCircleIcon,
+  LinesSortIcon,
+  LinesUnsortIcon
+} from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
 import { TableHeader, TableRowsSortType } from "@/models/table";
+import { TableSortStatus } from "@/models/store";
 
 const props = defineProps<{
   index: number;
@@ -90,11 +113,24 @@ const header = computed<TableHeader>(
 );
 const isConfirmShown = ref<boolean>(false);
 
+const tableSortStatus = computed<TableSortStatus | undefined>(
+  () => store.getters["table/sortStatus"]
+);
+
 async function sortRows(): Promise<void> {
   try {
+    let sortType: TableRowsSortType;
+    if (props.index === tableSortStatus.value?.index) {
+      sortType =
+        tableSortStatus.value.type === TableRowsSortType.Ascending
+          ? TableRowsSortType.Descending
+          : TableRowsSortType.Ascending;
+    } else {
+      sortType = TableRowsSortType.Ascending;
+    }
     await store.dispatch("table/sortRows", {
       index: props.index,
-      sortType: TableRowsSortType.Ascending
+      sortType: sortType
     });
   } catch (error) {
     if (error instanceof Error) {

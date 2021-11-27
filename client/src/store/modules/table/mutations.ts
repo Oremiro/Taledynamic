@@ -134,5 +134,17 @@ export const mutations: MutationTree<TableState> = {
     if (emptyRow !== undefined) {
       state.rows.push(emptyRow);
     }
+  },
+  setSortStatus(
+    state: TableState,
+    payload: { index: number; type: TableRowsSortType }
+  ): void {
+    state.sortStatus = {
+      index: payload.index,
+      type: payload.type
+    };
+  },
+  clearSortStatus(state: TableState) {
+    state.sortStatus = undefined;
   }
 };

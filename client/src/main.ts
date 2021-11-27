@@ -38,7 +38,8 @@ import {
   NButtonGroup,
   NLoadingBarProvider,
   NLayoutSider,
-  NPopconfirm
+  NPopconfirm,
+  NPopselect
 } from "naive-ui";
 
 const naive = create({
@@ -76,7 +77,8 @@ const naive = create({
     NButtonGroup,
     NLoadingBarProvider,
     NLayoutSider,
-    NPopconfirm
+    NPopconfirm,
+    NPopselect
   ]
 });
 

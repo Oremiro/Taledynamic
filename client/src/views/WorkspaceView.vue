@@ -55,8 +55,7 @@ import {
   NDivider,
   NSkeleton,
   SelectOption,
-  SelectGroupOption,
-  NPopselect
+  SelectGroupOption
 } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
