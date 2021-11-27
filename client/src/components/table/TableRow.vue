@@ -1,7 +1,6 @@
 <template>
   <th
     scope="row"
-    class="list-complete-item"
     :class="{
       draggable: !last,
       start: draggableStatus === 'start',

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <n-table style="width: auto" :single-line="false">
+    <n-table :single-line="false">
       <table-head-vue />
       <table-body-vue />
     </n-table>
@@ -44,13 +44,7 @@ const tableRows: TableRow[] = [
     new TableCell("Ноутбук", TableDataType.Text),
     new TableCell(100000, TableDataType.Number),
     new TableCell(1, TableDataType.Number),
-    new TableCell(new Date(Date.now()), TableDataType.Date)
-  ]),
-  new TableRow([
-    new TableCell("", TableDataType.Text),
-    new TableCell("", TableDataType.Number),
-    new TableCell("", TableDataType.Number),
-    new TableCell("", TableDataType.Date)
+    new TableCell(new Date(2021, 1, 10), TableDataType.Date)
   ])
 ];
 

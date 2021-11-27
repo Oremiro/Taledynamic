@@ -10,7 +10,7 @@
   >
     <div style="display: flex; gap: 0.5rem; align-items: center">
       <n-input
-        v-model:value="headerName"
+        v-model:value="header.name"
         autosize
         size="small"
         placeholder=""
@@ -18,10 +18,15 @@
           'background-color': themeVars.tableHeaderColor,
           'max-width': '10rem'
         }"
-        @mouseenter="store.commit('table/setEditableHeaderIndex', { index: index })"
+        @mouseenter="
+          store.commit('table/setEditableHeaderIndex', { index: index })
+        "
         @mouseleave="store.commit('table/clearEditableHeaderIndex')"
       />
-      <n-popconfirm v-if="store.getters['table/headers'].length > 1" v-model:show="isConfirmShown">
+      <n-popconfirm
+        v-if="store.getters['table/headers'].length > 1"
+        v-model:show="isConfirmShown"
+      >
         <template #icon>
           <n-icon :color="themeVars.errorColor">
             <error-circle-icon />
@@ -50,23 +55,28 @@
         <div>Удалить колонку?</div>
       </n-popconfirm>
     </div>
-    <n-button style="padding: 0 0.3rem" quaternary size="small">
+    <n-button
+      style="padding: 0 0.3rem"
+      quaternary
+      size="small"
+      @click="sortRows"
+    >
       <n-icon size="1.1rem">
-        <arrow-sort-icon></arrow-sort-icon>
+        <arrow-sort-icon />
       </n-icon>
     </n-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useThemeVars, NPopconfirm } from "naive-ui";
 import { ArrowSortIcon, DeleteIcon, ErrorCircleIcon } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
+import { TableHeader, TableRowsSortType } from "@/models/table";
 
 const props = defineProps<{
-  name: string;
   index: number;
 }>();
 
@@ -74,9 +84,24 @@ const emit = defineEmits<{
   (e: "delete"): void;
 }>();
 
-const headerName = ref<string>(props.name);
-const isConfirmShown = ref<boolean>(false);
 const store = useStore();
+const header = computed<TableHeader>(
+  () => store.getters["table/headers"][props.index]
+);
+const isConfirmShown = ref<boolean>(false);
+
+async function sortRows(): Promise<void> {
+  try {
+    await store.dispatch("table/sortRows", {
+      index: props.index,
+      sortType: TableRowsSortType.Ascending
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+  }
+}
 
 const themeVars = useThemeVars();
 </script>

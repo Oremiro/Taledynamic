@@ -1,14 +1,23 @@
 import { MutationTree } from "vuex";
 import { TableState } from "@/models/store";
-import { TableRow, TableHeader, TableCell } from "@/models/table";
+import {
+  TableRow,
+  TableHeader,
+  TableCell,
+  TableDataType,
+  TableRowsSortType
+} from "@/models/table";
 
 export const mutations: MutationTree<TableState> = {
   setTable(
     state: TableState,
     payload: { rows: TableRow[]; headers: TableHeader[] }
   ): void {
-    state.rows = payload.rows;
     state.headers = payload.headers;
+    state.rows = payload.rows;
+    state.rows.push(
+      new TableRow(payload.headers.map((item) => new TableCell("", item.type)))
+    );
   },
   pushRow(state: TableState, payload: { row: TableRow }): void {
     state.rows.push(payload.row);
@@ -64,16 +73,66 @@ export const mutations: MutationTree<TableState> = {
       state.rows[payload.rowIndex].cells[payload.indexFirst]
     ];
   },
-  setEditableRowIndex(state: TableState, payload: { index: number }) {
+  setEditableRowIndex(state: TableState, payload: { index: number }): void {
     state.editableRowIndex = payload.index;
   },
-  clearEditableRowIndex(state: TableState) {
+  clearEditableRowIndex(state: TableState): void {
     state.editableRowIndex = undefined;
   },
-  setEditableHeaderIndex(state: TableState, payload: { index: number }) {
+  setEditableHeaderIndex(state: TableState, payload: { index: number }): void {
     state.editableHeaderIndex = payload.index;
   },
-  clearEditableHeaderIndex(state: TableState) {
+  clearEditableHeaderIndex(state: TableState): void {
     state.editableHeaderIndex = undefined;
+  },
+  sortRows(
+    state: TableState,
+    payload: { index: number; sortType: TableRowsSortType }
+  ): void {
+    const direction: number =
+      payload.sortType === TableRowsSortType.Ascending ? 1 : -1;
+    const headerType: TableDataType = state.headers[payload.index].type;
+    const emptyRow: TableRow | undefined = state.rows.pop();
+    switch (headerType) {
+      case TableDataType.Text: {
+        state.rows.sort((itemFirst, itemSecond) => {
+          const textFirst = itemFirst.cells[payload.index].data;
+          const textSecond = itemSecond.cells[payload.index].data;
+          if (typeof textFirst === "string" && typeof textSecond === "string") {
+            return textFirst.localeCompare(textSecond) * direction;
+          }
+          return 0;
+        });
+        break;
+      }
+      case TableDataType.Number: {
+        state.rows.sort((itemFirst, itemSecond) => {
+          const numberFirst = itemFirst.cells[payload.index].data;
+          const numberSecond = itemSecond.cells[payload.index].data;
+          if (
+            typeof numberFirst === "number" &&
+            typeof numberSecond === "number"
+          ) {
+            return (numberFirst - numberSecond) * direction;
+          }
+          return 0;
+        });
+        break;
+      }
+      case TableDataType.Date: {
+        state.rows.sort((itemFirst, itemSecond) => {
+          const dateFirst = itemFirst.cells[payload.index].data;
+          const dateSecond = itemSecond.cells[payload.index].data;
+          if (dateFirst instanceof Date && dateSecond instanceof Date) {
+            return (dateFirst.getTime() - dateSecond.getTime()) * direction;
+          }
+          return 0;
+        });
+        break;
+      }
+    }
+    if (emptyRow !== undefined) {
+      state.rows.push(emptyRow);
+    }
   }
 };

@@ -5,6 +5,11 @@ export enum TableDataType {
   Attachment
 }
 
+export enum TableRowsSortType {
+  Ascending,
+  Descending
+}
+
 export class TableCell {
   readonly id: symbol;
   data: string | number | Date;

@@ -19,7 +19,6 @@
         @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
       >
         <table-header-vue
-          :name="header.name"
           :index="index"
           @delete="deleteColumn(index)"
         />

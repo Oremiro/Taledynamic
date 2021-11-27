@@ -3,17 +3,17 @@ import {
   TableCell,
   TableRow,
   TableHeader,
-  TableDataType
+  TableDataType,
+  TableRowsSortType
 } from "@/models/table";
 import { ActionTree } from "vuex";
 
 export const actions: ActionTree<TableState, State> = {
   async addRow({ state, commit }) {
-    const cells: TableCell[] = [];
-    for (const header of state.headers) {
-      cells.push(new TableCell("", header.type));
-    }
-    commit("pushRow", { row: new TableRow(cells) });
+    const row: TableRow = new TableRow(
+      state.headers.map((item) => new TableCell("", item.type))
+    );
+    commit("pushRow", { row: row });
   },
   async deleteRow({ commit, state }, payload: { index: number }) {
     if (payload.index < 0 || payload.index > state.rows.length - 1) {
@@ -88,5 +88,14 @@ export const actions: ActionTree<TableState, State> = {
     }
     commit("swapRows", payload);
   },
+  async sortRows(
+    { commit, state },
+    payload: { index: number; sortType: TableRowsSortType }
+  ) {
+    if (payload.index < 0 || payload.index > state.headers.length - 1) {
+      throw new Error("Index is out of range");
+    }
+    commit("sortRows", payload);
+  }
   // async updateHeader() {}
 };
