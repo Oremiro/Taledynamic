@@ -1,31 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{80597B18-2604-459A-AFE4-693AF24CA2D7}"
+	ProjectSection(SolutionItems) = preProject
+		..\credentials.json = ..\credentials.json
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taledynamic.Api", "Taledynamic.Api\Taledynamic.Api.csproj", "{5E7C77B2-F57B-4C4F-A204-EDD93B2C8D79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taledynamic.Api", "Taledynamic.Api\Taledynamic.Api.csproj", "{5E7C77B2-F57B-4C4F-A204-EDD93B2C8D79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taledynamic.Core", "Taledynamic.Core\Taledynamic.Core.csproj", "{10C7703B-4F5A-42EE-89CD-F324B82685D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taledynamic.Core", "Taledynamic.Core\Taledynamic.Core.csproj", "{10C7703B-4F5A-42EE-89CD-F324B82685D5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{081D5CDE-5308-4B95-A335-090ED2D8D5CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "tests\Core\Core.csproj", "{F339E6D9-1610-4A33-B059-D470EFE891D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "tests\Core\Core.csproj", "{F339E6D9-1610-4A33-B059-D470EFE891D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taledynamic.DAL", "Taledynamic.DAL\Taledynamic.DAL.csproj", "{D3AA70D4-EF79-44B5-84B5-BB1A99D2AD0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taledynamic.DAL", "Taledynamic.DAL\Taledynamic.DAL.csproj", "{D3AA70D4-EF79-44B5-84B5-BB1A99D2AD0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleDynamicBot", "Taledynamic.Bot\TaleDynamicBot.csproj", "{F2C121DD-14F2-460C-9380-E94CB38B82A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleDynamicBot", "Taledynamic.Bot\TaleDynamicBot.csproj", "{F2C121DD-14F2-460C-9380-E94CB38B82A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taledynamic.Sheets", "TaleDynamic.Sheets\Taledynamic.Sheets.csproj", "{7CEEFB12-1CD1-49CD-9BE9-002D99F46929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5E7C77B2-F57B-4C4F-A204-EDD93B2C8D79} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
-		{10C7703B-4F5A-42EE-89CD-F324B82685D5} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
-		{081D5CDE-5308-4B95-A335-090ED2D8D5CF} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
-		{F339E6D9-1610-4A33-B059-D470EFE891D2} = {081D5CDE-5308-4B95-A335-090ED2D8D5CF}
-		{D3AA70D4-EF79-44B5-84B5-BB1A99D2AD0D} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
-		{F2C121DD-14F2-460C-9380-E94CB38B82A1} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5E7C77B2-F57B-4C4F-A204-EDD93B2C8D79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -48,5 +48,24 @@ Global
 		{F2C121DD-14F2-460C-9380-E94CB38B82A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2C121DD-14F2-460C-9380-E94CB38B82A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2C121DD-14F2-460C-9380-E94CB38B82A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CEEFB12-1CD1-49CD-9BE9-002D99F46929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CEEFB12-1CD1-49CD-9BE9-002D99F46929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CEEFB12-1CD1-49CD-9BE9-002D99F46929}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CEEFB12-1CD1-49CD-9BE9-002D99F46929}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5E7C77B2-F57B-4C4F-A204-EDD93B2C8D79} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
+		{10C7703B-4F5A-42EE-89CD-F324B82685D5} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
+		{081D5CDE-5308-4B95-A335-090ED2D8D5CF} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
+		{F339E6D9-1610-4A33-B059-D470EFE891D2} = {081D5CDE-5308-4B95-A335-090ED2D8D5CF}
+		{D3AA70D4-EF79-44B5-84B5-BB1A99D2AD0D} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
+		{F2C121DD-14F2-460C-9380-E94CB38B82A1} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
+		{7CEEFB12-1CD1-49CD-9BE9-002D99F46929} = {80597B18-2604-459A-AFE4-693AF24CA2D7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD9315C6-E356-4F15-9D4D-5C393173F26C}
 	EndGlobalSection
 EndGlobal
