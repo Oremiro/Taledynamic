@@ -18,6 +18,7 @@
           'background-color': themeVars.tableHeaderColor,
           'max-width': '10rem'
         }"
+        @update:value="nameUpdateHandler"
         @mouseenter="
           store.commit('table/setEditableHeaderIndex', { index: index })
         "
@@ -98,6 +99,7 @@ import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
 import { TableHeader, TableRowsSortType } from "@/models/table";
 import { TableSortStatus } from "@/models/store";
+import { debounce } from "@/helpers";
 
 const props = defineProps<{
   index: number;
@@ -138,6 +140,16 @@ async function sortRows(): Promise<void> {
     }
   }
 }
+
+const nameUpdateHandler = debounce(async (value: string): Promise<void> => {
+  try {
+    await store.dispatch("table/updateHeader", { index: props.index, name: value });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    }
+  }
+}, 2000);
 
 const themeVars = useThemeVars();
 </script>

@@ -16,7 +16,7 @@
     </div>
   </th>
   <td
-    v-for="cell in data"
+    v-for="(cell, cellIndex) in data"
     :key="cell.id"
     style="padding: 0"
     :draggable="store.getters['table/editableRowIndex'] !== index"
@@ -25,8 +25,11 @@
     <table-cell-vue
       :data="cell.data"
       :type="cell.type"
-      @update="emit('update')"
-      @mouse-enter-cell="store.commit('table/setEditableRowIndex', { index: index })"
+      :index="cellIndex"
+      @update="cellUpdateHandler"
+      @mouse-enter-cell="
+        store.commit('table/setEditableRowIndex', { index: index })
+      "
       @mouse-leave-cell="store.commit('table/clearEditableRowIndex')"
     />
   </td>
@@ -70,6 +73,7 @@ import TableCellVue from "@/components/table/TableCell.vue";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { TableCell } from "@/models/table";
 import { useStore } from "@/store";
+import { debounce } from "@/helpers";
 
 const props = defineProps<{
   index: number;
@@ -88,6 +92,35 @@ async function deleteRow() {
   await store.dispatch("table/deleteRow", { index: props.index });
 }
 const isConfirmDeletionShown = ref<boolean>(false);
+
+const cellsUpdates = ref<Map<number, string | number | Date>>(new Map());
+
+const updateStoredCells = debounce(async (): Promise<void> => {
+  for (const [key, value] of cellsUpdates.value) {
+    try {
+      await store.dispatch("table/updateCell", {
+        rowIndex: props.index,
+        cellIndex: key,
+        data: value
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      }
+    }
+  }
+  cellsUpdates.value.clear();
+}, 2000);
+
+async function cellUpdateHandler(
+  index: number,
+  data: string | number | Date
+): Promise<void> {
+  emit("update");
+  cellsUpdates.value?.set(index, data);
+  await updateStoredCells();
+}
+
 const themeVars = useThemeVars();
 </script>
 

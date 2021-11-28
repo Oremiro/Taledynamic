@@ -40,6 +40,42 @@ export const mutations: MutationTree<TableState> = {
   deleteHeader(state: TableState, payload: { index: number }): void {
     state.headers.splice(payload.index, 1);
   },
+  updateHeader(
+    state: TableState,
+    payload: { index: number; name?: string; type?: TableDataType }
+  ): void {
+    if (payload.index < 0 || payload.index > state.headers.length - 1) {
+      throw new Error("Index is out of range");
+    }
+    if (payload.name !== undefined) {
+      state.headers[payload.index].name = payload.name;
+    }
+    if (payload.type !== undefined) {
+      state.headers[payload.index].type = payload.type;
+    }
+  },
+  updateCell(
+    state: TableState,
+    payload: {
+      rowIndex: number;
+      cellIndex: number;
+      data?: string;
+      type?: TableDataType;
+    }
+  ) {
+    if (payload.rowIndex < 0 || payload.rowIndex > state.rows.length - 1) {
+      throw new Error("Row index is out of range");
+    }
+    if (payload.cellIndex < 0 || payload.cellIndex > state.headers.length - 1) {
+      throw new Error("Cell index is out of range");
+    }
+    if (payload.data !== undefined) {
+      state.rows[payload.rowIndex].cells[payload.cellIndex].data = payload.data;
+    }
+    if (payload.type !== undefined) {
+      state.rows[payload.rowIndex].cells[payload.cellIndex].type = payload.type;
+    }
+  },
   swapHeaders(
     state: TableState,
     payload: { indexFirst: number; indexSecond: number }

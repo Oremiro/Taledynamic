@@ -8,7 +8,7 @@
       v-if="type === 0"
       v-model:value="cellDataText"
       placeholder=""
-      @update:value="emit('update', cellDataText)"
+      @update:value="dataUpdateHandler(cellDataText)"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
@@ -17,7 +17,7 @@
       v-model:value="cellDataNumber"
       :show-button="false"
       placeholder=""
-      @update:value="emit('update', cellDataNumber)"
+      @update:value="dataUpdateHandler(cellDataNumber)"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
@@ -28,7 +28,7 @@
       :first-day-of-week="0"
       placeholder=""
       format="dd.MM.yyyy"
-      @update:value="emit('update', cellDataDate)"
+      @update:value="dataUpdateHandler(cellDataDate)"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
@@ -46,13 +46,14 @@ import {
 import { TableDataType } from "@/models/table";
 
 const emit = defineEmits<{
-  (e: "update", data?: string | number | Date): void;
+  (e: "update", index: number, data: string | number | Date): void;
   (e: "mouseEnterCell"): void;
   (e: "mouseLeaveCell"): void;
 }>();
 
 const props = defineProps<{
   data?: string | number | Date;
+  index: number;
   type: TableDataType;
 }>();
 
@@ -85,6 +86,16 @@ const lightThemeOverrides = reactive<GlobalThemeOverrides>({
     border: "none"
   }
 });
+
+function dataUpdateHandler(data?: string | number): void {
+  let normalizedData: string | number | Date;
+  if (props.type === TableDataType.Date && typeof data === "number" ) {
+    normalizedData = new Date(data);
+  } else {
+    normalizedData = data ?? "";
+  }
+  emit("update", props.index, normalizedData);
+}
 
 const themeVars = useThemeVars();
 </script>

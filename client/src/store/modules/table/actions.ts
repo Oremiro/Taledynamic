@@ -98,6 +98,31 @@ export const actions: ActionTree<TableState, State> = {
     }
     commit("sortRows", payload);
     commit("setSortStatus", { index: payload.index, type: payload.sortType });
+  },
+  async updateHeader(
+    { state, commit },
+    payload: { index: number; name?: string; type?: TableDataType }
+  ) {
+    commit("updateHeader", payload);
+    if (payload.type !== undefined) {
+      for (let rowIndex = 0; rowIndex < state.rows.length; rowIndex++) {
+        commit("updateCell", {
+          rowIndex: rowIndex,
+          cellIndex: payload.index,
+          type: payload.type,
+          data: ""
+        });
+      }
+    }
+  },
+  async updateCell(
+    { commit },
+    payload: {
+      rowIndex: number;
+      cellIndex: number;
+      data: string | number | Date;
+    }
+  ) {
+    commit("updateCell", payload);
   }
-  // async updateHeader() {}
 };
