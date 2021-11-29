@@ -71,7 +71,7 @@ namespace Taledynamic.Sheets
             update.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
             UpdateValuesResponse response = update.Execute();
 
-            Console.WriteLine(response.UpdatedCells);
+            //Console.WriteLine(response.UpdatedCells);
         }
 
         public static void AppendCell(SheetsService service, String spreadsheetId, string tableNum, string range, string Value = "")
@@ -80,6 +80,7 @@ namespace Taledynamic.Sheets
 
             var cellData = new List<object>() { Value };
             ValueRange valueRange = new ValueRange();
+            valueRange.MajorDimension = "ROWS";
             valueRange.Values = new List<IList<object>> { cellData };
 
             SpreadsheetsResource.ValuesResource.AppendRequest append =
@@ -89,7 +90,7 @@ namespace Taledynamic.Sheets
             append.InsertDataOption = SpreadsheetsResource.ValuesResource.AppendRequest.InsertDataOptionEnum.INSERTROWS;
             AppendValuesResponse response = append.Execute();
 
-            Console.WriteLine(JsonConvert.SerializeObject(response));
+            //Console.WriteLine(JsonConvert.SerializeObject(response));
 
         }
 
@@ -100,8 +101,7 @@ namespace Taledynamic.Sheets
             SpreadsheetsResource.ValuesResource.ClearRequest request = service.Spreadsheets.Values.Clear(requestBody, spreadsheetId, rangeClear);
             ClearValuesResponse response = request.Execute();
 
-            Console.WriteLine(JsonConvert.SerializeObject(response));
-
+            //Console.WriteLine(JsonConvert.SerializeObject(response));
         }
 
         static void Main(string[] args)
@@ -110,7 +110,7 @@ namespace Taledynamic.Sheets
 
             using (var stream = new FileStream("../../credentials.json", FileMode.Open, FileAccess.Read))
             {
-                string credPath = "token.json";
+                string credPath = "../../token.json";
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.FromStream(stream).Secrets,
                     Scopes,
@@ -125,28 +125,19 @@ namespace Taledynamic.Sheets
                 ApplicationName = ApplicationName,
             });
 
+            // jude // tale // natan // projes
+            String spreadsheetId = "13WUMGvFSi2iOeudxSsAULafgQRegoHy40hSp3dLTkn8"; 
+            //String spreadsheetId = "1PbrrUAO-TTPs4fFyx590Io7VO-Erlntbomg0rEqq6G4"; 
+            //String spreadsheetId = "1_4yQUfmsUeJHZOjFYERoZe1wZtWeqIOpijbZ6lULKJI"; 
+            //String spreadsheetId = "14JxSgVtHnJwfoXBzU7m3hCdeSU-4D_TyWDY86-h5lvc"; 
 
-            //String spreadsheetId = "13WUMGvFSi2iOeudxSsAULafgQRegoHy40hSp3dLTkn8"; ///
-            String spreadsheetId = "1PbrrUAO-TTPs4fFyx590Io7VO-Erlntbomg0rEqq6G4";
-            //String spreadsheetId = "1_4yQUfmsUeJHZOjFYERoZe1wZtWeqIOpijbZ6lULKJI";
-            //String spreadsheetId = "14JxSgVtHnJwfoXBzU7m3hCdeSU-4D_TyWDY86-h5lvc";
+            
+            UpdateCell(service, spreadsheetId, "Лист1", "B4", "It's WOR;K");
 
-            //GetAllTable(service, spreadsheetId, "Лист1");
+            AppendCell(service, spreadsheetId, "Лист1", "C2", "ya;y");
 
-            UpdateCell(service, spreadsheetId, "Лист1", "B2", "Fuck you 2");
+            GetAllTable(service, spreadsheetId, "Лист1");
 
-
-
-
-            /*String rangeWrite2 = "Лист1!B2";
-
-            var cellsValues = new List<object>() { "Cell-Text" };
-            ValueRange valueRange2 = new ValueRange().Values = new List<IList<object>> { cellsValues };
-            SpreadsheetsResource.ValuesResource.AppendRequest append =
-                service.Spreadsheets.Values.Append(valueRange2, spreadsheetId, rangeWrite2);
-
-            append.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
-            AppendValuesResponse result2 = append.Execute();*/
 
 
         }
