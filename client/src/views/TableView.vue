@@ -1,18 +1,13 @@
 <template>
-  <div class="container" style="padding: 2rem">
+  <div class="container">
     <n-table :single-line="false">
-      <table-head-vue :data="tableHeaders" @swap="swapTableHeadersItems" />
-      <table-body-vue
-        :data="tableRows"
-        :row-length="tableHeaders.length"
-        @swap="swapTableBodyItems"
-      />
+      <table-head-vue />
+      <table-body-vue />
     </n-table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from "vue";
 import { NTable } from "naive-ui";
 import {
   TableRow,
@@ -22,22 +17,23 @@ import {
 } from "@/models/table";
 import TableHeadVue from "@/components/table/TableHead.vue";
 import TableBodyVue from "@/components/table/TableBody.vue";
+import { useStore } from "@/store";
 
-const props = defineProps<{
+defineProps<{
   workspaceId: string;
   tableId: string;
 }>();
 
-const workspaceId = computed<number>(() => parseInt(props.workspaceId));
-const tableId = computed<number>(() => parseInt(props.tableId));
+// const workspaceId = computed<number>(() => parseInt(props.workspaceId));
+// const tableId = computed<number>(() => parseInt(props.tableId));
 
-const tableHeaders = reactive<Array<TableHeader>>([
+const tableHeaders: TableHeader[] = [
   new TableHeader("Товар", TableDataType.Text),
   new TableHeader("Стоимость", TableDataType.Number),
   new TableHeader("Количество", TableDataType.Number),
   new TableHeader("Дата производства", TableDataType.Date)
-]);
-const tableRows = reactive<Array<TableRow>>([
+];
+const tableRows: TableRow[] = [
   new TableRow([
     new TableCell("Пылесос", TableDataType.Text),
     new TableCell(20000, TableDataType.Number),
@@ -48,39 +44,11 @@ const tableRows = reactive<Array<TableRow>>([
     new TableCell("Ноутбук", TableDataType.Text),
     new TableCell(100000, TableDataType.Number),
     new TableCell(1, TableDataType.Number),
-    new TableCell(new Date(Date.now()), TableDataType.Date)
-  ]),
-  new TableRow([
-    new TableCell("", TableDataType.Text),
-    new TableCell("", TableDataType.Number),
-    new TableCell("", TableDataType.Number),
-    new TableCell("", TableDataType.Date)
+    new TableCell(new Date(2021, 1, 10), TableDataType.Date)
   ])
-]);
+];
 
-async function swapTableHeadersItems(
-  indexFirst: number,
-  indexSecond: number
-): Promise<void> {
-  [tableHeaders[indexFirst], tableHeaders[indexSecond]] = [
-    tableHeaders[indexSecond],
-    tableHeaders[indexFirst]
-  ];
-  for (let tableRow of tableRows) {
-    [tableRow.cells[indexFirst], tableRow.cells[indexSecond]] = [
-      tableRow.cells[indexSecond],
-      tableRow.cells[indexFirst]
-    ];
-  }
-}
+const store = useStore();
+store.commit("table/setTable", { headers: tableHeaders, rows: tableRows });
 
-async function swapTableBodyItems(
-  indexFirst: number,
-  indexSecond: number
-): Promise<void> {
-  [tableRows[indexFirst], tableRows[indexSecond]] = [
-    tableRows[indexSecond],
-    tableRows[indexFirst]
-  ];
-}
 </script>

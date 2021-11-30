@@ -1,71 +1,140 @@
 <template>
-  <n-config-provider :theme-overrides="themeVars.tableColor === '#fff' ? lightThemeOverrides : darkThemeOverrides">
+  <n-config-provider
+    :theme-overrides="
+      themeVars.tableColor === '#fff' ? lightThemeOverrides : darkThemeOverrides
+    "
+  >
     <n-input
       v-if="type === 0"
+      ref="textInputRef"
       v-model:value="cellDataText"
-      :bordered="false"
       placeholder=""
-      size="large"
+      :readonly="true"
+      @focus="showTextArea"
     />
+    <n-table
+      v-if="isTextAreaShown"
+      style="position: fixed; z-index: 1000"
+      :style="{
+        width: textInputRef?.$el.getBoundingClientRect().width + 'px',
+        top: textInputRef?.$el.getBoundingClientRect().top + 'px'
+      }"
+    >
+      <n-input
+        ref="textAreaInputRef"
+        v-model:value="cellDataText"
+        type="textarea"
+        :autosize="{
+          minRows: 3,
+          maxRows: 6
+        }"
+        placeholder=""
+        @update:value="dataUpdateHandler(cellDataText)"
+        @blur="hideTextArea"
+        @mouseenter="$emit('mouseEnterCell')"
+        @mouseleave="$emit('mouseLeaveCell')"
+      />
+    </n-table>
     <n-input-number
       v-if="type === 1"
       v-model:value="cellDataNumber"
-      :bordered="false"
-      :show-button="cellDataNumber !== undefined"
+      :show-button="false"
       placeholder=""
-      size="large"
+      @update:value="dataUpdateHandler(cellDataNumber)"
+      @mouseenter="$emit('mouseEnterCell')"
+      @mouseleave="$emit('mouseLeaveCell')"
     />
     <n-date-picker
       v-if="type === 2"
       v-model:value="cellDataDate"
-      :bordered="false"
+      :actions="[]"
       :first-day-of-week="0"
       placeholder=""
       format="dd.MM.yyyy"
-      size="large"
+      @update:value="dataUpdateHandler(cellDataDate)"
+      @mouseenter="$emit('mouseEnterCell')"
+      @mouseleave="$emit('mouseLeaveCell')"
     />
   </n-config-provider>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars  } from "naive-ui";
-import { TableDataType } from "@/models/table";
+import { ref, reactive, nextTick } from "vue";
+import {
+  NInputNumber,
+  NDatePicker,
+  GlobalThemeOverrides,
+  useThemeVars,
+  NInput,
+  NTable
+} from "naive-ui";
+import { TableData, TableDataType } from "@/models/table";
+
+const emit = defineEmits<{
+  (e: "update", index: number, data: TableData): void;
+  (e: "mouseEnterCell"): void;
+  (e: "mouseLeaveCell"): void;
+}>();
 
 const props = defineProps<{
-  data?: string | number | Date;
+  data: TableData;
+  index: number;
   type: TableDataType;
 }>();
 
-const cellDataText = ref<string>(
+const cellDataText = ref<string | null>(
   props.type === TableDataType.Text && typeof props.data === "string"
     ? props.data
-    : ""
+    : null
 );
-const cellDataNumber = ref<number | undefined>(
+const cellDataNumber = ref<number | null>(
   props.type === TableDataType.Number && typeof props.data === "number"
     ? props.data
-    : undefined
+    : null
 );
-const cellDataDate = ref<number | undefined>(
+const cellDataDate = ref<number | null>(
   props.type === TableDataType.Date && props.data instanceof Date
     ? props.data.getTime()
-    : undefined
+    : null
 );
 // const cellDataAttachment = ref<string>();
 
 const darkThemeOverrides = reactive<GlobalThemeOverrides>({
   Input: {
-    color: 'rgb(24, 24, 28)',
+    color: "rgb(24, 24, 28)"
   }
 });
 
 const lightThemeOverrides = reactive<GlobalThemeOverrides>({
   Input: {
-    color: '#fff',
-    border: 'none'
+    color: "#fff",
+    border: "none"
   }
 });
+
+function dataUpdateHandler(data: string | number | null): void {
+  let normalizedData: TableData;
+  if (props.type === TableDataType.Date && typeof data === "number") {
+    normalizedData = new Date(data);
+  } else {
+    normalizedData = data;
+  }
+  emit("update", props.index, normalizedData);
+}
+
+const isTextAreaShown = ref<boolean>(false);
+const textAreaInputRef = ref<InstanceType<typeof NInput>>();
+const textInputRef = ref<InstanceType<typeof NInput>>();
+
+async function showTextArea() {
+  isTextAreaShown.value = true;
+  await nextTick();
+  textAreaInputRef.value?.focus();
+}
+
+function hideTextArea() {
+  isTextAreaShown.value = false;
+}
 
 const themeVars = useThemeVars();
 </script>

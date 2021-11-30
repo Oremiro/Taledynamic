@@ -1,90 +1,67 @@
 <template>
-  <transition-group name="list-complete" tag="tbody">
-    <transition-group
+  <tbody>
+    <tr
       v-for="(row, index) in tableRows"
       :key="row.id"
-      :draggable="true"
-      tag="tr"
-      name="list-complete"
-      class="list-complete-item"
+      :draggable="
+        index !== tableRows.length - 1 &&
+        store.getters['table/editableRowIndex'] !== index
+      "
       @dragstart="draggableList.dragStartHandler($event, index)"
       @dragend="draggableList.dragEndHandler($event)"
       @drop.prevent="draggableList.dropHandler($event, index, dropCallback)"
-      @dragover.prevent
+      v-on="{ dragover: index !== tableRows.length - 1 ? (event: Event) => event.preventDefault() : null }"
       @dragenter.prevent="draggableList.dragEnterHandler($event, index)"
     >
-      <th
-        :key="0"
-        scope="row"
-        class="list-complete-item draggable"
-        :class="{
-          start: index === draggableList.dragStartIndex,
-          enter: index === draggableList.dragEnterIndex
-        }"
-      ></th>
-      <td
-        v-for="cell in row.cells"
-        :key="cell.id"
-        class="list-complete-item"
-        style="padding: 0"
-        :draggable="true"
-        @dragstart.prevent
-      >
-        <table-cell-vue :data="cell.data" :type="cell.type" />
-      </td>
-      <td :key="1"></td>
-    </transition-group>
-  </transition-group>
+      <table-row-vue
+        :index="index"
+        :last="index === tableRows.length - 1"
+        :draggable-status="
+          index === draggableList.dragStartIndex
+            ? 'start'
+            : index === draggableList.dragEnterIndex
+            ? 'enter'
+            : undefined
+        "
+        :data="row.cells"
+        @update="rowUpdateHandler(index)"
+      />
+    </tr>
+  </tbody>
 </template>
 
 <script setup lang="ts">
 import { reactive, computed } from "vue";
-import TableCellVue from "@/components/table/TableCell.vue";
 import { TableRow } from "@/models/table";
-import { useThemeVars } from "naive-ui";
 import { DraggableList } from "@/components/table/draggable";
+import TableRowVue from "@/components/table/TableRow.vue";
+import { useStore } from "@/store";
 
-const props = defineProps<{
-  data: TableRow[];
-  rowLength: number;
-}>();
-
-const emit = defineEmits<{
-  (e: "swap", indexFirst: number, indexSecond: number): void;
-}>();
-
-const tableRows = computed<TableRow[]>(() => props.data);
+const store = useStore();
+const tableRows = computed<TableRow[]>(() => store.getters["table/rows"]);
 
 const draggableList = reactive<DraggableList>(new DraggableList("rows"));
-function dropCallback(index: number, itemIndex: number) {
-  emit("swap", index, itemIndex);
+async function dropCallback(index: number, itemIndex: number) {
+  if (index === tableRows.value.length - 1) return;
+  try {
+    await store.dispatch("table/swapRows", {
+      indexFirst: index,
+      indexSecond: itemIndex
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+  }
 }
 
-const themeVars = useThemeVars();
+async function rowUpdateHandler(rowIndex: number) {
+  if (rowIndex === tableRows.value.length - 1) {
+    await store.dispatch("table/addRow");
+  }
+}
 </script>
 
 <style scoped lang="scss">
-.draggable {
-  cursor: move;
-}
-.draggable.start {
-  opacity: 0.8;
-}
-.draggable.enter {
-  border-left: 1px solid v-bind("themeVars.primaryColor");
-}
-
-.list-complete-item {
-  transition: all 0.8s ease;
-}
-
-.list-complete-enter-from,
-.list-complete-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.list-complete-leave-active {
-  position: absolute;
-}
+@import "@/components/table/style.scss";
 </style>

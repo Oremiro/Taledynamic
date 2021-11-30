@@ -166,6 +166,7 @@ watch(
 );
 
 defineExpose({
-  sortList
+  sortList,
+  tables
 });
 </script>
