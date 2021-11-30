@@ -4,14 +4,15 @@ import {
   TableRow,
   TableHeader,
   TableDataType,
-  TableRowsSortType
+  TableRowsSortType,
+TableData
 } from "@/models/table";
 import { ActionTree } from "vuex";
 
 export const actions: ActionTree<TableState, State> = {
   async addRow({ state, commit }) {
     const row: TableRow = new TableRow(
-      state.headers.map((item) => new TableCell("", item.type))
+      state.headers.map((item) => new TableCell(null, item.type))
     );
     commit("pushRow", { row: row });
   },
@@ -31,7 +32,7 @@ export const actions: ActionTree<TableState, State> = {
     for (let rowIndex = 0; rowIndex < state.rows.length; rowIndex++) {
       commit("pushCell", {
         rowIndex: rowIndex,
-        cell: new TableCell("", payload.type)
+        cell: new TableCell(null, payload.type)
       });
     }
   },
@@ -120,7 +121,7 @@ export const actions: ActionTree<TableState, State> = {
     payload: {
       rowIndex: number;
       cellIndex: number;
-      data: string | number | Date;
+      data: TableData;
     }
   ) {
     commit("updateCell", payload);

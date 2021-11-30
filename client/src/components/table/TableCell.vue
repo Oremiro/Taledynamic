@@ -68,34 +68,34 @@ import {
   NInput,
   NTable
 } from "naive-ui";
-import { TableDataType } from "@/models/table";
+import { TableData, TableDataType } from "@/models/table";
 
 const emit = defineEmits<{
-  (e: "update", index: number, data: string | number | Date): void;
+  (e: "update", index: number, data: TableData): void;
   (e: "mouseEnterCell"): void;
   (e: "mouseLeaveCell"): void;
 }>();
 
 const props = defineProps<{
-  data?: string | number | Date;
+  data: TableData;
   index: number;
   type: TableDataType;
 }>();
 
-const cellDataText = ref<string>(
+const cellDataText = ref<string | null>(
   props.type === TableDataType.Text && typeof props.data === "string"
     ? props.data
-    : ""
+    : null
 );
-const cellDataNumber = ref<number | undefined>(
+const cellDataNumber = ref<number | null>(
   props.type === TableDataType.Number && typeof props.data === "number"
     ? props.data
-    : undefined
+    : null
 );
-const cellDataDate = ref<number | undefined>(
+const cellDataDate = ref<number | null>(
   props.type === TableDataType.Date && props.data instanceof Date
     ? props.data.getTime()
-    : undefined
+    : null
 );
 // const cellDataAttachment = ref<string>();
 
@@ -112,12 +112,12 @@ const lightThemeOverrides = reactive<GlobalThemeOverrides>({
   }
 });
 
-function dataUpdateHandler(data?: string | number): void {
-  let normalizedData: string | number | Date;
+function dataUpdateHandler(data: string | number | null): void {
+  let normalizedData: TableData;
   if (props.type === TableDataType.Date && typeof data === "number") {
     normalizedData = new Date(data);
   } else {
-    normalizedData = data ?? "";
+    normalizedData = data;
   }
   emit("update", props.index, normalizedData);
 }

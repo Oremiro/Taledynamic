@@ -149,7 +149,7 @@ const nameUpdateHandler = debounce(async (value: string): Promise<void> => {
       console.log(error.message);
     }
   }
-}, 2000);
+}, 5000);
 
 const themeVars = useThemeVars();
 </script>

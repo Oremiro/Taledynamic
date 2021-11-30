@@ -5,6 +5,8 @@ export enum TableDataType {
   Attachment
 }
 
+export type TableData = string | number | Date | null;
+
 export enum TableRowsSortType {
   Ascending,
   Descending
@@ -12,10 +14,10 @@ export enum TableRowsSortType {
 
 export class TableCell {
   readonly id: symbol;
-  data: string | number | Date;
+  data: TableData;
   type: TableDataType;
 
-  constructor(data: string | number | Date, type: TableDataType) {
+  constructor(data: TableData, type: TableDataType) {
     this.id = Symbol("id");
     if (data instanceof Date) {
       this.data = new Date(data.getTime());

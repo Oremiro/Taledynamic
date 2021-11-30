@@ -16,7 +16,9 @@ export const mutations: MutationTree<TableState> = {
     state.headers = payload.headers;
     state.rows = payload.rows;
     state.rows.push(
-      new TableRow(payload.headers.map((item) => new TableCell("", item.type)))
+      new TableRow(
+        payload.headers.map((item) => new TableCell(null, item.type))
+      )
     );
   },
   pushRow(state: TableState, payload: { row: TableRow }): void {
@@ -132,8 +134,8 @@ export const mutations: MutationTree<TableState> = {
     switch (headerType) {
       case TableDataType.Text: {
         state.rows.sort((itemFirst, itemSecond) => {
-          const textFirst = itemFirst.cells[payload.index].data;
-          const textSecond = itemSecond.cells[payload.index].data;
+          const textFirst = itemFirst.cells[payload.index].data ?? "";
+          const textSecond = itemSecond.cells[payload.index].data ?? "";
           if (typeof textFirst === "string" && typeof textSecond === "string") {
             return textFirst.localeCompare(textSecond) * direction;
           }
@@ -145,6 +147,8 @@ export const mutations: MutationTree<TableState> = {
         state.rows.sort((itemFirst, itemSecond) => {
           const numberFirst = itemFirst.cells[payload.index].data;
           const numberSecond = itemSecond.cells[payload.index].data;
+          if (numberFirst === null) return -direction;
+          if (numberSecond === null) return direction;
           if (
             typeof numberFirst === "number" &&
             typeof numberSecond === "number"
@@ -159,6 +163,8 @@ export const mutations: MutationTree<TableState> = {
         state.rows.sort((itemFirst, itemSecond) => {
           const dateFirst = itemFirst.cells[payload.index].data;
           const dateSecond = itemSecond.cells[payload.index].data;
+          if (dateFirst === null) return -direction;
+          if (dateSecond === null) return direction;
           if (dateFirst instanceof Date && dateSecond instanceof Date) {
             return (dateFirst.getTime() - dateSecond.getTime()) * direction;
           }

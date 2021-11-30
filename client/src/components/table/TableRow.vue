@@ -71,7 +71,7 @@ import { NPopconfirm, useThemeVars } from "naive-ui";
 import { AddIcon, DeleteIcon, ErrorCircleIcon } from "@/components/icons";
 import TableCellVue from "@/components/table/TableCell.vue";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
-import { TableCell } from "@/models/table";
+import { TableCell, TableData } from "@/models/table";
 import { useStore } from "@/store";
 import { debounce } from "@/helpers";
 
@@ -93,7 +93,7 @@ async function deleteRow() {
 }
 const isConfirmDeletionShown = ref<boolean>(false);
 
-const cellsUpdates = ref<Map<number, string | number | Date>>(new Map());
+const cellsUpdates = ref<Map<number, TableData>>(new Map());
 
 const updateStoredCells = debounce(async (): Promise<void> => {
   for (const [key, value] of cellsUpdates.value) {
@@ -114,7 +114,7 @@ const updateStoredCells = debounce(async (): Promise<void> => {
 
 async function cellUpdateHandler(
   index: number,
-  data: string | number | Date
+  data: TableData
 ): Promise<void> {
   emit("update");
   cellsUpdates.value?.set(index, data);
