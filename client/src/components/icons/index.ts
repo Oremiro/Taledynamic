@@ -7,6 +7,11 @@ import EditIcon from "@/components/icons/EditIcon.vue";
 import ErrorCircleIcon from "@/components/icons/ErrorCircleIcon.vue";
 import LinesSortIcon from "@/components/icons/LinesSortIcon.vue";
 import LinesUnsortIcon from "@/components/icons/LinesUnsortIcon.vue";
+import CalendarIcon from "@/components/icons/CalendarIcon.vue";
+import DocumentIcon from "@/components/icons/DocumentIcon.vue";
+import ImageIcon from "@/components/icons/ImageIcon.vue";
+import NumberSymbolIcon from "@/components/icons/NumberSymbolIcon.vue";
+import TextIcon from "@/components/icons/TextIcon.vue";
 
 export {
   AddIcon,
@@ -17,5 +22,10 @@ export {
   DismissIcon,
   ErrorCircleIcon,
   LinesSortIcon,
-  LinesUnsortIcon
+  LinesUnsortIcon,
+  CalendarIcon,
+  DocumentIcon,
+  ImageIcon,
+  NumberSymbolIcon,
+  TextIcon
 };

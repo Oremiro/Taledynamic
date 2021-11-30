@@ -56,39 +56,64 @@
         <div>Удалить колонку?</div>
       </n-popconfirm>
     </div>
-    <n-button
-      size="small"
-      secondary
-      :type="tableSortStatus?.index === index ? 'success' : 'default'"
-      style="padding: 0 0.3rem"
-      @click="sortRows"
-    >
-      <n-icon
-        v-if="tableSortStatus?.index === index"
-        size="1.1rem"
-        :style="{
-          transform:
-            tableSortStatus?.type === 0 ? 'scale(-1, -1)' : 'scale(-1, 1)'
-        }"
+    <div style="display: flex; gap: 0.5rem; align-items: center">
+      <n-popselect
+        v-model:value="columnType"
+        trigger="click"
+        :options="columnTypeOptions"
+        :render-label="optionsRenderLabel"
+        placement="right"
       >
-        <lines-sort-icon />
-      </n-icon>
-      <n-icon
-        v-else
-        size="1.1rem"
-        :style="{
-          transform: `scale(-1, -1)`
-        }"
+        <n-button size="small" secondary style="padding: 0 0.3rem">
+          <n-icon size="1.1rem">
+            <text-icon v-if="columnType === 0" />
+            <number-symbol-icon v-else-if="columnType === 1" />
+            <calendar-icon v-else-if="columnType === 2" />
+            <image-icon v-else-if="columnType === 3" />
+            <document-icon v-else />
+          </n-icon>
+        </n-button>
+      </n-popselect>
+      <n-button
+        size="small"
+        secondary
+        :type="tableSortStatus?.index === index ? 'success' : 'default'"
+        style="padding: 0 0.3rem"
+        @click="sortRows"
       >
-        <lines-unsort-icon />
-      </n-icon>
-    </n-button>
+        <n-icon
+          v-if="tableSortStatus?.index === index"
+          size="1.1rem"
+          :style="{
+            transform:
+              tableSortStatus?.type === 0 ? 'scale(-1, -1)' : 'scale(-1, 1)'
+          }"
+        >
+          <lines-sort-icon />
+        </n-icon>
+        <n-icon
+          v-else
+          size="1.1rem"
+          :style="{
+            transform: `scale(-1, -1)`
+          }"
+        >
+          <lines-unsort-icon />
+        </n-icon>
+      </n-button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useThemeVars, NPopconfirm } from "naive-ui";
+import { ref, computed, h } from "vue";
+import {
+  useThemeVars,
+  NPopconfirm,
+  SelectGroupOption,
+  SelectOption,
+  NIcon
+} from "naive-ui";
 import {
   DeleteIcon,
   ErrorCircleIcon,
@@ -97,8 +122,15 @@ import {
 } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
-import { TableHeader, TableRowsSortType } from "@/models/table";
+import { TableDataType, TableHeader, TableRowsSortType } from "@/models/table";
 import { TableSortStatus } from "@/models/store";
+import {
+  CalendarIcon,
+  DocumentIcon,
+  ImageIcon,
+  NumberSymbolIcon,
+  TextIcon
+} from "@/components/icons";
 
 const props = defineProps<{
   index: number;
@@ -142,13 +174,79 @@ async function sortRows(): Promise<void> {
 
 async function nameUpdateHandler(value: string): Promise<void> {
   try {
-    await store.dispatch("table/updateHeader", { index: props.index, name: value });
+    await store.dispatch("table/updateHeader", {
+      index: props.index,
+      name: value
+    });
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
     }
   }
+}
+
+const optionsRenderLabel = (option: SelectOption | SelectGroupOption) => {
+  if (option.type === "group") return option.label;
+  return [
+    h(
+      NIcon,
+      {
+        size: "1.1rem",
+        style: {
+          verticalAlign: "middle",
+          marginRight: ".5rem"
+        }
+      },
+      {
+        default: () =>
+          h(
+            option.value === TableDataType.Text
+              ? TextIcon
+              : option.value === TableDataType.Number
+              ? NumberSymbolIcon
+              : option.value === TableDataType.Date
+              ? CalendarIcon
+              : option.value === TableDataType.Image
+              ? ImageIcon
+              : DocumentIcon
+          )
+      }
+    ),
+    option.label
+  ];
 };
+
+const columnTypeOptions: SelectGroupOption[] = [
+  {
+    type: "group",
+    label: "Тип колонки",
+    key: "columnType",
+    children: [
+      {
+        label: "Текст",
+        value: TableDataType.Text
+      },
+      {
+        label: "Число",
+        value: TableDataType.Number
+      },
+      {
+        label: "Дата",
+        value: TableDataType.Date
+      },
+      {
+        label: "Изображение",
+        value: TableDataType.Image
+      },
+      {
+        label: "Файл",
+        value: TableDataType.File
+      }
+    ]
+  }
+];
+
+const columnType = ref<TableDataType>(TableDataType.Text);
 
 const themeVars = useThemeVars();
 </script>
