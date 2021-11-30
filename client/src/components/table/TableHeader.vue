@@ -99,7 +99,6 @@ import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
 import { TableHeader, TableRowsSortType } from "@/models/table";
 import { TableSortStatus } from "@/models/store";
-import { debounce } from "@/helpers";
 
 const props = defineProps<{
   index: number;
@@ -141,7 +140,7 @@ async function sortRows(): Promise<void> {
   }
 }
 
-const nameUpdateHandler = debounce(async (value: string): Promise<void> => {
+async function nameUpdateHandler(value: string): Promise<void> {
   try {
     await store.dispatch("table/updateHeader", { index: props.index, name: value });
   } catch (error) {
@@ -149,7 +148,7 @@ const nameUpdateHandler = debounce(async (value: string): Promise<void> => {
       console.log(error.message);
     }
   }
-}, 5000);
+};
 
 const themeVars = useThemeVars();
 </script>

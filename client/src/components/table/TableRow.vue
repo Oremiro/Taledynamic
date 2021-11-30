@@ -73,7 +73,6 @@ import TableCellVue from "@/components/table/TableCell.vue";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { TableCell, TableData } from "@/models/table";
 import { useStore } from "@/store";
-import { debounce } from "@/helpers";
 
 const props = defineProps<{
   index: number;
@@ -93,32 +92,23 @@ async function deleteRow() {
 }
 const isConfirmDeletionShown = ref<boolean>(false);
 
-const cellsUpdates = ref<Map<number, TableData>>(new Map());
-
-const updateStoredCells = debounce(async (): Promise<void> => {
-  for (const [key, value] of cellsUpdates.value) {
-    try {
-      await store.dispatch("table/updateCell", {
-        rowIndex: props.index,
-        cellIndex: key,
-        data: value
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      }
-    }
-  }
-  cellsUpdates.value.clear();
-}, 2000);
-
 async function cellUpdateHandler(
   index: number,
   data: TableData
 ): Promise<void> {
+  try {
+    await store.dispatch("table/updateCell", {
+      rowIndex: props.index,
+      cellIndex: index,
+      data: data
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    }
+  }
+  store.commit("table/clearSortStatus");
   emit("update");
-  cellsUpdates.value?.set(index, data);
-  await updateStoredCells();
 }
 
 const themeVars = useThemeVars();
