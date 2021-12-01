@@ -63,6 +63,7 @@
         :options="columnTypeOptions"
         :render-label="optionsRenderLabel"
         placement="right"
+        @update:value="onColumnTypeUpdate"
       >
         <n-button size="small" secondary style="padding: 0 0.3rem">
           <n-icon size="1.1rem">
@@ -122,7 +123,7 @@ import {
 } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
-import { TableDataType, TableHeader, TableRowsSortType } from "@/models/table";
+import { TableDataType, TableHeader, TableRow, TableRowsSortType } from "@/models/table";
 import { TableSortStatus } from "@/models/store";
 import {
   CalendarIcon,
@@ -246,7 +247,17 @@ const columnTypeOptions: SelectGroupOption[] = [
   }
 ];
 
-const columnType = ref<TableDataType>(TableDataType.Text);
+async function onColumnTypeUpdate(value: TableDataType): Promise<void> {
+  try {
+    await store.dispatch("table/setColumnType", { index: props.index, type: value })
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    }
+  }
+}
+
+const columnType = ref<TableDataType>(store.getters["table/headers"][props.index].type);
 
 const themeVars = useThemeVars();
 </script>

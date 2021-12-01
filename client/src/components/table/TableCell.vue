@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, nextTick } from "vue";
+import { ref, reactive, nextTick, watch } from "vue";
 import {
   NInputNumber,
   NDatePicker,
@@ -82,22 +82,27 @@ const props = defineProps<{
   type: TableDataType;
 }>();
 
-const cellDataText = ref<string | null>(
+const cellDataText = ref<string | null>(null);
+const cellDataNumber = ref<number | null>(null);
+const cellDataDate = ref<number | null>(null);
+// const cellDataAttachment = ref<string>();
+watch(() => props.data, () => {
+  cellDataText.value = (
   props.type === TableDataType.Text && typeof props.data === "string"
     ? props.data
     : null
 );
-const cellDataNumber = ref<number | null>(
+cellDataNumber.value = (
   props.type === TableDataType.Number && typeof props.data === "number"
     ? props.data
     : null
 );
-const cellDataDate = ref<number | null>(
+cellDataDate.value = (
   props.type === TableDataType.Date && props.data instanceof Date
     ? props.data.getTime()
     : null
 );
-// const cellDataAttachment = ref<string>();
+}, { immediate: true })
 
 const darkThemeOverrides = reactive<GlobalThemeOverrides>({
   Input: {

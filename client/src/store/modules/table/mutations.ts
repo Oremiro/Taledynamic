@@ -185,5 +185,29 @@ export const mutations: MutationTree<TableState> = {
   },
   clearSortStatus(state: TableState) {
     state.sortStatus = undefined;
+  },
+  setHeaderType(
+    state: TableState,
+    payload: { index: number; type: TableDataType }
+  ): void {
+    if (payload.index < 0 || payload.index > state.headers.length - 1) {
+      throw new Error("Index is out of range");
+    }
+    state.headers[payload.index].type = payload.type;
+  },
+  setCellType(
+    state: TableState,
+    payload: { rowIndex: number; cellIndex: number; type: TableDataType }
+  ): void {
+    if (payload.rowIndex < 0 || payload.rowIndex > state.rows.length - 1) {
+      throw new Error("Row index is out of range");
+    }
+    if (payload.cellIndex < 0 || payload.cellIndex > state.headers.length - 1) {
+      throw new Error("Cell index is out of range");
+    }
+    const cell: TableCell =
+      state.rows[payload.rowIndex].cells[payload.cellIndex];
+    if (cell.type !== payload.type) cell.data = null;
+    cell.type = payload.type;
   }
 };
