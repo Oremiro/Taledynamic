@@ -9,7 +9,14 @@
         class="draggable"
         :class="{
           start: index === draggableList.dragStartIndex,
-          enter: index === draggableList.dragEnterIndex
+          'enter--left':
+            index === draggableList.dragEnterIndex &&
+            draggableList.dragStartIndex !== undefined &&
+            index < draggableList.dragStartIndex,
+          'enter--right':
+            index === draggableList.dragEnterIndex &&
+            draggableList.dragStartIndex !== undefined &&
+            index > draggableList.dragStartIndex,
         }"
         :draggable="index !== store.getters['table/editableHeaderIndex']"
         @dragstart="draggableList.dragStartHandler($event, index)"
@@ -20,13 +27,9 @@
       >
         <table-header-vue :index="index" @delete="deleteColumn(index)" />
       </th>
-      <th :style="!isCreatingInputShown ? { width: '3rem'} : {}">
+      <th :style="!isCreatingInputShown ? { width: '3rem' } : {}">
         <div
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          "
+          style="display: flex; align-items: center; justify-content: center"
         >
           <n-form-item
             v-if="isCreatingInputShown"
@@ -81,9 +84,9 @@ const tableHeaders = computed<TableHeader[]>(
 const draggableList = reactive<DraggableList>(new DraggableList("headers"));
 async function dropCallback(index: number, itemIndex: number) {
   try {
-    await store.dispatch("table/swapColumns", {
-      indexFirst: index,
-      indexSecond: itemIndex
+    await store.dispatch("table/moveColumn", {
+      oldIndex: itemIndex,
+      newIndex: index
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -149,7 +152,10 @@ const themeVars = useThemeVars();
 th {
   padding: 0;
 }
-.draggable.enter {
-  border-bottom: 1px solid v-bind("themeVars.primaryColor");
+.draggable.enter--left {
+  border-left: 1px solid v-bind("themeVars.primaryColor");
+}
+.draggable.enter--right {
+  border-right: 1px solid v-bind("themeVars.primaryColor");
 }
 </style>

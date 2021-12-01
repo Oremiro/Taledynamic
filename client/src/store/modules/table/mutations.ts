@@ -27,14 +27,12 @@ export const mutations: MutationTree<TableState> = {
   deleteRow(state: TableState, payload: { index: number }): void {
     state.rows.splice(payload.index, 1);
   },
-  swapRows(
+  moveRow(
     state: TableState,
-    payload: { indexFirst: number; indexSecond: number }
+    payload: { oldIndex: number; newIndex: number }
   ): void {
-    [state.rows[payload.indexFirst], state.rows[payload.indexSecond]] = [
-      state.rows[payload.indexSecond],
-      state.rows[payload.indexFirst]
-    ];
+    const removedItem: TableRow = state.rows.splice(payload.oldIndex, 1)[0];
+    state.rows.splice(payload.newIndex, 0, removedItem);
   },
   pushHeader(state: TableState, payload: { header: TableHeader }): void {
     state.headers.push(payload.header);
@@ -78,14 +76,15 @@ export const mutations: MutationTree<TableState> = {
       state.rows[payload.rowIndex].cells[payload.cellIndex].type = payload.type;
     }
   },
-  swapHeaders(
+  moveHeader(
     state: TableState,
-    payload: { indexFirst: number; indexSecond: number }
+    payload: { oldIndex: number; newIndex: number }
   ): void {
-    [state.headers[payload.indexFirst], state.headers[payload.indexSecond]] = [
-      state.headers[payload.indexSecond],
-      state.headers[payload.indexFirst]
-    ];
+    const removedItem: TableHeader = state.headers.splice(
+      payload.oldIndex,
+      1
+    )[0];
+    state.headers.splice(payload.newIndex, 0, removedItem);
   },
   pushCell(
     state: TableState,
@@ -99,17 +98,15 @@ export const mutations: MutationTree<TableState> = {
   ): void {
     state.rows[payload.rowIndex].cells.splice(payload.cellIndex, 1);
   },
-  swapCells(
+  moveCell(
     state: TableState,
-    payload: { rowIndex: number; indexFirst: number; indexSecond: number }
+    payload: { rowIndex: number; oldIndex: number; newIndex: number }
   ): void {
-    [
-      state.rows[payload.rowIndex].cells[payload.indexFirst],
-      state.rows[payload.rowIndex].cells[payload.indexSecond]
-    ] = [
-      state.rows[payload.rowIndex].cells[payload.indexSecond],
-      state.rows[payload.rowIndex].cells[payload.indexFirst]
-    ];
+    const removedItem: TableCell = state.rows[payload.rowIndex].cells.splice(
+      payload.oldIndex,
+      1
+    )[0];
+    state.rows[payload.rowIndex].cells.splice(payload.newIndex, 0, removedItem);
   },
   setEditableRowIndex(state: TableState, payload: { index: number }): void {
     state.editableRowIndex = payload.index;

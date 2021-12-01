@@ -48,46 +48,46 @@ export const actions: ActionTree<TableState, State> = {
       commit("deleteCell", { rowIndex: rowIndex, cellIndex: payload.index });
     }
   },
-  async swapColumns(
+  async moveColumn(
     { commit, state },
-    payload: { indexFirst: number; indexSecond: number }
+    payload: { oldIndex: number; newIndex: number }
   ) {
     if (
-      payload.indexFirst < 0 ||
-      payload.indexFirst > state.headers.length - 1 ||
-      payload.indexSecond < 0 ||
-      payload.indexSecond > state.headers.length - 1
+      payload.oldIndex < 0 ||
+      payload.oldIndex > state.headers.length - 1 ||
+      payload.newIndex < 0 ||
+      payload.newIndex > state.headers.length - 1
     ) {
       throw new Error("Index is out of range");
     }
-    if (payload.indexFirst === payload.indexSecond) {
+    if (payload.oldIndex === payload.newIndex) {
       throw new Error("Indexes are the same");
     }
-    commit("swapHeaders", payload);
+    commit("moveHeader", payload);
     for (let rowIndex = 0; rowIndex < state.rows.length; rowIndex++) {
-      commit("swapCells", {
+      commit("moveCell", {
         rowIndex: rowIndex,
-        indexFirst: payload.indexFirst,
-        indexSecond: payload.indexSecond
+        oldIndex: payload.oldIndex,
+        newIndex: payload.newIndex
       });
     }
   },
-  async swapRows(
+  async moveRow(
     { commit, state },
-    payload: { indexFirst: number; indexSecond: number }
+    payload: { oldIndex: number; newIndex: number }
   ) {
     if (
-      payload.indexFirst < 0 ||
-      payload.indexFirst > state.rows.length - 1 ||
-      payload.indexSecond < 0 ||
-      payload.indexSecond > state.rows.length - 1
+      payload.oldIndex < 0 ||
+      payload.oldIndex > state.rows.length - 1 ||
+      payload.newIndex < 0 ||
+      payload.newIndex > state.rows.length - 1
     ) {
       throw new Error("Index is out of range");
     }
-    if (payload.indexFirst === payload.indexSecond) {
+    if (payload.oldIndex === payload.newIndex) {
       throw new Error("Indexes are the same");
     }
-    commit("swapRows", payload);
+    commit("moveRow", payload);
     commit("clearSortStatus");
   },
   async sortRows(
