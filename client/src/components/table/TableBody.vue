@@ -16,11 +16,17 @@
       <table-row-vue
         :index="index"
         :last="index === tableRows.length - 1"
-        :draggable-status="
+        :draggable-class="
           index === draggableList.dragStartIndex
             ? 'start'
-            : index === draggableList.dragEnterIndex
-            ? 'enter'
+            : index === draggableList.dragEnterIndex &&
+              draggableList.dragStartIndex !== undefined &&
+              index < draggableList.dragStartIndex
+            ? 'enter--top'
+            : index === draggableList.dragEnterIndex &&
+              draggableList.dragStartIndex !== undefined &&
+              index > draggableList.dragStartIndex
+            ? 'enter--bottom'
             : undefined
         "
         :data="row.cells"
@@ -44,9 +50,9 @@ const draggableList = reactive<DraggableList>(new DraggableList("rows"));
 async function dropCallback(index: number, itemIndex: number) {
   if (index === tableRows.value.length - 1) return;
   try {
-    await store.dispatch("table/swapRows", {
-      indexFirst: index,
-      indexSecond: itemIndex
+    await store.dispatch("table/moveRow", {
+      oldIndex: itemIndex,
+      newIndex: index
     });
   } catch (error) {
     if (error instanceof Error) {

@@ -2,7 +2,8 @@ export enum TableDataType {
   Text,
   Number,
   Date,
-  Attachment
+  Image,
+  File
 }
 
 export type TableData = string | number | Date | null;

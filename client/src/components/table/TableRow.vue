@@ -3,8 +3,9 @@
     scope="row"
     :class="{
       draggable: !last,
-      start: draggableStatus === 'start',
-      enter: draggableStatus === 'enter' && !last
+      start: draggableClass === 'start',
+      'enter--top': draggableClass === 'enter--top' && !last,
+      'enter--bottom': draggableClass === 'enter--bottom' && !last,
     }"
     style="padding: 0 0.3rem"
   >
@@ -77,7 +78,7 @@ import { useStore } from "@/store";
 const props = defineProps<{
   index: number;
   last: boolean;
-  draggableStatus?: "enter" | "start";
+  draggableClass?: "start" | "enter--top" | "enter--bottom";
   data: TableCell[];
 }>();
 
@@ -116,7 +117,10 @@ const themeVars = useThemeVars();
 
 <style scoped lang="scss">
 @import "@/components/table/style.scss";
-.draggable.enter {
-  border-left: 1px solid v-bind("themeVars.primaryColor");
+.draggable.enter--top {
+  border-top: 1px solid v-bind("themeVars.primaryColor");
+}
+.draggable.enter--bottom {
+  border-bottom: 1px solid v-bind("themeVars.primaryColor");
 }
 </style>
