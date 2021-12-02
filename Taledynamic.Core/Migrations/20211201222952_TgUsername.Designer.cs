@@ -11,7 +11,7 @@ namespace Taledynamic.Core.Migrations
 {
     [DbContext(typeof(TaledynamicContext))]
     [Migration("20211201222952_TgUsername")]
-    partial class TgId
+    partial class TgUsername
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

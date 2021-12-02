@@ -5,7 +5,7 @@ namespace Taledynamic.DAL.Entities
 {
     public class User: BaseEntity
     {
-        public string TgId { get; set; }
+        public string TgUsername { get; set; }
         public string Email { get; set; }
         [JsonIgnore]
         public string Password { get; set; }

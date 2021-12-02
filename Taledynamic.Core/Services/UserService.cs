@@ -435,7 +435,7 @@ namespace Taledynamic.Core.Services
             var user = await _context
                 .Users
                 .AsQueryable()
-                .FirstOrDefaultAsync(u => u.TgId == request.TgId && u.IsActive);
+                .FirstOrDefaultAsync(u => u.TgUsername == request.TgUsername && u.IsActive);
 
             var response = new TgAuthResponse()
             {
