@@ -1,34 +1,19 @@
 import { State, TableState } from "@/models/store";
-import {
-  TableCell,
-  TableRow,
-  TableHeader,
-  TableDataType,
-  TableRowsSortType,
-  TableData
-} from "@/models/table";
+import { TableCell, TableRow, TableHeader, TableDataType, TableRowsSortType, TableData } from "@/models/table";
 import { ActionTree } from "vuex";
 
 export const actions: ActionTree<TableState, State> = {
   async addRow({ state, commit }): Promise<void> {
-    const row: TableRow = new TableRow(
-      state.headers.map((item) => new TableCell(null, item.type))
-    );
+    const row: TableRow = new TableRow(state.headers.map((item) => new TableCell(null, item.type)));
     commit("pushRow", { row: row });
   },
-  async deleteRow(
-    { commit, state },
-    payload: { index: number }
-  ): Promise<void> {
+  async deleteRow({ commit, state }, payload: { index: number }): Promise<void> {
     if (payload.index < 0 || payload.index > state.rows.length - 1) {
       throw new Error("Row index is out of range");
     }
     commit("deleteRow", payload);
   },
-  async addColumn(
-    { commit, state },
-    payload: { name: string; type: TableDataType }
-  ): Promise<void> {
+  async addColumn({ commit, state }, payload: { name: string; type: TableDataType }): Promise<void> {
     commit("pushHeader", {
       header: new TableHeader(payload.name, payload.type)
     });
@@ -39,10 +24,7 @@ export const actions: ActionTree<TableState, State> = {
       });
     }
   },
-  async deleteColumn(
-    { commit, state },
-    payload: { index: number }
-  ): Promise<void> {
+  async deleteColumn({ commit, state }, payload: { index: number }): Promise<void> {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Column index is out of range");
     }
@@ -54,10 +36,7 @@ export const actions: ActionTree<TableState, State> = {
       commit("deleteCell", { rowIndex: rowIndex, cellIndex: payload.index });
     }
   },
-  async moveColumn(
-    { commit, state },
-    payload: { oldIndex: number; newIndex: number }
-  ): Promise<void> {
+  async moveColumn({ commit, state }, payload: { oldIndex: number; newIndex: number }): Promise<void> {
     if (
       payload.oldIndex < 0 ||
       payload.oldIndex > state.headers.length - 1 ||
@@ -78,10 +57,7 @@ export const actions: ActionTree<TableState, State> = {
       });
     }
   },
-  async moveRow(
-    { commit, state },
-    payload: { oldIndex: number; newIndex: number }
-  ): Promise<void> {
+  async moveRow({ commit, state }, payload: { oldIndex: number; newIndex: number }): Promise<void> {
     if (
       payload.oldIndex < 0 ||
       payload.oldIndex > state.rows.length - 1 ||
@@ -96,10 +72,7 @@ export const actions: ActionTree<TableState, State> = {
     commit("moveRow", payload);
     commit("clearSortStatus");
   },
-  async sortRows(
-    { commit, state },
-    payload: { index: number; sortType: TableRowsSortType }
-  ): Promise<void> {
+  async sortRows({ commit, state }, payload: { index: number; sortType: TableRowsSortType }): Promise<void> {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Index is out of range");
     }
@@ -132,10 +105,7 @@ export const actions: ActionTree<TableState, State> = {
   ): Promise<void> {
     commit("updateCell", payload);
   },
-  async setColumnType(
-    { state, commit },
-    payload: { index: number; type: TableDataType }
-  ): Promise<void> {
+  async setColumnType({ state, commit }, payload: { index: number; type: TableDataType }): Promise<void> {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Index is out of range");
     }
@@ -149,5 +119,6 @@ export const actions: ActionTree<TableState, State> = {
         type: payload.type
       });
     }
+    commit("clearSortStatus");
   }
 };

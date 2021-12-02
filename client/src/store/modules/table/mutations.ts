@@ -1,25 +1,12 @@
 import { MutationTree } from "vuex";
 import { TableState } from "@/models/store";
-import {
-  TableRow,
-  TableHeader,
-  TableCell,
-  TableDataType,
-  TableRowsSortType
-} from "@/models/table";
+import { TableRow, TableHeader, TableCell, TableDataType, TableRowsSortType } from "@/models/table";
 
 export const mutations: MutationTree<TableState> = {
-  setTable(
-    state: TableState,
-    payload: { rows: TableRow[]; headers: TableHeader[] }
-  ): void {
+  setTable(state: TableState, payload: { rows: TableRow[]; headers: TableHeader[] }): void {
     state.headers = payload.headers;
     state.rows = payload.rows;
-    state.rows.push(
-      new TableRow(
-        payload.headers.map((item) => new TableCell(null, item.type))
-      )
-    );
+    state.rows.push(new TableRow(payload.headers.map((item) => new TableCell(null, item.type))));
   },
   pushRow(state: TableState, payload: { row: TableRow }): void {
     state.rows.push(payload.row);
@@ -27,10 +14,7 @@ export const mutations: MutationTree<TableState> = {
   deleteRow(state: TableState, payload: { index: number }): void {
     state.rows.splice(payload.index, 1);
   },
-  moveRow(
-    state: TableState,
-    payload: { oldIndex: number; newIndex: number }
-  ): void {
+  moveRow(state: TableState, payload: { oldIndex: number; newIndex: number }): void {
     const removedItem: TableRow = state.rows.splice(payload.oldIndex, 1)[0];
     state.rows.splice(payload.newIndex, 0, removedItem);
   },
@@ -40,10 +24,7 @@ export const mutations: MutationTree<TableState> = {
   deleteHeader(state: TableState, payload: { index: number }): void {
     state.headers.splice(payload.index, 1);
   },
-  updateHeader(
-    state: TableState,
-    payload: { index: number; name?: string; type?: TableDataType }
-  ): void {
+  updateHeader(state: TableState, payload: { index: number; name?: string; type?: TableDataType }): void {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Index is out of range");
     }
@@ -76,36 +57,18 @@ export const mutations: MutationTree<TableState> = {
       state.rows[payload.rowIndex].cells[payload.cellIndex].type = payload.type;
     }
   },
-  moveHeader(
-    state: TableState,
-    payload: { oldIndex: number; newIndex: number }
-  ): void {
-    const removedItem: TableHeader = state.headers.splice(
-      payload.oldIndex,
-      1
-    )[0];
+  moveHeader(state: TableState, payload: { oldIndex: number; newIndex: number }): void {
+    const removedItem: TableHeader = state.headers.splice(payload.oldIndex, 1)[0];
     state.headers.splice(payload.newIndex, 0, removedItem);
   },
-  pushCell(
-    state: TableState,
-    payload: { rowIndex: number; cell: TableCell }
-  ): void {
+  pushCell(state: TableState, payload: { rowIndex: number; cell: TableCell }): void {
     state.rows[payload.rowIndex].cells.push(payload.cell);
   },
-  deleteCell(
-    state: TableState,
-    payload: { rowIndex: number; cellIndex: number }
-  ): void {
+  deleteCell(state: TableState, payload: { rowIndex: number; cellIndex: number }): void {
     state.rows[payload.rowIndex].cells.splice(payload.cellIndex, 1);
   },
-  moveCell(
-    state: TableState,
-    payload: { rowIndex: number; oldIndex: number; newIndex: number }
-  ): void {
-    const removedItem: TableCell = state.rows[payload.rowIndex].cells.splice(
-      payload.oldIndex,
-      1
-    )[0];
+  moveCell(state: TableState, payload: { rowIndex: number; oldIndex: number; newIndex: number }): void {
+    const removedItem: TableCell = state.rows[payload.rowIndex].cells.splice(payload.oldIndex, 1)[0];
     state.rows[payload.rowIndex].cells.splice(payload.newIndex, 0, removedItem);
   },
   setEditableRowIndex(state: TableState, payload: { index: number }): void {
@@ -120,12 +83,8 @@ export const mutations: MutationTree<TableState> = {
   clearEditableHeaderIndex(state: TableState): void {
     state.editableHeaderIndex = undefined;
   },
-  sortRows(
-    state: TableState,
-    payload: { index: number; sortType: TableRowsSortType }
-  ): void {
-    const direction: number =
-      payload.sortType === TableRowsSortType.Ascending ? 1 : -1;
+  sortRows(state: TableState, payload: { index: number; sortType: TableRowsSortType }): void {
+    const direction: number = payload.sortType === TableRowsSortType.Ascending ? 1 : -1;
     const headerType: TableDataType = state.headers[payload.index].type;
     const emptyRow: TableRow | undefined = state.rows.pop();
     switch (headerType) {
@@ -146,10 +105,7 @@ export const mutations: MutationTree<TableState> = {
           const numberSecond = itemSecond.cells[payload.index].data;
           if (numberFirst === null) return -direction;
           if (numberSecond === null) return direction;
-          if (
-            typeof numberFirst === "number" &&
-            typeof numberSecond === "number"
-          ) {
+          if (typeof numberFirst === "number" && typeof numberSecond === "number") {
             return (numberFirst - numberSecond) * direction;
           }
           return 0;
@@ -174,10 +130,7 @@ export const mutations: MutationTree<TableState> = {
       state.rows.push(emptyRow);
     }
   },
-  setSortStatus(
-    state: TableState,
-    payload: { index: number; type: TableRowsSortType }
-  ): void {
+  setSortStatus(state: TableState, payload: { index: number; type: TableRowsSortType }): void {
     state.sortStatus = {
       index: payload.index,
       type: payload.type
@@ -186,28 +139,62 @@ export const mutations: MutationTree<TableState> = {
   clearSortStatus(state: TableState) {
     state.sortStatus = undefined;
   },
-  setHeaderType(
-    state: TableState,
-    payload: { index: number; type: TableDataType }
-  ): void {
+  setHeaderType(state: TableState, payload: { index: number; type: TableDataType }): void {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Index is out of range");
     }
     state.headers[payload.index].type = payload.type;
   },
-  setCellType(
-    state: TableState,
-    payload: { rowIndex: number; cellIndex: number; type: TableDataType }
-  ): void {
+  setCellType(state: TableState, payload: { rowIndex: number; cellIndex: number; type: TableDataType }): void {
     if (payload.rowIndex < 0 || payload.rowIndex > state.rows.length - 1) {
       throw new Error("Row index is out of range");
     }
     if (payload.cellIndex < 0 || payload.cellIndex > state.headers.length - 1) {
       throw new Error("Cell index is out of range");
     }
-    const cell: TableCell =
-      state.rows[payload.rowIndex].cells[payload.cellIndex];
-    if (cell.type !== payload.type) cell.data = null;
+    const cell: TableCell = state.rows[payload.rowIndex].cells[payload.cellIndex];
+    if (cell.type !== payload.type) {
+      if (payload.type === TableDataType.Text) {
+        if (cell.type === TableDataType.Number && typeof cell.data === "number") {
+          cell.data = cell.data.toString();
+        } else if (cell.type === TableDataType.Date && cell.data instanceof Date) {
+          cell.data = cell.data.toLocaleDateString("ru");
+        } else {
+          cell.data = null;
+        }
+      } else if (payload.type === TableDataType.Number) {
+        if (cell.type === TableDataType.Text && typeof cell.data === "string") {
+          const convertedData = Number(cell.data);
+          if (!isNaN(convertedData)) {
+            cell.data = convertedData;
+          } else {
+            cell.data = null;
+          }
+        } else if (cell.type === TableDataType.Date && cell.data instanceof Date) {
+          cell.data = cell.data.getTime();
+        } else {
+          cell.data = null;
+        }
+      } else if (payload.type === TableDataType.Date) {
+        if (cell.type === TableDataType.Text && typeof cell.data === "string") {
+          const matchedDate = cell.data.match(/(\d{2,4}).(\d{2}).(\d{2,4})/);
+          if (matchedDate !== null) {
+            const convertedData = Date.parse(`${matchedDate[3]}-${matchedDate[2]}-${matchedDate[1]}`);
+            if (!isNaN(convertedData)) {
+              cell.data = new Date(convertedData);
+            } else {
+              cell.data = null;
+            }
+          } else {
+            cell.data = null;
+          }
+        } else {
+          cell.data = null;
+        }
+      } else {
+        cell.data = null;
+      }
+    }
     cell.type = payload.type;
   }
 };

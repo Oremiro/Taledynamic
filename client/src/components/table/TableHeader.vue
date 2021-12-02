@@ -1,13 +1,5 @@
 <template>
-  <div
-    style="
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.5rem 0.8rem;
-      gap: 0.5rem;
-    "
-  >
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.8rem; gap: 0.5rem">
     <div style="display: flex; gap: 0.5rem; align-items: center">
       <n-input
         v-model:value="header.name"
@@ -19,35 +11,21 @@
           'max-width': '10rem'
         }"
         @update:value="nameUpdateHandler"
-        @mouseenter="
-          store.commit('table/setEditableHeaderIndex', { index: index })
-        "
+        @mouseenter="store.commit('table/setEditableHeaderIndex', { index: index })"
         @mouseleave="store.commit('table/clearEditableHeaderIndex')"
       />
-      <n-popconfirm
-        v-if="store.getters['table/headers'].length > 1"
-        v-model:show="isConfirmShown"
-      >
+      <n-popconfirm v-if="store.getters['table/headers'].length > 1" v-model:show="isConfirmShown">
         <template #icon>
           <n-icon :color="themeVars.errorColor">
             <error-circle-icon />
           </n-icon>
         </template>
         <template #action>
-          <n-button ghost type="error" size="small" @click="emit('delete')">
-            Да
-          </n-button>
-          <n-button ghost size="small" @click="isConfirmShown = false">
-            Нет
-          </n-button>
+          <n-button ghost type="error" size="small" @click="emit('delete')"> Да </n-button>
+          <n-button ghost size="small" @click="isConfirmShown = false"> Нет </n-button>
         </template>
         <template #trigger>
-          <dynamically-typed-button
-            style="padding: 0 0.3rem"
-            type="error"
-            size="small"
-            secondary
-          >
+          <dynamically-typed-button style="padding: 0 0.3rem" type="error" size="small" secondary>
             <n-icon size="1.1rem">
               <delete-icon />
             </n-icon>
@@ -65,12 +43,8 @@
           </n-icon>
         </template>
         <template #action>
-          <n-button ghost type="warning" size="small" @click="setColumnType(columnType)">
-            Да
-          </n-button>
-          <n-button ghost size="small" @click="resetColumnType">
-            Нет
-          </n-button>
+          <n-button ghost type="warning" size="small" @click="setColumnType(columnType)"> Да </n-button>
+          <n-button ghost size="small" @click="resetColumnType"> Нет </n-button>
         </template>
         <template #trigger>
           <n-popselect
@@ -93,7 +67,10 @@
             </n-button>
           </n-popselect>
         </template>
-        <span>Изменение типа может привести к потери <br> данных непустых ячеек. Продолжить?</span>
+        <span
+          >Изменение типа может привести к потери <br />
+          данных непустых ячеек. Продолжить?</span
+        >
       </n-popconfirm>
       <n-button
         size="small"
@@ -106,8 +83,7 @@
           v-if="tableSortStatus?.index === index"
           size="1.1rem"
           :style="{
-            transform:
-              tableSortStatus?.type === 0 ? 'scale(-1, -1)' : 'scale(-1, 1)'
+            transform: tableSortStatus?.type === 0 ? 'scale(-1, -1)' : 'scale(-1, 1)'
           }"
         >
           <lines-sort-icon />
@@ -128,36 +104,13 @@
 
 <script setup lang="ts">
 import { ref, computed, h, nextTick } from "vue";
-import {
-  useThemeVars,
-  NPopconfirm,
-  SelectGroupOption,
-  SelectOption,
-  NIcon,
-  NSkeleton
-} from "naive-ui";
-import {
-  DeleteIcon,
-  ErrorCircleIcon,
-  LinesSortIcon,
-  LinesUnsortIcon
-} from "@/components/icons";
+import { useThemeVars, NPopconfirm, SelectGroupOption, SelectOption, NIcon, NSkeleton } from "naive-ui";
+import { DeleteIcon, ErrorCircleIcon, LinesSortIcon, LinesUnsortIcon } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
-import {
-  TableDataType,
-  TableHeader,
-  TableRow,
-  TableRowsSortType
-} from "@/models/table";
+import { TableDataType, TableHeader, TableRow, TableRowsSortType } from "@/models/table";
 import { TableSortStatus } from "@/models/store";
-import {
-  CalendarIcon,
-  DocumentIcon,
-  ImageIcon,
-  NumberSymbolIcon,
-  TextIcon
-} from "@/components/icons";
+import { CalendarIcon, DocumentIcon, ImageIcon, NumberSymbolIcon, TextIcon } from "@/components/icons";
 
 const props = defineProps<{
   index: number;
@@ -168,14 +121,10 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const header = computed<TableHeader>(
-  () => store.getters["table/headers"][props.index]
-);
+const header = computed<TableHeader>(() => store.getters["table/headers"][props.index]);
 const isConfirmShown = ref<boolean>(false);
 
-const tableSortStatus = computed<TableSortStatus | undefined>(
-  () => store.getters["table/sortStatus"]
-);
+const tableSortStatus = computed<TableSortStatus | undefined>(() => store.getters["table/sortStatus"]);
 
 async function sortRows(): Promise<void> {
   try {
@@ -317,9 +266,7 @@ async function onColumnTypeUpdate(value: TableDataType): Promise<void> {
   }
 }
 
-const columnType = ref<TableDataType>(
-  store.getters["table/headers"][props.index].type
-);
+const columnType = ref<TableDataType>(store.getters["table/headers"][props.index].type);
 
 const isTypeConfirmationShown = ref<boolean>(false);
 
