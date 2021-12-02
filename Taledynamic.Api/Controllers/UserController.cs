@@ -24,6 +24,13 @@ namespace Taledynamic.Api.Controllers
             _userService = userService;
         }
 
+        [HttpPost("tgauth")]
+        public async Task<TgAuthResponse> TgAuth(TgAuthRequest request)
+        {
+            TgAuthResponse response = await _userService.TgAuthAsync(request);
+            return response;
+        }
+
         [HttpPost("authenticate")]
         public async Task<AuthenticateResponse> Authenticate([FromBody] AuthenticateRequest request)
         {

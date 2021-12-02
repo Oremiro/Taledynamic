@@ -424,5 +424,22 @@ namespace Taledynamic.Core.Services
 
             return response;
         }
+        public async Task<TgAuthResponse> TgAuthAsync(TgAuthRequest request)
+        {
+            var validator = request.IsValid();
+            if (!validator.Status)
+            {
+                throw new BadRequestException(validator.Message);
+            }
+
+            var user = await _context
+                .Users
+                .AsQueryable()
+                .FirstOrDefaultAsync(u => u.TgUsername == request.TgUsername && u.IsActive);
+
+            var response = new TgAuthResponse();
+            
+            return response;
+        }
     }
 }
