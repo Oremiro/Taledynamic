@@ -2,12 +2,9 @@
   <n-config-provider :theme="currentTheme">
     <n-global-style />
     <n-message-provider>
-      <n-layout style="min-height: 100vh">
+      <n-layout style="min-height: 100vh" position="absolute">
         <n-loading-bar-provider>
-          <layout-header
-            :current-theme="currentTheme"
-            @change-theme="setTheme"
-          />
+          <layout-header :current-theme="currentTheme" @change-theme="setTheme" />
         </n-loading-bar-provider>
         <n-layout has-sider position="absolute" style="top: 3.3rem">
           <layout-sider />
@@ -72,10 +69,7 @@ signinBC.onmessage = (ev: MessageEvent<LoginState>): void => {
       user: userState.user,
       accessToken: userState.accessTokenInMemory
     });
-    if (
-      router.currentRoute.value.name === "AuthSignIn" ||
-      router.currentRoute.value.name === "AuthSignUp"
-    ) {
+    if (router.currentRoute.value.name === "AuthSignIn" || router.currentRoute.value.name === "AuthSignUp") {
       router.push({ name: "ProfileIndex" });
     }
   }
@@ -103,10 +97,8 @@ onUnmounted(() => {
 }
 
 .container {
-  height: 100%;
-  padding-top: 4rem;
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding: 2.5rem 3.5rem;
 }
 </style>
