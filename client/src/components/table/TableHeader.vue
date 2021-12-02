@@ -57,24 +57,44 @@
       </n-popconfirm>
     </div>
     <div style="display: flex; gap: 0.5rem; align-items: center">
-      <n-popselect
-        v-model:value="columnType"
-        trigger="click"
-        :options="columnTypeOptions"
-        :render-label="optionsRenderLabel"
-        placement="right"
-        @update:value="onColumnTypeUpdate"
-      >
-        <n-button size="small" secondary style="padding: 0 0.3rem">
-          <n-icon size="1.1rem">
-            <text-icon v-if="columnType === 0" />
-            <number-symbol-icon v-else-if="columnType === 1" />
-            <calendar-icon v-else-if="columnType === 2" />
-            <image-icon v-else-if="columnType === 3" />
-            <document-icon v-else />
+      <n-skeleton v-if="typeSelectLoading" size="small" width="1.7rem" :sharp="false" />
+      <n-popconfirm v-else :show="isTypeConfirmationShown" trigger="manual">
+        <template #icon>
+          <n-icon>
+            <error-circle-icon />
           </n-icon>
-        </n-button>
-      </n-popselect>
+        </template>
+        <template #action>
+          <n-button ghost type="warning" size="small" @click="setColumnType(columnType)">
+            Да
+          </n-button>
+          <n-button ghost size="small" @click="resetColumnType">
+            Нет
+          </n-button>
+        </template>
+        <template #trigger>
+          <n-popselect
+            v-model:value="columnType"
+            trigger="click"
+            :options="columnTypeOptions"
+            :render-label="optionsRenderLabel"
+            :loading="typeSelectLoading"
+            placement="right"
+            @update:value="onColumnTypeUpdate"
+          >
+            <n-button size="small" secondary style="padding: 0 0.3rem">
+              <n-icon size="1.1rem">
+                <text-icon v-if="columnType === 0" />
+                <number-symbol-icon v-else-if="columnType === 1" />
+                <calendar-icon v-else-if="columnType === 2" />
+                <image-icon v-else-if="columnType === 3" />
+                <document-icon v-else />
+              </n-icon>
+            </n-button>
+          </n-popselect>
+        </template>
+        <span>Изменение типа может привести к потери <br> данных непустых ячеек. Продолжить?</span>
+      </n-popconfirm>
       <n-button
         size="small"
         secondary
@@ -107,13 +127,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h } from "vue";
+import { ref, computed, h, nextTick } from "vue";
 import {
   useThemeVars,
   NPopconfirm,
   SelectGroupOption,
   SelectOption,
-  NIcon
+  NIcon,
+  NSkeleton
 } from "naive-ui";
 import {
   DeleteIcon,
@@ -123,7 +144,12 @@ import {
 } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { useStore } from "@/store";
-import { TableDataType, TableHeader, TableRow, TableRowsSortType } from "@/models/table";
+import {
+  TableDataType,
+  TableHeader,
+  TableRow,
+  TableRowsSortType
+} from "@/models/table";
 import { TableSortStatus } from "@/models/store";
 import {
   CalendarIcon,
@@ -247,9 +273,25 @@ const columnTypeOptions: SelectGroupOption[] = [
   }
 ];
 
-async function onColumnTypeUpdate(value: TableDataType): Promise<void> {
+async function isColumnEmpty(): Promise<boolean> {
+  const rows: TableRow[] = store.getters["table/rows"];
+  for (let row of rows) {
+    if (row.cells[props.index].data !== null) {
+      return false;
+    }
+  }
+  return true;
+}
+
+const typeSelectLoading = ref<boolean>(false);
+
+async function setColumnType(type: TableDataType) {
+  isTypeConfirmationShown.value = false;
   try {
-    await store.dispatch("table/setColumnType", { index: props.index, type: value })
+    await store.dispatch("table/setColumnType", {
+      index: props.index,
+      type: type
+    });
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
@@ -257,7 +299,29 @@ async function onColumnTypeUpdate(value: TableDataType): Promise<void> {
   }
 }
 
-const columnType = ref<TableDataType>(store.getters["table/headers"][props.index].type);
+async function resetColumnType() {
+  columnType.value = store.getters["table/headers"][props.index].type;
+  isTypeConfirmationShown.value = false;
+}
+
+async function onColumnTypeUpdate(value: TableDataType): Promise<void> {
+  if (value === store.getters["table/headers"][props.index].type) return;
+  typeSelectLoading.value = true;
+  const isEmpty: boolean = await isColumnEmpty();
+  typeSelectLoading.value = false;
+  await nextTick();
+  if (isEmpty) {
+    setColumnType(value);
+  } else {
+    isTypeConfirmationShown.value = true;
+  }
+}
+
+const columnType = ref<TableDataType>(
+  store.getters["table/headers"][props.index].type
+);
+
+const isTypeConfirmationShown = ref<boolean>(false);
 
 const themeVars = useThemeVars();
 </script>
