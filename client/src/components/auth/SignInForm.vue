@@ -49,7 +49,7 @@ import { useStore } from "@/store";
 import { debounce, emailRegex, externalOptions } from "@/helpers";
 import { SignInFormData } from "@/models";
 import DelayedButton from "@/components/DelayedButton.vue";
-import { UserState } from "@/models/store";
+import { LoginState } from "@/models/store";
 
 const formData = reactive<SignInFormData>({
   email: {
@@ -106,7 +106,7 @@ function submitForm(): void {
   formRef.value?.validate(async (errors): Promise<void> => {
     if (!errors) {
       try {
-        const userState: UserState = await store.dispatch(
+        const userState: LoginState = await store.dispatch(
           "user/login",
           formData
         );

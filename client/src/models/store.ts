@@ -25,7 +25,15 @@ export interface State {
 
 export interface UserState {
   user: User;
-  accessTokenInMemory: string;
+  accessTokenInMemory: {
+    value: string;
+    expiresAt: Date | null;
+  };
+}
+
+export interface LoginState {
+  user: User,
+  accessTokenInMemory: string
 }
 
 export interface Workspace {
@@ -60,5 +68,5 @@ export interface TableState {
   rows: TableRow[];
   editableRowIndex?: number;
   editableHeaderIndex?: number;
-  sortStatus?: TableSortStatus
+  sortStatus?: TableSortStatus;
 }

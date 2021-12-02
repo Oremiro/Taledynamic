@@ -33,7 +33,7 @@ import LayoutHeader from "@/layouts/LayoutHeader.vue";
 import LayoutSider from "@/layouts/LayoutSider.vue";
 import { Theme } from "@/models";
 import { useStore } from "@/store";
-import { UserState } from "@/models/store";
+import { LoginState } from "@/models/store";
 
 const currentTheme = ref<Theme>(darkTheme);
 const storedTheme: string | null = localStorage.getItem("theme");
@@ -65,9 +65,9 @@ onstorage = (event: StorageEvent): void => {
 };
 
 const signinBC = new BroadcastChannel("signin");
-signinBC.onmessage = (ev: MessageEvent<UserState>): void => {
+signinBC.onmessage = (ev: MessageEvent<LoginState>): void => {
   if (!store.getters["user/isLoggedIn"]) {
-    const userState: UserState = ev.data;
+    const userState = ev.data;
     store.commit("user/login", {
       user: userState.user,
       accessToken: userState.accessTokenInMemory

@@ -5,5 +5,8 @@ export const state: UserState = {
     id: null,
     email: ""
   },
-  accessTokenInMemory: ""
+  accessTokenInMemory: {
+    value: "",
+    expiresAt: null
+  }
 };
