@@ -35,7 +35,7 @@ namespace TaleDynamicBot.States
 
         public override async void DefaultAction(ITelegramBotClient botClient, Message message)
         {
-            botClient.SendTextMessageAsync(
+            await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Вы можете продолжить обработку с помощью команды /sending ."
             );

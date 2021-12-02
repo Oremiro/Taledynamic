@@ -15,7 +15,7 @@ namespace TaleDynamicBot.States
         {
             await botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "http://taledynamic.com/tgauth?" + update.Message.Chat.Username
+                text: "http://taledynamic.com/tgauth?" + update.Message.Chat.Id
             );
             this._user.ChangeState(new StateAuth());
         }
