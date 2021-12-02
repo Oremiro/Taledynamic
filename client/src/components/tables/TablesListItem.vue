@@ -86,6 +86,7 @@ async function editTableName(name: string): Promise<void> {
   }
   try {
     isInputLoading.value = true;
+    await store.dispatch("user/refreshExpired")
     const { data } = await TableApi.update(
       {
         name: name,
@@ -95,7 +96,6 @@ async function editTableName(name: string): Promise<void> {
     );
     emit("update", props.id, data.table);
   } catch (error) {
-    // TODO: 401 Handler
     if (axios.isAxiosError(error)) {
       console.log(error.message);
     }
@@ -111,11 +111,11 @@ const isDeleteConfirmationShown = ref<boolean>(false);
 
 async function deleteTable(): Promise<void> {
   try {
+    await store.dispatch("user/refreshExpired")
     await TableApi.delete({ id: props.id }, store.getters["user/accessToken"]);
     emit("delete", props.id);
     message.success("Таблица удалена");
   } catch (error) {
-    // TODO: 401 Handler
     if (axios.isAxiosError(error)) {
       console.log(error.message);
     }

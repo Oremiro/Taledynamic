@@ -94,6 +94,7 @@ const tablesInitializationStatus = ref<InitializationStatus>(
 async function initializeTablesList(): Promise<void> {
   tablesInitializationStatus.value = InitializationStatus.Pending;
   try {
+    await store.dispatch("user/refreshExpired")
     const { data } = await TableApi.getList(
       {
         workspaceId: props.workspaceId
@@ -104,7 +105,6 @@ async function initializeTablesList(): Promise<void> {
     tablesInitializationStatus.value = InitializationStatus.Success;
   } catch (error) {
     tablesInitializationStatus.value = InitializationStatus.Error;
-    // TODO: 401 Handler
     if (axios.isAxiosError(error)) {
       message.error(error.message);
     }
