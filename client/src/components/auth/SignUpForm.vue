@@ -5,6 +5,7 @@
         v-slot="{ handleInput, handleBlur, handleFocus, value }"
         v-model:value="formData.email.value"
         :options="options"
+        :blur-after-select="true"
       >
         <n-input
           placeholder=""

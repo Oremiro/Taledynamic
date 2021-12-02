@@ -1,26 +1,30 @@
 import { AutoCompleteOption } from "naive-ui";
 
 export const emailRegex = /^[a-zA-Z0-9][\w.-]*@[a-zA-Z]{2,}(\.[a-zA-Z]{2,})+$/;
-export const passwordRegex =
-  /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*_(),.+-]).{8,64}$/;
+export const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*_(),.+-]).{8,64}$/;
+
+export const emailDomains: string[] = [
+  "aol.com",
+  "bk.ru",
+  "gmail.com",
+  "hotmail.com",
+  "icloud.com",
+  "inbox.ru",
+  "list.ru",
+  "live.com",
+  "mail.ru",
+  "msn.com",
+  "outlook.com",
+  "protonmail.com",
+  "yahoo.com",
+  "yandex.ru"
+];
 
 export function externalOptions(value: string): AutoCompleteOption[] {
-  const base: string[] = [
-    "gmail.com",
-    "outlook.com",
-    "yandex.ru",
-    "mail.ru",
-    "aol.com",
-    "list.ru",
-    "bk.ru",
-    "inbox.ru"
-  ];
   const [prefix, suffix]: string[] = value.split("@");
-  let filteredBase: string[];
-  if (suffix !== "") {
-    filteredBase = base.filter((item) => item.startsWith(suffix)).slice(0, 3);
-  } else {
-    filteredBase = base.slice(0, 3);
+  let filteredBase: string[] = [];
+  if (suffix !== "" && !emailDomains.includes(suffix)) {
+    filteredBase = emailDomains.filter((item) => item.startsWith(suffix)).slice(0, 3);
   }
   return filteredBase.map((suffix) => {
     return {
@@ -30,9 +34,7 @@ export function externalOptions(value: string): AutoCompleteOption[] {
   });
 }
 
-export async function stringValidator(
-  targetValue: string
-): Promise<void> {
+export async function stringValidator(targetValue: string): Promise<void> {
   const trimmedValue: string = targetValue.trim();
   if (trimmedValue === "") {
     throw new Error("Required");

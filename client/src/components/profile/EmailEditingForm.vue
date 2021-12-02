@@ -1,7 +1,12 @@
 <template>
   <n-form ref="formRef" :rules="rules" :model="formData">
     <n-form-item ref="emailInputRef" first label="Email" path="email.value">
-      <n-auto-complete v-slot="{ handleInput, handleBlur, handleFocus, value }" v-model:value="formData.email.value">
+      <n-auto-complete
+        v-slot="{ handleInput, handleBlur, handleFocus, value }"
+        v-model:value="formData.email.value"
+        :options="options"
+        :blur-after-select="true"
+      >
         <n-input
           placeholder=""
           :value="value"
@@ -53,9 +58,9 @@
 </template>
 
 <script setup lang="ts">
-import { debounce, emailRegex } from "@/helpers";
+import { debounce, emailRegex, externalOptions } from "@/helpers";
 import { FormRules, NForm, NFormItem, useMessage } from "naive-ui";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { useStore } from "@/store";
 import { EmailEditFormData } from "@/models";
 import QuestionTooltip from "@/components/QuestionTooltip.vue";
@@ -179,4 +184,6 @@ function submitForm(): void {
     submitButtonRef.value?.holdDisabled();
   });
 }
+
+const options = computed(() => externalOptions(formData.email.value));
 </script>
