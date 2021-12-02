@@ -437,7 +437,10 @@ namespace Taledynamic.Core.Services
                 .AsQueryable()
                 .FirstOrDefaultAsync(u => u.TgUsername == request.TgUsername && u.IsActive);
 
-            var response = new TgAuthResponse();
+            var response = new TgAuthResponse()
+            {
+                Message = "Success."
+            };
             
             return response;
         }

@@ -1,6 +1,7 @@
 ﻿namespace Taledynamic.DAL.Models.Responses.UserResponses
 {
-    public class TgAuthResponse
+    public class TgAuthResponse:BaseResponse
+
     {
     }
 }

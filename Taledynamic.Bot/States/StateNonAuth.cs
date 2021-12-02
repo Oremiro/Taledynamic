@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot;
@@ -9,16 +10,13 @@ namespace TaleDynamicBot.States
 {
     public class StateNonAuth:State
     {
+        private static readonly HttpClient client = new HttpClient();
         public override async void Auth(ITelegramBotClient botClient, Update update)
         {
-            //авторизация в проекте.
-
-            Log.Information($"Username {update.Message.Chat.Username} has logged");
             await botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "....."
+                text: "http://taledynamic.com/tgauth?" + update.Message.Chat.Username
             );
-            //if auth successed and await moments
             this._user.ChangeState(new StateAuth());
         }
         
