@@ -43,7 +43,7 @@
               placeholder=""
               autosize
               size="small"
-              :maxlength="50"
+              :maxlength="100"
               style="max-width: 10rem"
               @blur="hideCreatingInput"
               @keyup.enter="addColumn"

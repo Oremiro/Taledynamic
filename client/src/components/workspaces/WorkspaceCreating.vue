@@ -7,41 +7,23 @@
       :loading="isWorkspaceCreatingPending"
       @click="isWorkspaceInputShown = true"
     >
-      {{
-        isWorkspaceCreatingPending
-          ? "Создание пространства"
-          : "Создать пространство"
-      }}
+      {{ isWorkspaceCreatingPending ? "Создание пространства" : "Создать пространство" }}
     </delayed-button>
-    <n-form-item
-      v-else
-      :show-label="false"
-      :show-feedback="false"
-      :rule="workspaceCreatingRule"
-    >
+    <n-form-item v-else :show-label="false" :show-feedback="false" :rule="workspaceCreatingRule">
       <n-input-group>
         <n-input
           ref="nameInput"
           v-model:value="newWorkspaceName"
+          :maxlength="100"
           placeholder="Название пространства"
           @keyup.enter="createWorkspace"
         />
-        <n-button
-          v-if="isWorkspaceInputValid"
-          attr-type="submit"
-          style="padding: 0.6rem"
-          @click="createWorkspace"
-        >
+        <n-button v-if="isWorkspaceInputValid" attr-type="submit" style="padding: 0.6rem" @click="createWorkspace">
           <n-icon size="1.2rem">
             <checkmark-icon />
           </n-icon>
         </n-button>
-        <dynamically-typed-button
-          ghost
-          style="padding: 0.6rem"
-          type="error"
-          @click="clearNameInput"
-        >
+        <dynamically-typed-button ghost style="padding: 0.6rem" type="error" @click="clearNameInput">
           <n-icon size="1.2rem">
             <dismiss-icon />
           </n-icon>

@@ -3,6 +3,7 @@
     <div style="display: flex; gap: 0.5rem; align-items: center">
       <n-input
         v-model:value="header.name"
+        :maxlength="100"
         autosize
         size="small"
         placeholder=""

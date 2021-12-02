@@ -1,23 +1,20 @@
 <template>
   <n-form ref="formRef" :rules="rules" :model="formData">
     <n-form-item ref="emailInputRef" first label="Email" path="email.value">
-      <n-auto-complete
-        v-slot="{ handleInput, handleBlur, handleFocus, value }"
-        v-model:value="formData.email.value"
-      >
+      <n-auto-complete v-slot="{ handleInput, handleBlur, handleFocus, value }" v-model:value="formData.email.value">
         <n-input
           placeholder=""
           :value="value"
           :loading="isEmailValidationPending"
+          :maxlength="100"
           @input="handleInput"
           @focus="handleFocus"
           @blur="handleBlur"
         >
           <template v-if="!formData.email.isValid" #prefix>
             <question-tooltip>
-              Email может содержать только буквы латинского алфавита, цифры,
-              точку, подчеркивание и минус. Почтовый домен должен быть
-              корректным.
+              Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый
+              домен должен быть корректным.
             </question-tooltip>
           </template>
         </n-input>
@@ -27,6 +24,7 @@
       <n-form-item label="Текущий пароль" path="currentPassword.value">
         <n-input
           v-model:value="formData.currentPassword.value"
+          :maxlength="100"
           type="password"
           show-password-on="click"
           placeholder=""

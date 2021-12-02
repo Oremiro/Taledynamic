@@ -92,6 +92,7 @@ const tablesInitializationStatus = ref<InitializationStatus>(
 );
 
 async function initializeTablesList(): Promise<void> {
+  if(isNaN(props.workspaceId)) return;
   tablesInitializationStatus.value = InitializationStatus.Pending;
   try {
     await store.dispatch("user/refreshExpired")

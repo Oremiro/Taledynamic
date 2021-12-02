@@ -10,15 +10,15 @@
           placeholder=""
           :value="value"
           :loading="isEmailValidationPending"
+          :maxlength="100"
           @input="handleInput"
           @focus="handleFocus"
           @blur="handleBlur"
         >
           <template v-if="!formData.email.isValid && !isEmailUsed" #prefix>
             <question-tooltip>
-              Email может содержать только буквы латинского алфавита, цифры,
-              точку, подчеркивание и минус. Почтовый домен должен быть
-              корректным.
+              Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый
+              домен должен быть корректным.
             </question-tooltip>
           </template>
         </n-input>
@@ -30,28 +30,24 @@
         type="password"
         show-password-on="click"
         placeholder=""
+        :maxlength="100"
         :loading="isPasswordValidationPending"
         @input="handlePasswordInput"
       >
         <template v-if="!formData.password.isValid" #prefix>
           <question-tooltip>
-            Пароль должен содержать минимум 8 символов, заглавную букву,
-            строчную букву, цифру и специальный символ.
+            Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
           </question-tooltip>
         </template>
       </n-input>
     </n-form-item>
-    <n-form-item
-      ref="confirmedPasswordRef"
-      first
-      label="Повторите пароль"
-      path="confirmedPassword.value"
-    >
+    <n-form-item ref="confirmedPasswordRef" first label="Повторите пароль" path="confirmedPassword.value">
       <n-input
         v-model:value="formData.confirmedPassword.value"
         type="password"
         show-password-on="click"
         placeholder=""
+        :maxlength="100"
         :disabled="!formData.password.isValid"
         :loading="isConfirmedPwdValidationPending"
       />
@@ -86,12 +82,7 @@ import { computed, reactive, ref } from "vue";
 import { useMessage, NForm, FormRules, NFormItem } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
-import {
-  debounce,
-  emailRegex,
-  passwordRegex,
-  externalOptions
-} from "@/helpers";
+import { debounce, emailRegex, passwordRegex, externalOptions } from "@/helpers";
 import { UserApi } from "@/helpers/api/user";
 import { SignUpFormData } from "@/models";
 import QuestionTooltip from "@/components/QuestionTooltip.vue";
@@ -220,9 +211,7 @@ const options = computed(() => externalOptions(formData.email.value));
 
 function handlePasswordInput(): void {
   if (formData.confirmedPassword.value != "") {
-    confirmedPasswordRef.value
-      ?.validate({ trigger: "password-input" })
-      .catch(() => true);
+    confirmedPasswordRef.value?.validate({ trigger: "password-input" }).catch(() => true);
   }
 }
 function submitForm(): void {

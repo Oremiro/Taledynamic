@@ -1,29 +1,19 @@
 <template>
-  <n-form-item
-    ref="tableNameFormItem"
-    :show-label="false"
-    :show-feedback="false"
-    :rule="tableNameRule"
-  >
+  <n-form-item ref="tableNameFormItem" :show-label="false" :show-feedback="false" :rule="tableNameRule">
     <n-input-group>
       <n-input
         ref="tableNameInput"
         v-model:value="tableName"
         autosize
         :show-count="!loading"
-        :maxlength="30"
+        :maxlength="50"
         placeholder=""
         :loading="loading"
         :disabled="loading"
         @blur="emit('blur', $event)"
         @keyup.enter="validate"
       />
-      <n-button
-        v-if="isTableNameValid && !loading"
-        attr-type="submit"
-        style="padding: 0.6rem"
-        @click="validate"
-      >
+      <n-button v-if="isTableNameValid && !loading" attr-type="submit" style="padding: 0.6rem" @click="validate">
         <n-icon size="1.2rem">
           <checkmark-icon />
         </n-icon>
