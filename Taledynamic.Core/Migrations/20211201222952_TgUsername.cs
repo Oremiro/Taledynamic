@@ -2,7 +2,7 @@
 
 namespace Taledynamic.Core.Migrations
 {
-    public partial class TgUsername : Migration
+    public partial class TgId : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -7,13 +7,13 @@ namespace Taledynamic.DAL.Models.Requests.UserRequests
     public class TgAuthRequest:BaseRequest
     {
         [Required]
-        public string TgUsername { get; set; }
+        public string TgId { get; set; }
         
         public override ValidateState IsValid()
         {
             StringBuilder sb = new StringBuilder();
             
-            if (TgUsername == null)
+            if (TgId == null)
             {
                 sb.Append("TgUsername is not set");
             }
