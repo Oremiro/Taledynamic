@@ -43,12 +43,12 @@
           </n-icon>
         </template>
         <template #action>
-          <n-button ghost type="warning" size="small" @click="setColumnType(columnType)"> Да </n-button>
+          <n-button ghost type="warning" size="small" @click="setColumnType(tempColumnType)"> Да </n-button>
           <n-button ghost size="small" @click="resetColumnType"> Нет </n-button>
         </template>
         <template #trigger>
           <n-popselect
-            v-model:value="columnType"
+            v-model:value="tempColumnType"
             trigger="click"
             :options="columnTypeOptions"
             :render-label="optionsRenderLabel"
@@ -246,15 +246,16 @@ async function setColumnType(type: TableDataType) {
       console.log(error.message);
     }
   }
+  columnType.value = type;
 }
 
 async function resetColumnType() {
-  columnType.value = store.getters["table/headers"][props.index].type;
+  tempColumnType.value = columnType.value;
   isTypeConfirmationShown.value = false;
 }
 
 async function onColumnTypeUpdate(value: TableDataType): Promise<void> {
-  if (value === store.getters["table/headers"][props.index].type) return;
+  if (value === columnType.value) return;
   typeSelectLoading.value = true;
   const isEmpty: boolean = await isColumnEmpty();
   typeSelectLoading.value = false;
@@ -267,6 +268,7 @@ async function onColumnTypeUpdate(value: TableDataType): Promise<void> {
 }
 
 const columnType = ref<TableDataType>(store.getters["table/headers"][props.index].type);
+const tempColumnType = ref<TableDataType>(columnType.value);
 
 const isTypeConfirmationShown = ref<boolean>(false);
 
