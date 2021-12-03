@@ -65,7 +65,7 @@
 <script setup lang="ts">
 import { computed, h, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
-import { darkTheme, MenuGroupOption, MenuOption, useLoadingBar, useMessage } from "naive-ui";
+import { darkTheme, MenuGroupOption, MenuOption, useLoadingBar } from "naive-ui";
 import { useStore } from "@/store";
 import { Theme } from "@/models";
 
@@ -78,7 +78,6 @@ const emit = defineEmits<{
 
 const loadingBar = useLoadingBar();
 loadingBar.start();
-const message = useMessage();
 const store = useStore();
 const route = useRoute();
 
@@ -120,7 +119,6 @@ watch(
       loadingBar.finish();
     } else if (value === "error") {
       loadingBar.error();
-      message.error("Ваша сессия устарела");
     }
   }
 );

@@ -178,7 +178,7 @@ async function deleteWorkspace() {
       if (workspaces.length) {
         router.push({ name: "Workspace", params: { id: workspaces[0].id } });
       } else {
-        router.push({ name: "Home" });
+        router.push({ name: "Main" });
       }
     }
   } catch (error) {

@@ -5,7 +5,8 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "Home",
+    name: "Main",
+    meta: { requiresAuth: true },
     component: () => import("@/views/MainView.vue")
   },
   {
@@ -86,10 +87,7 @@ router.beforeResolve(async (to) => {
       name: "Auth",
       query: { redirect: to.fullPath }
     };
-  } else if (
-    (to.name === "AuthSignIn" || to.name === "AuthSignUp") &&
-    isLoggedIn
-  ) {
+  } else if ((to.name === "AuthSignIn" || to.name === "AuthSignUp") && isLoggedIn) {
     return {
       name: "ProfileIndex"
     };
@@ -101,8 +99,7 @@ router.afterEach(
   () =>
     new Promise<void>((resolve) => {
       const isLoggedIn: boolean = store.getters["user/isLoggedIn"];
-      const workspacesInitStatus: InitializationStatus =
-        store.getters["workspaces/initStatus"];
+      const workspacesInitStatus: InitializationStatus = store.getters["workspaces/initStatus"];
       if (isLoggedIn && workspacesInitStatus !== InitializationStatus.Success) {
         setTimeout(async () => {
           try {
