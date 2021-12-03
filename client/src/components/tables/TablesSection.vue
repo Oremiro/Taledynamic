@@ -35,8 +35,9 @@
     </template>
     <template #default>
       <tables-list
+        v-if="currentWorkspace !== null"
         ref="tablesListRef"
-        :workspace-id="workspaceId"
+        :workspace-id="currentWorkspace.id"
         :editable="isTablesEditable"
         :sort-type="popSortValue"
       />

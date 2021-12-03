@@ -1,24 +1,26 @@
 <template>
-  <transition name="fade" mode="out-in">
-    <div v-if="isInitializationSuccess" class="workspaces-section-content">
-      <transition name="fade" mode="out-in">
-        <div v-if="workspacesLength" style="height: 100%">
-          <div class="workspaces-section-content-header">
-            <n-text depth="3"> Ваши рабочие пространства </n-text>
-            <workspaces-sort-item />
+  <n-card>
+    <transition name="fade" mode="out-in">
+      <div v-if="isInitializationSuccess" class="workspaces-section-content">
+        <transition name="fade" mode="out-in">
+          <div v-if="workspacesLength" style="height: 100%">
+            <div class="workspaces-section-content-header">
+              <n-text depth="3"> Ваши рабочие пространства </n-text>
+              <workspaces-sort-item />
+            </div>
+            <n-scrollbar style="height: 100%">
+              <workspaces-list />
+            </n-scrollbar>
           </div>
-          <n-scrollbar style="height: 100%">
-            <workspaces-list />
-          </n-scrollbar>
+          <n-empty v-else size="large" description="Рабочих пространств нет" class="workspaces-section-content-empty" />
+        </transition>
+        <div class="workspaces-section-content-footer">
+          <workspace-creating-item />
         </div>
-        <n-empty v-else size="large" description="Рабочих пространств нет" class="workspaces-section-content-empty" />
-      </transition>
-      <div class="workspaces-section-content-footer">
-        <workspace-creating-button />
       </div>
-    </div>
-    <workspace-loading v-else :error="isInitializationError" @repeat-loading="initWorkspaces" />
-  </transition>
+      <workspace-loading v-else :error="isInitializationError" @repeat-loading="initWorkspaces" />
+    </transition>
+  </n-card>
 </template>
 
 <script setup lang="ts">
@@ -26,7 +28,7 @@ import { computed } from "vue";
 import { NScrollbar, NEmpty } from "naive-ui";
 import { useStore } from "@/store";
 import { InitializationStatus } from "@/models";
-import WorkspaceCreatingButton from "@/components/workspaces/WorkspaceCreating.vue";
+import WorkspaceCreatingItem from "@/components/workspaces/WorkspaceCreatingItem.vue";
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
 import WorkspaceLoading from "@/components/workspaces/WorkspacesLoading.vue";
 import WorkspacesSortItem from "@/components/workspaces/WorkspacesSortItem.vue";
@@ -61,13 +63,13 @@ async function initWorkspaces(): Promise<void> {
 }
 
 .workspaces-section-content-header {
-  // padding: 1rem;
+  padding-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .workspaces-section-content-footer {
-  // padding: 1rem;
+  padding-top: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
