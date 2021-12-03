@@ -22,3 +22,12 @@ services:
       - $PWD/dev-tools/postgres/data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  mongodb:
+    image: mongo  
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+    volumes:
+      - $PWD/dev-tools/mongodb/data:/db
+    ports:
+      - "27017:27017"
