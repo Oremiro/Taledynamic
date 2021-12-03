@@ -48,39 +48,21 @@
             <edit-icon />
           </n-icon>
         </n-button>
-        <n-popconfirm v-model:show="confirmShow">
-          <template #icon>
-            <n-icon :color="errorColor">
-              <error-circle-icon />
-            </n-icon>
-          </template>
-          <template #action>
-            <n-button ghost type="error" size="small" @click.stop="deleteWorkspace"> Да </n-button>
-            <n-button ghost size="small" @click.stop="confirmShow = false"> Нет </n-button>
-          </template>
-          <template #trigger>
-            <dynamically-typed-button type="error" text @click.stop>
-              <n-icon size="1.2rem">
-                <delete-icon />
-              </n-icon>
-            </dynamically-typed-button>
-          </template>
-          <div>Удалить пространство?</div>
-        </n-popconfirm>
+        <workspace-deleting-item :id="id" />
       </div>
     </div>
   </transition>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { FormItemRule, NEllipsis, NInput, NPopconfirm, useMessage, useThemeVars } from "naive-ui";
+import { ref } from "vue";
+import { FormItemRule, NEllipsis, NInput, useMessage } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace } from "@/models/store";
 import { stringValidator } from "@/helpers";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
-import { CheckmarkIcon, EditIcon, DeleteIcon, ErrorCircleIcon, DismissIcon } from "@/components/icons";
+import { CheckmarkIcon, EditIcon, DismissIcon } from "@/components/icons";
 import { useRouter } from "vue-router";
+import WorkspaceDeletingItem from "@/components/workspaces/WorkspaceDeletingItem.vue";
 
 const props = defineProps({
   id: {
@@ -153,30 +135,6 @@ async function editWorkspaceName(): Promise<void> {
   }
 }
 
-const errorColor = computed<string>(() => useThemeVars().value.errorColor);
-const confirmShow = ref<boolean>(false);
-
 const store = useStore();
 const message = useMessage();
-
-async function deleteWorkspace() {
-  confirmShow.value = false;
-  try {
-    await store.dispatch("workspaces/delete", { id: props.id });
-    message.success("Пространство удалено");
-    const currentWorkspace: Workspace | null = store.getters["workspaces/currentWorkspace"];
-    if (currentWorkspace?.id === props.id) {
-      const workspaces: Workspace[] = store.getters["workspaces/workspaces"];
-      if (workspaces.length) {
-        router.push({ name: "Main", params: { id: workspaces[0].id } });
-      } else {
-        router.push({ name: "Main" });
-      }
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      message.error(error.message);
-    }
-  }
-}
 </script>

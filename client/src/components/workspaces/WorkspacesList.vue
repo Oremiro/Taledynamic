@@ -10,25 +10,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, PropType } from "vue";
+import { computed, h } from "vue";
 import { MenuGroupOption, MenuOption } from "naive-ui";
 import { Workspace } from "@/models/store";
 import WorkspacesListItem from "@/components/workspaces/WorkspacesListItem.vue";
 import { useStore } from "@/store";
 import { useRouter } from "vue-router";
 
-const props = defineProps({
-  workspaces: {
-    type: Array as PropType<Workspace[]>,
-    required: true
-  }
-});
-
 const store = useStore();
+const workspaces = computed<Workspace[]>(() => store.getters["workspaces/workspaces"]);
 const currentWorkspaceId = computed<number>(() => store.getters["workspaces/currentWorkspace"]?.id);
 
 const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() =>
-  props.workspaces.map((item: Workspace) => {
+  workspaces.value.map((item: Workspace) => {
     return {
       label: () => h(WorkspacesListItem, { id: item.id, name: item.name }),
       key: item.id
@@ -38,11 +32,7 @@ const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() =>
 
 const router = useRouter();
 async function setCurrentWorkspace(id: number): Promise<void> {
-  if (isNaN(id)) {
-    router.push({ name: "NotFound" });
-    return;
-  }
-  const currentWorkspace: Workspace | undefined = props.workspaces.find((item) => item.id === id);
+  const currentWorkspace: Workspace | undefined = workspaces.value.find((item) => item.id === id);
   if (currentWorkspace) {
     store.commit("workspaces/setCurrent", { workspace: currentWorkspace });
   } else {

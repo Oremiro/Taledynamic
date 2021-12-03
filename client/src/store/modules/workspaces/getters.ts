@@ -6,6 +6,9 @@ export const getters: GetterTree<WorkspacesState, State> = {
   workspaces(state: WorkspacesState): Workspace[] {
     return state.workspaces;
   },
+  workspacesLength(state: WorkspacesState): number {
+    return state.workspaces.length;
+  },
   currentWorkspace(state: WorkspacesState): Workspace | null {
     return state.currentWorkspace;
   },

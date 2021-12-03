@@ -2,13 +2,13 @@
   <transition name="fade" mode="out-in">
     <div v-if="isInitializationSuccess" class="workspaces-section-content">
       <transition name="fade" mode="out-in">
-        <div v-if="workspaces.length" style="height: 100%">
+        <div v-if="workspacesLength" style="height: 100%">
           <div class="workspaces-section-content-header">
             <n-text depth="3"> Ваши рабочие пространства </n-text>
             <workspaces-sort-item />
           </div>
           <n-scrollbar style="height: 100%">
-            <workspaces-list :workspaces="workspaces" />
+            <workspaces-list />
           </n-scrollbar>
         </div>
         <n-empty v-else size="large" description="Рабочих пространств нет" class="workspaces-section-content-empty" />
@@ -25,7 +25,6 @@
 import { computed } from "vue";
 import { NScrollbar, NEmpty } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace } from "@/models/store";
 import { InitializationStatus } from "@/models";
 import WorkspaceCreatingButton from "@/components/workspaces/WorkspaceCreating.vue";
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
@@ -34,7 +33,8 @@ import WorkspacesSortItem from "@/components/workspaces/WorkspacesSortItem.vue";
 
 const store = useStore();
 
-const workspaces = computed<Workspace[]>(() => store.getters["workspaces/workspaces"]);
+const workspacesLength = computed<number>(() => store.getters["workspaces/workspacesLength"]);
+
 const isInitializationSuccess = computed<boolean>(
   () => store.getters["workspaces/initStatus"] === InitializationStatus.Success
 );
