@@ -19,6 +19,10 @@ namespace Taledynamic.Api
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File(
+                    path:@"Logs/log.txt",
+                    rollingInterval:RollingInterval.Day
+                    )
                 .CreateLogger();
 
             try
