@@ -5,18 +5,7 @@
         <div v-if="workspaces.length" style="height: 100%">
           <div class="workspaces-section-content-header">
             <n-text depth="3"> Ваши рабочие пространства </n-text>
-            <n-popselect
-              v-model:value="popSortValue"
-              trigger="click"
-              :options="popOptions"
-              @update:value="updateHandler"
-            >
-              <n-button text>
-                <n-icon size="1.2rem">
-                  <arrow-sort-icon />
-                </n-icon>
-              </n-button>
-            </n-popselect>
+            <workspaces-sort-item />
           </div>
           <n-scrollbar style="height: 100%">
             <workspaces-list :workspaces="workspaces" />
@@ -28,74 +17,32 @@
         <workspace-creating-button />
       </div>
     </div>
-    <workspace-loading v-else :error="isInitializationError" @repeat-loading="getWorkspaces" />
+    <workspace-loading v-else :error="isInitializationError" @repeat-loading="initWorkspaces" />
   </transition>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
-import { SelectGroupOption, SelectOption, NScrollbar, NEmpty } from "naive-ui";
+import { computed } from "vue";
+import { NScrollbar, NEmpty } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace, WorkspacesSortType } from "@/models/store";
+import { Workspace } from "@/models/store";
 import { InitializationStatus } from "@/models";
 import WorkspaceCreatingButton from "@/components/workspaces/WorkspaceCreating.vue";
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
 import WorkspaceLoading from "@/components/workspaces/WorkspacesLoading.vue";
-import ArrowSortIcon from "@/components/icons/ArrowSortIcon.vue";
+import WorkspacesSortItem from "@/components/workspaces/WorkspacesSortItem.vue";
 
 const store = useStore();
 
 const workspaces = computed<Workspace[]>(() => store.getters["workspaces/workspaces"]);
-const popOptions: Array<SelectOption | SelectGroupOption> = [
-  {
-    type: "group",
-    label: "По дате",
-    key: "sortByDate",
-    children: [
-      {
-        label: "Сначала новые",
-        value: WorkspacesSortType.DateDescending
-      },
-      {
-        label: "Сначала старые",
-        value: WorkspacesSortType.DateAscending
-      }
-    ]
-  },
-  {
-    type: "group",
-    label: "По названию",
-    key: "sortByName",
-    children: [
-      {
-        label: "От A до Z",
-        value: WorkspacesSortType.NameAscending
-      },
-      {
-        label: "От Z до A",
-        value: WorkspacesSortType.NameDescending
-      }
-    ]
-  }
-];
-
-const popSortValueStored: string | null = localStorage.getItem("workspacesSort");
-const popSortValueParsed: number = popSortValueStored
-  ? parseInt(popSortValueStored)
-  : WorkspacesSortType.DateDescending;
-const popSortValue = ref<WorkspacesSortType>(
-  !isNaN(popSortValueParsed) ? popSortValueParsed : WorkspacesSortType.DateDescending
+const isInitializationSuccess = computed<boolean>(
+  () => store.getters["workspaces/initStatus"] === InitializationStatus.Success
+);
+const isInitializationError = computed<boolean>(
+  () => store.getters["workspaces/initStatus"] === InitializationStatus.Error
 );
 
-const isInitializationSuccess = computed<boolean>(() => workspacesInitStatus.value === InitializationStatus.Success);
-const isInitializationError = computed<boolean>(() => workspacesInitStatus.value === InitializationStatus.Error);
-
-async function updateHandler(value: number): Promise<void> {
-  localStorage.setItem("workspacesSort", value.toString());
-  await store.dispatch("workspaces/sort", { sortType: value });
-}
-
-async function getWorkspaces(): Promise<void> {
+async function initWorkspaces(): Promise<void> {
   try {
     await store.dispatch("workspaces/init");
   } catch (error) {
@@ -104,25 +51,6 @@ async function getWorkspaces(): Promise<void> {
     }
   }
 }
-
-/* Setting workspaces sort */
-const workspacesInitStatus = computed<InitializationStatus>(() => store.getters["workspaces/initStatus"]);
-
-onMounted(async () => {
-  if (workspacesInitStatus.value === InitializationStatus.Success) {
-    await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-  }
-});
-
-watch(workspacesInitStatus, async (value) => {
-  if (value === InitializationStatus.Success) {
-    await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-  }
-});
-
-watch(workspaces, async () => {
-  await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-});
 </script>
 
 <style lang="scss" scoped>
