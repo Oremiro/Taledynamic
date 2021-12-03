@@ -1,14 +1,7 @@
 <template>
   <transition name="fade" mode="out-in">
     <div v-if="isInitializationSuccess && tables.length">
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 1.5rem;
-        "
-      >
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem">
         <n-text>Ваши таблицы</n-text>
         <n-tag>{{ tables.length }} / 100</n-tag>
       </div>
@@ -44,11 +37,7 @@
       style="height: 15rem; display: flex; justify-content: center"
     >
       <template #extra>
-        <table-creating-item
-          :workspace-id="props.workspaceId"
-          :tables-count="tables.length"
-          @create="pushTableToList"
-        >
+        <table-creating-item :workspace-id="props.workspaceId" :tables-count="tables.length" @create="pushTableToList">
           Создать таблицу
         </table-creating-item>
       </template>
@@ -64,7 +53,7 @@
 
 <script setup lang="ts">
 import axios from "axios";
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import { useMessage, NEmpty, NTag } from "naive-ui";
 import { TableDto } from "@/models/api/responses";
 import { TableApi } from "@/helpers/api/table";
@@ -79,7 +68,7 @@ import { AddIcon } from "@/components/icons";
 const props = defineProps<{
   workspaceId: number;
   editable?: boolean;
-  sortType?: TablesSortType
+  sortType?: TablesSortType;
 }>();
 
 const tables = ref<TableDto[]>([]);
@@ -87,15 +76,13 @@ const tables = ref<TableDto[]>([]);
 const store = useStore();
 const message = useMessage();
 
-const tablesInitializationStatus = ref<InitializationStatus>(
-  InitializationStatus.Pending
-);
+const tablesInitializationStatus = ref<InitializationStatus>(InitializationStatus.Pending);
 
 async function initializeTablesList(): Promise<void> {
-  if(isNaN(props.workspaceId)) return;
+  if (isNaN(props.workspaceId)) return;
   tablesInitializationStatus.value = InitializationStatus.Pending;
   try {
-    await store.dispatch("user/refreshExpired")
+    await store.dispatch("user/refreshExpired");
     const { data } = await TableApi.getList(
       {
         workspaceId: props.workspaceId
@@ -134,28 +121,18 @@ function deleteListItem(id: number) {
 
 async function sortList(sortType: TablesSortType) {
   if (sortType === TablesSortType.NameAscending) {
-    tables.value.sort((itemFirst, itemSecond) =>
-      itemFirst.name.localeCompare(itemSecond.name)
-    );
+    tables.value.sort((itemFirst, itemSecond) => itemFirst.name.localeCompare(itemSecond.name));
   } else if (sortType === TablesSortType.NameDescending) {
-    tables.value.sort((itemFirst, itemSecond) =>
-      itemSecond.name.localeCompare(itemFirst.name)
-    );
+    tables.value.sort((itemFirst, itemSecond) => itemSecond.name.localeCompare(itemFirst.name));
   }
 }
 
-const isInitializationError = computed<boolean>(
-  () => tablesInitializationStatus.value === InitializationStatus.Error
-);
+const isInitializationError = computed<boolean>(() => tablesInitializationStatus.value === InitializationStatus.Error);
 const isInitializationSuccess = computed<boolean>(
   () => tablesInitializationStatus.value === InitializationStatus.Success
 );
 
 const initializeTableListDebounced = debounce(initializeTablesList, 1000);
-onMounted(async () => {
-  await initializeTableListDebounced();
-  await sortList(props.sortType ?? TablesSortType.NameAscending);
-});
 
 watch(
   () => props.workspaceId,
@@ -163,7 +140,8 @@ watch(
     tablesInitializationStatus.value = InitializationStatus.Pending;
     await initializeTableListDebounced();
     await sortList(props.sortType ?? TablesSortType.NameAscending);
-  }
+  },
+  { immediate: true }
 );
 
 defineExpose({
