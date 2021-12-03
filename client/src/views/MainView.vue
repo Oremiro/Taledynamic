@@ -7,9 +7,7 @@
         </n-card>
       </n-gi>
       <n-gi :span="9">
-        <n-card>
-          
-        </n-card>
+        <!-- <workspace-view /> -->
       </n-gi>
     </n-grid>
   </div>
@@ -17,6 +15,7 @@
 
 <script setup lang="ts">
 import WorkspacesSection from '@/components/workspaces/WorkspacesSection.vue';
+import WorkspaceView from '@/views/WorkspaceView.vue';
 </script>
 
 <style lang="scss" scoped>

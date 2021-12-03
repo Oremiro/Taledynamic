@@ -6,6 +6,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Main",
+    props: true,
     meta: { requiresAuth: true },
     component: () => import("@/views/MainView.vue")
   },

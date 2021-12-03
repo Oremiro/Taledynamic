@@ -22,33 +22,19 @@
             <workspaces-list :workspaces="workspaces" />
           </n-scrollbar>
         </div>
-        <n-empty
-          v-else
-          size="large"
-          description="Рабочих пространств нет"
-          class="workspaces-section-content-empty"
-        />
+        <n-empty v-else size="large" description="Рабочих пространств нет" class="workspaces-section-content-empty" />
       </transition>
       <div class="workspaces-section-content-footer">
         <workspace-creating-button />
       </div>
     </div>
-    <workspace-loading
-      v-else
-      :error="isInitializationError"
-      @repeat-loading="getWorkspaces"
-    />
+    <workspace-loading v-else :error="isInitializationError" @repeat-loading="getWorkspaces" />
   </transition>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
-import {
-  SelectGroupOption,
-  SelectOption,
-  NScrollbar,
-  NEmpty
-} from "naive-ui";
+import { SelectGroupOption, SelectOption, NScrollbar, NEmpty } from "naive-ui";
 import { useStore } from "@/store";
 import { Workspace, WorkspacesSortType } from "@/models/store";
 import { InitializationStatus } from "@/models";
@@ -59,9 +45,7 @@ import ArrowSortIcon from "@/components/icons/ArrowSortIcon.vue";
 
 const store = useStore();
 
-const workspaces = computed<Workspace[]>(
-  () => store.getters["workspaces/workspaces"]
-);
+const workspaces = computed<Workspace[]>(() => store.getters["workspaces/workspaces"]);
 const popOptions: Array<SelectOption | SelectGroupOption> = [
   {
     type: "group",
@@ -95,23 +79,16 @@ const popOptions: Array<SelectOption | SelectGroupOption> = [
   }
 ];
 
-const popSortValueStored: string | null =
-  localStorage.getItem("workspacesSort");
+const popSortValueStored: string | null = localStorage.getItem("workspacesSort");
 const popSortValueParsed: number = popSortValueStored
   ? parseInt(popSortValueStored)
   : WorkspacesSortType.DateDescending;
 const popSortValue = ref<WorkspacesSortType>(
-  !isNaN(popSortValueParsed)
-    ? popSortValueParsed
-    : WorkspacesSortType.DateDescending
+  !isNaN(popSortValueParsed) ? popSortValueParsed : WorkspacesSortType.DateDescending
 );
 
-const isInitializationSuccess = computed<boolean>(
-  () => workspacesInitStatus.value === InitializationStatus.Success
-);
-const isInitializationError = computed<boolean>(
-  () => workspacesInitStatus.value === InitializationStatus.Error
-);
+const isInitializationSuccess = computed<boolean>(() => workspacesInitStatus.value === InitializationStatus.Success);
+const isInitializationError = computed<boolean>(() => workspacesInitStatus.value === InitializationStatus.Error);
 
 async function updateHandler(value: number): Promise<void> {
   localStorage.setItem("workspacesSort", value.toString());
@@ -129,9 +106,7 @@ async function getWorkspaces(): Promise<void> {
 }
 
 /* Setting workspaces sort */
-const workspacesInitStatus = computed<InitializationStatus>(
-  () => store.getters["workspaces/initStatus"]
-);
+const workspacesInitStatus = computed<InitializationStatus>(() => store.getters["workspaces/initStatus"]);
 
 onMounted(async () => {
   if (workspacesInitStatus.value === InitializationStatus.Success) {
@@ -158,13 +133,13 @@ watch(workspaces, async () => {
 }
 
 .workspaces-section-content-header {
-  padding: 1rem;
+  // padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .workspaces-section-content-footer {
-  padding: 1rem;
+  // padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
