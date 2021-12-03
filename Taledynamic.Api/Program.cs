@@ -13,10 +13,10 @@ namespace Taledynamic.Api
 {
     public class Program
     {
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
@@ -25,12 +25,10 @@ namespace Taledynamic.Api
             {
                 Log.Information("Starting web host");
                 CreateHostBuilder(args).Build().Run();
-                return 0;
             }
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Host terminated unexpectedly");
-                return 1;
             }
             finally
             {
