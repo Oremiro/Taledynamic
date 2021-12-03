@@ -2,12 +2,9 @@
   <n-config-provider :theme="currentTheme">
     <n-global-style />
     <n-message-provider>
-      <n-layout style="min-height: 100vh">
+      <n-layout style="min-height: 100vh" position="absolute">
         <n-loading-bar-provider>
-          <layout-header
-            :current-theme="currentTheme"
-            @change-theme="setTheme"
-          />
+          <layout-header :current-theme="currentTheme" @change-theme="setTheme" />
         </n-loading-bar-provider>
         <n-layout has-sider position="absolute" style="top: 3.3rem">
           <layout-sider />
@@ -33,7 +30,7 @@ import LayoutHeader from "@/layouts/LayoutHeader.vue";
 import LayoutSider from "@/layouts/LayoutSider.vue";
 import { Theme } from "@/models";
 import { useStore } from "@/store";
-import { UserState } from "@/models/store";
+import { LoginState } from "@/models/store";
 
 const currentTheme = ref<Theme>(darkTheme);
 const storedTheme: string | null = localStorage.getItem("theme");
@@ -65,17 +62,14 @@ onstorage = (event: StorageEvent): void => {
 };
 
 const signinBC = new BroadcastChannel("signin");
-signinBC.onmessage = (ev: MessageEvent<UserState>): void => {
+signinBC.onmessage = (ev: MessageEvent<LoginState>): void => {
   if (!store.getters["user/isLoggedIn"]) {
-    const userState: UserState = ev.data;
+    const userState = ev.data;
     store.commit("user/login", {
       user: userState.user,
       accessToken: userState.accessTokenInMemory
     });
-    if (
-      router.currentRoute.value.name === "AuthSignIn" ||
-      router.currentRoute.value.name === "AuthSignUp"
-    ) {
+    if (router.currentRoute.value.name === "AuthSignIn" || router.currentRoute.value.name === "AuthSignUp") {
       router.push({ name: "ProfileIndex" });
     }
   }
@@ -103,10 +97,8 @@ onUnmounted(() => {
 }
 
 .container {
-  height: 100%;
-  padding-top: 4rem;
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding: 2.5rem 3.5rem;
 }
 </style>

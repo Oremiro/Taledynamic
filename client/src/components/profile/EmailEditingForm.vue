@@ -4,20 +4,22 @@
       <n-auto-complete
         v-slot="{ handleInput, handleBlur, handleFocus, value }"
         v-model:value="formData.email.value"
+        :options="options"
+        :blur-after-select="true"
       >
         <n-input
           placeholder=""
           :value="value"
           :loading="isEmailValidationPending"
+          :maxlength="100"
           @input="handleInput"
           @focus="handleFocus"
           @blur="handleBlur"
         >
           <template v-if="!formData.email.isValid" #prefix>
             <question-tooltip>
-              Email может содержать только буквы латинского алфавита, цифры,
-              точку, подчеркивание и минус. Почтовый домен должен быть
-              корректным.
+              Email может содержать только буквы латинского алфавита, цифры, точку, подчеркивание и минус. Почтовый
+              домен должен быть корректным.
             </question-tooltip>
           </template>
         </n-input>
@@ -27,6 +29,7 @@
       <n-form-item label="Текущий пароль" path="currentPassword.value">
         <n-input
           v-model:value="formData.currentPassword.value"
+          :maxlength="100"
           type="password"
           show-password-on="click"
           placeholder=""
@@ -55,9 +58,9 @@
 </template>
 
 <script setup lang="ts">
-import { debounce, emailRegex } from "@/helpers";
+import { debounce, emailRegex, externalOptions } from "@/helpers";
 import { FormRules, NForm, NFormItem, useMessage } from "naive-ui";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { useStore } from "@/store";
 import { EmailEditFormData } from "@/models";
 import QuestionTooltip from "@/components/QuestionTooltip.vue";
@@ -181,4 +184,6 @@ function submitForm(): void {
     submitButtonRef.value?.holdDisabled();
   });
 }
+
+const options = computed(() => externalOptions(formData.email.value));
 </script>

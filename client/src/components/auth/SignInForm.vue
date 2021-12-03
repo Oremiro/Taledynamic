@@ -6,11 +6,13 @@
         :options="options"
         placeholder=""
         :loading="isEmailValidationPending"
+        :blur-after-select="true"
       />
     </n-form-item>
     <n-form-item first label="Пароль" path="password.value">
       <n-input
         v-model:value="formData.password.value"
+        :maxlength="100"
         type="password"
         show-password-on="click"
         placeholder=""
@@ -27,12 +29,7 @@
         type="primary"
         ghost
         :loading="submitLoading"
-        :disabled="
-          !formData.email.isValid ||
-          !formData.password.value ||
-          submitLoading ||
-          isEmailValidationPending
-        "
+        :disabled="!formData.email.isValid || !formData.password.value || submitLoading || isEmailValidationPending"
         @click="submitForm"
       >
         Войти
@@ -49,7 +46,7 @@ import { useStore } from "@/store";
 import { debounce, emailRegex, externalOptions } from "@/helpers";
 import { SignInFormData } from "@/models";
 import DelayedButton from "@/components/DelayedButton.vue";
-import { UserState } from "@/models/store";
+import { LoginState } from "@/models/store";
 
 const formData = reactive<SignInFormData>({
   email: {
@@ -106,15 +103,13 @@ function submitForm(): void {
   formRef.value?.validate(async (errors): Promise<void> => {
     if (!errors) {
       try {
-        const userState: UserState = await store.dispatch(
-          "user/login",
-          formData
-        );
+        const userState: LoginState = await store.dispatch("user/login", formData);
         const signinBC = new BroadcastChannel("signin");
         signinBC.postMessage(userState);
         signinBC.close();
         message.success("Вы успешно вошли!");
-        router.push("/profile");
+        const nextRoute = router.currentRoute.value.query.redirect;
+        router.push(typeof nextRoute === "string" ? nextRoute : "/profile");
       } catch (error) {
         if (error instanceof Error) {
           message.error(error.message);

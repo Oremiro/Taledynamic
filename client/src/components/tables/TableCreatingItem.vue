@@ -60,6 +60,7 @@ async function createTable(name: string): Promise<void> {
   }
   try {
     isInputLoading.value = true;
+    await store.dispatch("user/refreshExpired")
     const { data } = await TableApi.create(
       {
         name: name,
@@ -71,7 +72,6 @@ async function createTable(name: string): Promise<void> {
     emit("create", data.table);
     message.success("Таблица успешно создана");
   } catch (error) {
-    // TODO: 401 Handler
     if (axios.isAxiosError(error)) {
       console.log(error.message);
     }

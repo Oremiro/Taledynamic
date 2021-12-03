@@ -3,13 +3,7 @@ import { ActionTree } from "vuex";
 import { VueCookieNext } from "vue-cookie-next";
 import { UserApi } from "@/helpers/api/user";
 import { SignUpFormData, SignInFormData } from "@/models";
-import {
-  State,
-  UserState,
-  UpdatedEmailData,
-  UpdatedPasswordData,
-  User
-} from "@/models/store";
+import { State, UserState, UpdatedEmailData, UpdatedPasswordData, User, LoginState } from "@/models/store";
 
 export const actions: ActionTree<UserState, State> = {
   async init({ dispatch }): Promise<boolean> {
@@ -44,16 +38,14 @@ export const actions: ActionTree<UserState, State> = {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status == 400) {
-          throw new Error(
-            "Пользователь с таким почтовым адресом уже существует"
-          );
+          throw new Error("Пользователь с таким почтовым адресом уже существует");
         } else {
           throw new Error("Ошибка регистрации");
         }
       }
     }
   },
-  async login({ commit }, formData: SignInFormData): Promise<UserState> {
+  async login({ commit }, formData: SignInFormData): Promise<LoginState> {
     const requestedUser = {
       email: formData.email.value,
       password: formData.password.value
@@ -89,9 +81,10 @@ export const actions: ActionTree<UserState, State> = {
       }
     }
   },
-  async logout({ commit, state }): Promise<void> {
+  async logout({ state, commit, dispatch }): Promise<void> {
+    await dispatch("refreshExpired");
     try {
-      const { data } = await UserApi.revokeToken({}, state.accessTokenInMemory);
+      const { data } = await UserApi.revokeToken({}, state.accessTokenInMemory.value);
       if (data.isSuccess && data.statusCode === 200) {
         commit("logout");
         VueCookieNext.removeCookie("remembered");
@@ -135,7 +128,14 @@ export const actions: ActionTree<UserState, State> = {
       }
     }
   },
-  async updateEmail({ commit, state }, data: UpdatedEmailData): Promise<void> {
+  async refreshExpired({ getters, dispatch }): Promise<void> {
+    if (getters.isAccessTokenExpired) {
+      console.log("Refreshing")
+      await dispatch("refresh");
+    }
+  },
+  async updateEmail({ commit, dispatch, state }, data: UpdatedEmailData): Promise<void> {
+    await dispatch("refreshExpired");
     if (state.user.id) {
       try {
         const { data: responseData } = await UserApi.update(
@@ -144,7 +144,7 @@ export const actions: ActionTree<UserState, State> = {
             password: data.currentPassword,
             email: data.newEmail
           },
-          state.accessTokenInMemory
+          state.accessTokenInMemory.value
         );
         const user: User = {
           id: responseData.user.id,
@@ -168,10 +168,8 @@ export const actions: ActionTree<UserState, State> = {
       throw new Error("Отсутствует ID пользователя");
     }
   },
-  async updatePassword(
-    { commit, state },
-    data: UpdatedPasswordData
-  ): Promise<void> {
+  async updatePassword({ commit, dispatch, state }, data: UpdatedPasswordData): Promise<void> {
+    await dispatch("refreshExpired");
     if (state.user.id) {
       try {
         const { data: responseData } = await UserApi.update(
@@ -181,7 +179,7 @@ export const actions: ActionTree<UserState, State> = {
             newPassword: data.newPassword,
             confirmNewPassword: data.confirmedNewPassword
           },
-          state.accessTokenInMemory
+          state.accessTokenInMemory.value
         );
         const user: User = {
           id: responseData.user.id,
@@ -205,13 +203,11 @@ export const actions: ActionTree<UserState, State> = {
       throw new Error("Отсутствует ID пользователя");
     }
   },
-  async delete({ commit, state }): Promise<void> {
+  async delete({ commit, dispatch, state }): Promise<void> {
+    await dispatch("refreshExpired");
     if (state.user.id) {
       try {
-        await UserApi.delete(
-          { userId: state.user.id },
-          state.accessTokenInMemory
-        );
+        await UserApi.delete({ userId: state.user.id }, state.accessTokenInMemory.value);
         commit("logout");
         VueCookieNext.removeCookie("remembered");
         localStorage.removeItem("user");
