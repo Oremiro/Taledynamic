@@ -10,7 +10,7 @@
           </n-text>
         </template>
         <template #subtitle>
-          <div>Дата изменения: {{ currentWorkspace?.modified.toLocaleString() }}</div>
+          <div>Изменено: {{ currentWorkspace?.modified.toLocaleString() }}</div>
         </template>
         <template #extra>
           <div v-if="tablesListRef?.tables.length !== 0" style="display: flex; gap: 0.5rem">

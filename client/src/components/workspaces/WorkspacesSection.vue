@@ -1,12 +1,12 @@
 <template>
   <n-card
     style="height: calc(100vh - 8.3rem)"
-    content-style="height: 100%;"
+    content-style="height: 100%; padding-left: .8rem; padding-right: .8rem"
   >
     <transition name="fade" mode="out-in">
       <div v-if="isInitializationSuccess && workspacesLength > 0" class="workspaces-section-content">
         <div class="workspaces-section-content-header">
-          <n-text depth="3"> Ваши рабочие пространства </n-text>
+          <n-text> Ваши рабочие пространства </n-text>
           <workspaces-sort-item />
         </div>
         <n-scrollbar style="height: 100%">
@@ -70,14 +70,14 @@ async function initWorkspaces(): Promise<void> {
 }
 
 .workspaces-section-content-header {
-  padding-bottom: 1rem;
+  padding: 0 .5rem 1rem .5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
 }
 .workspaces-section-content-footer {
-  padding-top: 1rem;
+  padding: 1rem .5rem 0 .5rem;
   display: flex;
   align-items: center;
   justify-content: center;

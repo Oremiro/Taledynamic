@@ -6,6 +6,19 @@
         <n-tag>{{ tables.length }} / 100</n-tag>
       </div>
       <div style="display: flex; gap: 1rem; flex-wrap: wrap">
+        <table-creating-item
+          v-if="tables.length < 100"
+          :workspace-id="props.workspaceId"
+          :tables-count="tables.length"
+          tertiary
+          type="primary"
+          style="max-width: 12rem;"
+          @create="pushTableToList"
+        >
+          <n-icon size="1.2rem">
+            <add-icon />
+          </n-icon>
+        </table-creating-item>
         <tables-list-item
           v-for="table of tables"
           :id="table.id"
@@ -16,19 +29,6 @@
           @update="updateListItem"
           @delete="deleteListItem"
         />
-        <table-creating-item
-          v-if="tables.length < 100"
-          :workspace-id="props.workspaceId"
-          :tables-count="tables.length"
-          tertiary
-          type="primary"
-          style="max-width: 10rem;"
-          @create="pushTableToList"
-        >
-          <n-icon size="1.2rem">
-            <add-icon />
-          </n-icon>
-        </table-creating-item>
       </div>
     </div>
     <n-empty
