@@ -34,9 +34,14 @@
     <n-empty
       v-else-if="isInitializationSuccess && !tables.length"
       size="large"
-      description="Здесь пока что нет таблиц"
+      description="В выбранном рабочем пространстве нет таблиц"
       style="height: 15rem; display: flex; justify-content: center; text-align: start;"
     >
+      <template #icon>
+        <n-icon>
+          <apps-list-icon />
+        </n-icon>
+      </template>
       <template #extra>
         <div style="max-width: 15rem; text-align: initial;">
           <table-creating-item
@@ -70,7 +75,7 @@ import { InitializationStatus, TablesSortType } from "@/models";
 import TablesLoadingItem from "@/components/tables/TablesLoadingItem.vue";
 import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
 import TablesListItem from "@/components/tables/TablesListItem.vue";
-import { AddIcon } from "@/components/icons";
+import { AddIcon, AppsListIcon } from "@/components/icons";
 
 const props = defineProps<{
   workspaceId: number;

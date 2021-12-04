@@ -40,7 +40,8 @@ import {
   NLoadingBarProvider,
   NLayoutSider,
   NPopconfirm,
-  NPopselect
+  NPopselect,
+  NEmpty
 } from "naive-ui";
 
 const naive = create({
@@ -80,7 +81,8 @@ const naive = create({
     NLoadingBarProvider,
     NLayoutSider,
     NPopconfirm,
-    NPopselect
+    NPopselect,
+    NEmpty
   ]
 });
 

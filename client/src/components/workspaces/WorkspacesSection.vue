@@ -1,8 +1,5 @@
 <template>
-  <n-card
-    style="height: calc(100vh - 8.3rem)"
-    content-style="height: 100%; padding-left: .8rem; padding-right: .8rem"
-  >
+  <n-card style="height: calc(100vh - 8.3rem)" content-style="height: 100%; padding-left: .8rem; padding-right: .8rem">
     <transition name="fade" mode="out-in">
       <div v-if="isInitializationSuccess && workspacesLength > 0" class="workspaces-section-content">
         <div class="workspaces-section-content-header">
@@ -17,7 +14,13 @@
         </div>
       </div>
       <div v-else-if="isInitializationSuccess && workspacesLength <= 0" class="workspaces-section-empty">
-        <n-empty size="large" description="Рабочих пространств нет" />
+        <n-empty size="large" description="Рабочих пространств нет">
+          <template #icon>
+            <n-icon>
+              <folder-icon />
+            </n-icon>
+          </template>
+        </n-empty>
         <workspace-creating-item />
       </div>
       <workspace-loading
@@ -38,6 +41,7 @@ import WorkspaceCreatingItem from "@/components/workspaces/WorkspaceCreatingItem
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
 import WorkspaceLoading from "@/components/workspaces/WorkspacesLoading.vue";
 import WorkspacesSortItem from "@/components/workspaces/WorkspacesSortItem.vue";
+import { FolderIcon } from "@/components/icons";
 
 const store = useStore();
 
@@ -70,14 +74,14 @@ async function initWorkspaces(): Promise<void> {
 }
 
 .workspaces-section-content-header {
-  padding: 0 .5rem 1rem .5rem;
+  padding: 0 0.5rem 1rem 0.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
 }
 .workspaces-section-content-footer {
-  padding: 1rem .5rem 0 .5rem;
+  padding: 1rem 0.5rem 0 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
