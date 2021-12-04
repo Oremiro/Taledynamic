@@ -75,7 +75,7 @@ async function initWorkspaces(): Promise<void> {
   justify-content: center;
 }
 .workspaces-section-content-empty {
-  height: 100%;
+  padding: 2rem 0;
   display: flex;
   justify-content: center;
   align-items: center;

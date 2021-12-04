@@ -12,7 +12,7 @@
 import { ref, watch } from "vue";
 import { SelectGroupOption, SelectOption } from "naive-ui";
 import { ArrowSortIcon } from "@/components/icons";
-import { WorkspacesSortType } from "@/models/store";
+import { Workspace, WorkspacesSortType } from "@/models/store";
 import { useStore } from "@/store";
 import { InitializationStatus } from "@/models";
 
@@ -67,6 +67,10 @@ watch(
   async (value: InitializationStatus) => {
     if (value === InitializationStatus.Success) {
       await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
+      if (store.getters["workspaces/workspaces"].length > 0) {
+        const firstWorkspace: Workspace = store.getters["workspaces/workspaces"][0];
+        store.commit("workspaces/setCurrentId", { workspaceId: firstWorkspace.id });
+      }
     }
   },
   { immediate: true }

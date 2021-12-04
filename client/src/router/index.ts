@@ -6,7 +6,6 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Main",
-    props: true,
     meta: { requiresAuth: true },
     component: () => import("@/views/MainView.vue")
   },
@@ -50,13 +49,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/components/profile/DataSection.vue")
       }
     ]
-  },
-  {
-    path: "/workspace/:id",
-    name: "Workspace",
-    props: true,
-    meta: { requiresAuth: true },
-    component: () => import("@/views/WorkspaceView.vue")
   },
   {
     path: "/table/:workspaceId/:tableId",

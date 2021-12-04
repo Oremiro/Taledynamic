@@ -114,7 +114,7 @@ async function editWorkspaceName(): Promise<void> {
   }
   isNameInputLoading.value = true;
   try {
-    const currentWorkspaceId: number = store.getters["workspaces/currentWorkspace"]?.id;
+    const currentWorkspaceId: number | null = store.getters["workspaces/currentWorkspaceId"];
     await store.dispatch("workspaces/update", {
       id: props.id,
       name: workspaceName.value
@@ -122,7 +122,7 @@ async function editWorkspaceName(): Promise<void> {
     if (props.id === currentWorkspaceId) {
       router.push({
         name: "Main",
-        params: { id: store.getters["workspaces/currentWorkspace"]?.id }
+        params: { id: store.getters["workspaces/currentWorkspaceId"] }
       });
     }
   } catch (error) {

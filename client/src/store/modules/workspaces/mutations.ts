@@ -35,8 +35,8 @@ export const mutations: MutationTree<WorkspacesState> = {
       state.workspaces.push(cloneWorkspace(item));
     });
   },
-  setCurrent(state: WorkspacesState, payload: { workspace: Workspace }): void {
-    state.currentWorkspace = payload.workspace;
+  setCurrentId(state: WorkspacesState, payload: { workspaceId: number }): void {
+    state.currentWorkspaceId = payload.workspaceId;
   },
   setSortType(
     state: WorkspacesState,

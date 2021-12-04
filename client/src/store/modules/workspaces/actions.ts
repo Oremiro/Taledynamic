@@ -60,8 +60,8 @@ export const actions: ActionTree<WorkspacesState, State> = {
           oldWorkspaceIndex: workspaceIndex,
           newWorkspace: data.workspace
         });
-        if (payload.id === state.currentWorkspace?.id) {
-          commit("setCurrent", { workspace: data.workspace });
+        if (payload.id === state.currentWorkspaceId) {
+          commit("setCurrentId", { workspaceId: data.workspace.id });
         }
         await dispatch("sort", { sortType: state.sortType });
       } catch (error) {

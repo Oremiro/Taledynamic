@@ -44,11 +44,11 @@ async function deleteWorkspace() {
   try {
     await store.dispatch("workspaces/delete", { id: props.id });
     message.success("Пространство удалено");
-    const currentWorkspace: Workspace | null = store.getters["workspaces/currentWorkspace"];
-    if (currentWorkspace?.id === props.id) {
+    const currentWorkspaceId: number | null = store.getters["workspaces/currentWorkspaceId"];
+    if (currentWorkspaceId === props.id) {
       const workspaces: Workspace[] = store.getters["workspaces/workspaces"];
       if (workspaces.length) {
-        router.push({ name: "Main", params: { id: workspaces[0].id } });
+        store.commit("workspaces/setCurrentId", { workspaceId: workspaces[0].id });
       } else {
         router.push({ name: "Main" });
       }

@@ -24,9 +24,9 @@
     </template>
     <template #default>
       <tables-list
-        v-if="currentWorkspace !== null"
+        v-if="currentWorkspaceId !== null"
         ref="tablesListRef"
-        :workspace-id="currentWorkspace.id"
+        :workspace-id="currentWorkspaceId"
         :editable="isTablesEditable"
         :sort-type="sortValue"
       />
@@ -45,12 +45,12 @@ import { EditIcon } from "@/components/icons";
 import TablesSortItem from "@/components/tables/TablesSortItem.vue";
 
 const store = useStore();
-const currentWorkspace = computed<Workspace | null>(() => store.getters["workspaces/currentWorkspace"]);
+const currentWorkspaceId = computed<number | null>(() => store.getters["workspaces/currentWorkspaceId"]);
+const currentWorkspace = computed<Workspace | null>(
+  () => store.getters["workspaces/workspaces"].find((item: Workspace) => item.id === currentWorkspaceId.value) ?? null
+);
 
 const isTablesEditable = ref<boolean>(false);
-
-
-
 
 const tablesListRef = ref<InstanceType<typeof TablesList>>();
 

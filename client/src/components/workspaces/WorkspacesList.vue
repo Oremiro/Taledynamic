@@ -16,7 +16,7 @@ import { useStore } from "@/store";
 
 const store = useStore();
 const workspaces = computed<Workspace[]>(() => store.getters["workspaces/workspaces"]);
-const currentWorkspaceId = computed<number>(() => store.getters["workspaces/currentWorkspace"]?.id);
+const currentWorkspaceId = computed<number | null>(() => store.getters["workspaces/currentWorkspaceId"]);
 
 const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() =>
   workspaces.value.map((item: Workspace) => {
@@ -28,9 +28,9 @@ const menuOptions = computed<Array<MenuOption | MenuGroupOption>>(() =>
 );
 
 async function onUpdateValue(id: number): Promise<void> {
-  const currentWorkspace: Workspace | undefined = workspaces.value.find((item) => item.id === id);
-  if (currentWorkspace) {
-    store.commit("workspaces/setCurrent", { workspace: currentWorkspace });
+  const workspace: Workspace | undefined = workspaces.value.find((item) => item.id === id);
+  if (workspace) {
+    store.commit("workspaces/setCurrentId", { workspaceId: workspace.id });
   }
 }
 </script>

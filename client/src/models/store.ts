@@ -46,7 +46,7 @@ export interface Workspace {
 
 export interface WorkspacesState {
   workspaces: Workspace[];
-  currentWorkspace: Workspace | null;
+  currentWorkspaceId: number | null;
   sortType: WorkspacesSortType;
   initStatus: InitializationStatus;
 }

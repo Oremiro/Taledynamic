@@ -9,8 +9,8 @@ export const getters: GetterTree<WorkspacesState, State> = {
   workspacesLength(state: WorkspacesState): number {
     return state.workspaces.length;
   },
-  currentWorkspace(state: WorkspacesState): Workspace | null {
-    return state.currentWorkspace;
+  currentWorkspaceId(state: WorkspacesState): number | null {
+    return state.currentWorkspaceId;
   },
   initStatus(state: WorkspacesState): InitializationStatus {
     return state.initStatus;
