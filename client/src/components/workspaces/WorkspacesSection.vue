@@ -1,25 +1,30 @@
 <template>
-  <n-card>
-    {{ store.getters["workspaces/currentWorkspaceId"] }}
+  <n-card
+    style="height: calc(100vh - 8.3rem)"
+    content-style="height: 100%;"
+  >
     <transition name="fade" mode="out-in">
-      <div v-if="isInitializationSuccess" class="workspaces-section-content">
-        <transition name="fade" mode="out-in">
-          <div v-if="workspacesLength">
-            <div class="workspaces-section-content-header">
-              <n-text depth="3"> Ваши рабочие пространства </n-text>
-              <workspaces-sort-item />
-            </div>
-            <n-scrollbar>
-              <workspaces-list />
-            </n-scrollbar>
-          </div>
-          <n-empty v-else size="large" description="Рабочих пространств нет" class="workspaces-section-content-empty" />
-        </transition>
+      <div v-if="isInitializationSuccess && workspacesLength > 0" class="workspaces-section-content">
+        <div class="workspaces-section-content-header">
+          <n-text depth="3"> Ваши рабочие пространства </n-text>
+          <workspaces-sort-item />
+        </div>
+        <n-scrollbar style="height: 100%">
+          <workspaces-list />
+        </n-scrollbar>
         <div class="workspaces-section-content-footer">
           <workspace-creating-item />
         </div>
       </div>
-      <workspace-loading v-else :error="isInitializationError" @repeat-loading="initWorkspaces" />
+      <div v-else-if="isInitializationSuccess && workspacesLength <= 0" class="workspaces-section-empty">
+        <n-empty size="large" description="Рабочих пространств нет" />
+        <workspace-creating-item />
+      </div>
+      <workspace-loading
+        v-else-if="!isInitializationSuccess"
+        :error="isInitializationError"
+        @repeat-loading="initWorkspaces"
+      />
     </transition>
   </n-card>
 </template>
@@ -58,9 +63,10 @@ async function initWorkspaces(): Promise<void> {
 
 <style lang="scss" scoped>
 .workspaces-section-content {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 }
 
 .workspaces-section-content-header {
@@ -68,6 +74,7 @@ async function initWorkspaces(): Promise<void> {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
 }
 .workspaces-section-content-footer {
   padding-top: 1rem;
@@ -75,10 +82,12 @@ async function initWorkspaces(): Promise<void> {
   align-items: center;
   justify-content: center;
 }
-.workspaces-section-content-empty {
+.workspaces-section-empty {
   height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
 }
 </style>

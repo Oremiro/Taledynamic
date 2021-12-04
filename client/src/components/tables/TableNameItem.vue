@@ -6,7 +6,7 @@
         v-model:value="tableName"
         :show-count="!loading"
         :maxlength="50"
-        placeholder=""
+        placeholder="Название"
         :disabled="loading"
         @blur="emit('blur', $event)"
         @keyup.enter="validate"

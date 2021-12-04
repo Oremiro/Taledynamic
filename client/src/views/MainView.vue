@@ -1,14 +1,15 @@
 <template>
   <div class="container">
-    <n-grid v-if="store.getters['workspaces/currentWorkspaceId']" :cols="12" :x-gap="20">
+    <n-grid :cols="12" :x-gap="20">
       <n-gi :span="3">
         <workspaces-section />
       </n-gi>
       <n-gi :span="9">
-        <tables-section />
+        <transition name="fade" mode="out-in">
+          <tables-section v-if="store.getters['workspaces/currentWorkspaceId']" />
+        </transition>
       </n-gi>
     </n-grid>
-    <workspaces-section v-else />
   </div>
 </template>
 

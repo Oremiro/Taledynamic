@@ -3,7 +3,11 @@
     <template #header>
       <n-page-header v-if="isInitializationSuccess">
         <template #title>
-          <n-text type="success">{{ currentWorkspace?.name }}</n-text>
+          <n-text type="success">
+            <n-ellipsis style="max-width: 20rem" :tooltip="{ delay: 500 }">
+              {{ currentWorkspace?.name }}
+            </n-ellipsis>
+          </n-text>
         </template>
         <template #subtitle>
           <div>Дата изменения: {{ currentWorkspace?.modified.toLocaleString() }}</div>
@@ -36,7 +40,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { NPageHeader, NDivider, NSkeleton } from "naive-ui";
+import { NPageHeader, NDivider, NSkeleton, NEllipsis } from "naive-ui";
 import { useStore } from "@/store";
 import { Workspace } from "@/models/store";
 import { InitializationStatus, TablesSortType } from "@/models";

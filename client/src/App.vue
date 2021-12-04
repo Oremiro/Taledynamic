@@ -6,14 +6,23 @@
         <n-loading-bar-provider>
           <layout-header :current-theme="currentTheme" @change-theme="setTheme" />
         </n-loading-bar-provider>
-        <n-layout position="absolute" style="top: 3.3rem">
-          <n-layout-content embedded :native-scrollbar="false" content-style="min-height: 100%">
+        <n-layout
+          position="absolute"
+          :native-scrollbar="false"
+          style="top: 3.3rem"
+        >
+          <n-layout-content embedded content-style="min-height: calc(100vh - 3.3rem)">
             <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
                 <component :is="Component" />
               </transition>
             </router-view>
           </n-layout-content>
+          <n-layout-footer>
+            <div style="display: flex; justify-content: center; padding: 1rem;">
+              <n-text :depth="3">Made by TaledynamicTeam</n-text>
+            </div>
+          </n-layout-footer>
         </n-layout>
       </n-layout>
     </n-message-provider>
