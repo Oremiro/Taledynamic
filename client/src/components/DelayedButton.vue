@@ -31,9 +31,7 @@ const props = defineProps({
     default: false
   },
   type: {
-    type: String as PropType<
-      "default" | "primary" | "success" | "info" | "warning" | "error"
-    >,
+    type: String as PropType<"default" | "primary" | "success" | "info" | "warning" | "error">,
     default: "default"
   },
   duration: {

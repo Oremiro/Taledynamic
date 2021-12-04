@@ -14,8 +14,8 @@
           >
             <n-empty size="large">
               <template #default>
-                <div style="text-align: center;">
-                  Здесь будет отображаться список ваших таблиц.<br>
+                <div style="text-align: center">
+                  Здесь будет отображаться список ваших таблиц.<br />
                   Для начала создайте рабочее пространство.
                 </div>
               </template>

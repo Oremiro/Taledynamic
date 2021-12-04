@@ -1,11 +1,6 @@
 <template>
   <transition name="fade" mode="out-in">
-    <n-button
-      v-if="!isInputShown"
-      :tertiary="tertiary"
-      :type="type"
-      @click="isInputShown = true"
-    >
+    <n-button v-if="!isInputShown" :tertiary="tertiary" :type="type" @click="isInputShown = true">
       <slot />
     </n-button>
     <table-name-item
@@ -43,9 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const isInputShown = ref<boolean>(false);
-const defaultTableName = computed<string>(
-  () => `Table #${props.tablesCount + 1}`
-);
+const defaultTableName = computed<string>(() => `Table #${props.tablesCount + 1}`);
 const isInputLoading = ref<boolean>(false);
 
 const store = useStore();
@@ -53,14 +46,12 @@ const message = useMessage();
 
 async function createTable(name: string): Promise<void> {
   if (props.tablesCount >= 100) {
-    message.error(
-      "В одном рабочем пространстве не может быть более 100 таблиц"
-    );
+    message.error("В одном рабочем пространстве не может быть более 100 таблиц");
     return;
   }
   try {
     isInputLoading.value = true;
-    await store.dispatch("user/refreshExpired")
+    await store.dispatch("user/refreshExpired");
     const { data } = await TableApi.create(
       {
         name: name,

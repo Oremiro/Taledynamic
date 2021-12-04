@@ -2,11 +2,8 @@
   <div class="container">
     <n-grid :cols="30" style="max-width: 40rem">
       <n-gi :span="8">
-        <n-card
-          hoverable
-          content-style="padding-left: 0; padding-right: 0"
-        >
-          <n-menu :options="menuOptions" :value="route.path" style="padding: 0 .8rem;" />
+        <n-card hoverable content-style="padding-left: 0; padding-right: 0">
+          <n-menu :options="menuOptions" :value="route.path" style="padding: 0 0.8rem" />
         </n-card>
       </n-gi>
       <n-gi :span="1" />
@@ -35,17 +32,11 @@ const route = useRoute();
 const message = useMessage();
 const menuOptions: MenuOption[] = [
   {
-    label: () =>
-      h(RouterLink, { to: "/account/data" }, { default: () => "Данные" }),
+    label: () => h(RouterLink, { to: "/account/data" }, { default: () => "Данные" }),
     key: "/account/data"
   },
   {
-    label: () =>
-      h(
-        RouterLink,
-        { to: "/account/settings" },
-        { default: () => "Настройки" }
-      ),
+    label: () => h(RouterLink, { to: "/account/settings" }, { default: () => "Настройки" }),
     key: "/account/settings"
   },
   {

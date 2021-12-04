@@ -5,7 +5,7 @@
       draggable: !last,
       start: draggableClass === 'start',
       'enter--top': draggableClass === 'enter--top' && !last,
-      'enter--bottom': draggableClass === 'enter--bottom' && !last,
+      'enter--bottom': draggableClass === 'enter--bottom' && !last
     }"
     style="padding: 0 0.3rem"
   >
@@ -28,17 +28,12 @@
       :type="cell.type"
       :index="cellIndex"
       @update="cellUpdateHandler"
-      @mouse-enter-cell="
-        store.commit('table/setEditableRowIndex', { index: index })
-      "
+      @mouse-enter-cell="store.commit('table/setEditableRowIndex', { index: index })"
       @mouse-leave-cell="store.commit('table/clearEditableRowIndex')"
     />
   </td>
   <td style="padding: 0">
-    <div
-      v-if="!last"
-      style="display: flex; align-items: center; justify-content: center"
-    >
+    <div v-if="!last" style="display: flex; align-items: center; justify-content: center">
       <n-popconfirm v-if="!last" v-model:show="isConfirmDeletionShown">
         <template #icon>
           <n-icon :color="themeVars.errorColor">
@@ -46,12 +41,8 @@
           </n-icon>
         </template>
         <template #action>
-          <n-button ghost type="error" size="small" @click="deleteRow">
-            Да
-          </n-button>
-          <n-button ghost size="small" @click="isConfirmDeletionShown = false">
-            Нет
-          </n-button>
+          <n-button ghost type="error" size="small" @click="deleteRow"> Да </n-button>
+          <n-button ghost size="small" @click="isConfirmDeletionShown = false"> Нет </n-button>
         </template>
         <template #trigger>
           <dynamically-typed-button type="error" size="tiny" ghost @click.stop>
@@ -93,10 +84,7 @@ async function deleteRow() {
 }
 const isConfirmDeletionShown = ref<boolean>(false);
 
-async function cellUpdateHandler(
-  index: number,
-  data: TableData
-): Promise<void> {
+async function cellUpdateHandler(index: number, data: TableData): Promise<void> {
   try {
     await store.dispatch("table/updateCell", {
       rowIndex: props.index,

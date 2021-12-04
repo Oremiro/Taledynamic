@@ -3,10 +3,7 @@
     <tr
       v-for="(row, index) in tableRows"
       :key="row.id"
-      :draggable="
-        index !== tableRows.length - 1 &&
-        store.getters['table/editableRowIndex'] !== index
-      "
+      :draggable="index !== tableRows.length - 1 && store.getters['table/editableRowIndex'] !== index"
       @dragstart="draggableList.dragStartHandler($event, index)"
       @dragend="draggableList.dragEndHandler($event)"
       @drop.prevent="draggableList.dropHandler($event, index, dropCallback)"

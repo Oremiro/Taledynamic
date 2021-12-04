@@ -130,7 +130,7 @@ export const actions: ActionTree<UserState, State> = {
   },
   async refreshExpired({ getters, dispatch }): Promise<void> {
     if (getters.isAccessTokenExpired) {
-      console.log("Refreshing")
+      console.log("Refreshing");
       await dispatch("refresh");
     }
   },

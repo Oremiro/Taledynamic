@@ -9,12 +9,7 @@
 
 <script setup lang="ts">
 import { NTable } from "naive-ui";
-import {
-  TableRow,
-  TableHeader,
-  TableDataType,
-  TableCell
-} from "@/models/table";
+import { TableRow, TableHeader, TableDataType, TableCell } from "@/models/table";
 import TableHeadVue from "@/components/table/TableHead.vue";
 import TableBodyVue from "@/components/table/TableBody.vue";
 import { useStore } from "@/store";
@@ -50,5 +45,4 @@ const tableRows: TableRow[] = [
 
 const store = useStore();
 store.commit("table/setTable", { headers: tableHeaders, rows: tableRows });
-
 </script>

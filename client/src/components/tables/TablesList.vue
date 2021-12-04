@@ -12,7 +12,7 @@
           :tables-count="tables.length"
           tertiary
           type="primary"
-          style="max-width: 12rem;"
+          style="max-width: 12rem"
           @create="pushTableToList"
         >
           <n-icon size="1.2rem">
@@ -35,7 +35,7 @@
       v-else-if="isInitializationSuccess && !tables.length"
       size="large"
       description="В выбранном рабочем пространстве нет таблиц"
-      style="height: 15rem; display: flex; justify-content: center; text-align: start;"
+      style="height: 15rem; display: flex; justify-content: center; text-align: start"
     >
       <template #icon>
         <n-icon>
@@ -43,7 +43,7 @@
         </n-icon>
       </template>
       <template #extra>
-        <div style="max-width: 15rem; text-align: initial;">
+        <div style="max-width: 15rem; text-align: initial">
           <table-creating-item
             :workspace-id="props.workspaceId"
             :tables-count="tables.length"

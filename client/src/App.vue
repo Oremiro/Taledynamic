@@ -6,11 +6,7 @@
         <n-loading-bar-provider>
           <layout-header :current-theme="currentTheme" @change-theme="setTheme" />
         </n-loading-bar-provider>
-        <n-layout
-          position="absolute"
-          :native-scrollbar="false"
-          style="top: 3.3rem"
-        >
+        <n-layout position="absolute" :native-scrollbar="false" style="top: 3.3rem">
           <n-layout-content embedded content-style="min-height: calc(100vh - 3.3rem)">
             <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
@@ -18,11 +14,7 @@
               </transition>
             </router-view>
           </n-layout-content>
-          <n-layout-footer>
-            <div style="display: flex; justify-content: center; padding: 1rem;">
-              <n-text :depth="3">Made by TaledynamicTeam</n-text>
-            </div>
-          </n-layout-footer>
+          <layout-footer />
         </n-layout>
       </n-layout>
     </n-message-provider>
@@ -35,6 +27,7 @@ import { ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { darkTheme, useOsTheme } from "naive-ui";
 import LayoutHeader from "@/layouts/LayoutHeader.vue";
+import LayoutFooter from "@/layouts/LayoutFooter.vue";
 import { Theme } from "@/models";
 import { useStore } from "@/store";
 import { LoginState } from "@/models/store";

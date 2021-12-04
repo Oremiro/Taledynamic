@@ -86,9 +86,4 @@ const naive = create({
   ]
 });
 
-createApp(App)
-  .use(store, key)
-  .use(router)
-  .use(naive)
-  .use(VueCookieNext)
-  .mount("#app");
+createApp(App).use(store, key).use(router).use(naive).use(VueCookieNext).mount("#app");

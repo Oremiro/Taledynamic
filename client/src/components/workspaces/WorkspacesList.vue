@@ -1,10 +1,5 @@
 <template>
-  <n-menu
-    :value="currentWorkspaceId"
-    :options="menuOptions"
-    :indent="22"
-    @update:value="onUpdateValue"
-  />
+  <n-menu :value="currentWorkspaceId" :options="menuOptions" :indent="22" @update:value="onUpdateValue" />
 </template>
 
 <script setup lang="ts">
