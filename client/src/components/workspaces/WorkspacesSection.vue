@@ -1,14 +1,15 @@
 <template>
   <n-card>
+    {{ store.getters["workspaces/currentWorkspaceId"] }}
     <transition name="fade" mode="out-in">
       <div v-if="isInitializationSuccess" class="workspaces-section-content">
         <transition name="fade" mode="out-in">
-          <div v-if="workspacesLength" style="height: 100%">
+          <div v-if="workspacesLength">
             <div class="workspaces-section-content-header">
               <n-text depth="3"> Ваши рабочие пространства </n-text>
               <workspaces-sort-item />
             </div>
-            <n-scrollbar style="height: 100%">
+            <n-scrollbar>
               <workspaces-list />
             </n-scrollbar>
           </div>
@@ -75,7 +76,7 @@ async function initWorkspaces(): Promise<void> {
   justify-content: center;
 }
 .workspaces-section-content-empty {
-  padding: 2rem 0;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

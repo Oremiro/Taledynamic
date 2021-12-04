@@ -22,6 +22,7 @@
           :tables-count="tables.length"
           tertiary
           type="primary"
+          style="max-width: 10rem;"
           @create="pushTableToList"
         >
           <n-icon size="1.2rem">
@@ -34,12 +35,18 @@
       v-else-if="isInitializationSuccess && !tables.length"
       size="large"
       description="Здесь пока что нет таблиц"
-      style="height: 15rem; display: flex; justify-content: center"
+      style="height: 15rem; display: flex; justify-content: center; text-align: start;"
     >
       <template #extra>
-        <table-creating-item :workspace-id="props.workspaceId" :tables-count="tables.length" @create="pushTableToList">
-          Создать таблицу
-        </table-creating-item>
+        <div style="max-width: 15rem; text-align: initial;">
+          <table-creating-item
+            :workspace-id="props.workspaceId"
+            :tables-count="tables.length"
+            @create="pushTableToList"
+          >
+            Создать таблицу
+          </table-creating-item>
+        </div>
       </template>
     </n-empty>
     <tables-loading-item

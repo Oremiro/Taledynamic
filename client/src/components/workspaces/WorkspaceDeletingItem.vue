@@ -22,10 +22,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
 import { NPopconfirm, useMessage, useThemeVars } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace } from "@/models/store";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { DeleteIcon, ErrorCircleIcon } from "@/components/icons";
 
@@ -36,7 +34,6 @@ const props = defineProps<{
 const message = useMessage();
 
 const store = useStore();
-const router = useRouter();
 const confirmShow = ref<boolean>(false);
 
 async function deleteWorkspace() {
@@ -44,15 +41,6 @@ async function deleteWorkspace() {
   try {
     await store.dispatch("workspaces/delete", { id: props.id });
     message.success("Пространство удалено");
-    const currentWorkspaceId: number | null = store.getters["workspaces/currentWorkspaceId"];
-    if (currentWorkspaceId === props.id) {
-      const workspaces: Workspace[] = store.getters["workspaces/workspaces"];
-      if (workspaces.length) {
-        store.commit("workspaces/setCurrentId", { workspaceId: workspaces[0].id });
-      } else {
-        router.push({ name: "Main" });
-      }
-    }
   } catch (error) {
     if (error instanceof Error) {
       message.error(error.message);

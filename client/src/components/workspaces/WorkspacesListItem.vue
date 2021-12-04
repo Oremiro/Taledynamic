@@ -35,9 +35,7 @@
     </div>
     <div v-else style="display: flex; justify-content: space-between; align-items: center">
       <n-ellipsis :tooltip="{ delay: 500, placement: 'top-end' }">
-        <div>
-          {{ name }}
-        </div>
+        {{ name }}
         <template #tooltip>
           {{ name }}
         </template>
