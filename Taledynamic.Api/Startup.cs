@@ -13,6 +13,7 @@ using Taledynamic.Core;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.Core.Services;
+using Taledynamic.DAL.Models.Internal;
 
 
 namespace Taledynamic.Api
@@ -30,6 +31,8 @@ namespace Taledynamic.Api
         {
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
             var connectionStrings = Configuration.GetSection("ConnectionStrings");
+            var mongoDbSection = Configuration.GetSection(nameof(MongoDbSettings));
+            // mongoDbSection.
             services.AddDbContext<TaledynamicContext>(options =>
             {
                 options.UseNpgsql(connectionStrings["PostgresDatabase"],
