@@ -38,7 +38,7 @@ namespace Taledynamic.Api.Middlewares
                     StatusCode = httpException.HttpStatusCode
                 };
                 
-                Log.Information($"[{nameof(ExceptionHandlerMiddleware)}]: " +
+                Log.Error($"[{nameof(ExceptionHandlerMiddleware)}]: " +
                                 $"Method '{MethodBase.GetCurrentMethod()?.Name}' have error:" +
                                 $"Exception - {httpException}, Message - {httpException.Message}, " +
                                 $"Status code - {httpException.HttpStatusCode}.");
@@ -57,7 +57,7 @@ namespace Taledynamic.Api.Middlewares
                     StatusCode = HttpStatusCode.InternalServerError
                 };
                 
-                Log.Information($"[{nameof(ExceptionHandlerMiddleware)}]: " +
+                Log.Error($"[{nameof(ExceptionHandlerMiddleware)}]: " +
                                 $"Method '{MethodBase.GetCurrentMethod()?.Name}' have error:" +
                                 $"Exception - {exception}, Message - {exception.Message} " +
                                 $"Status code - {HttpStatusCode.InternalServerError}.");
