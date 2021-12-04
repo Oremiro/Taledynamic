@@ -32,8 +32,8 @@ export interface UserState {
 }
 
 export interface LoginState {
-  user: User,
-  accessTokenInMemory: string
+  user: User;
+  accessTokenInMemory: string;
 }
 
 export interface Workspace {
@@ -46,7 +46,7 @@ export interface Workspace {
 
 export interface WorkspacesState {
   workspaces: Workspace[];
-  currentWorkspace: Workspace | null;
+  currentWorkspaceId: number | null;
   sortType: WorkspacesSortType;
   initStatus: InitializationStatus;
 }

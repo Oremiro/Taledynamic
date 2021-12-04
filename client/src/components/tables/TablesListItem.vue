@@ -2,13 +2,9 @@
   <transition name="fade" mode="out-in">
     <n-button-group v-if="!isInputShown">
       <n-button @click="navigateToTable">
-        {{ name }}
+        <n-ellipsis style="max-width: 10rem" :tooltip="{ delay: 500 }">{{ name }}</n-ellipsis>
       </n-button>
-      <n-button
-        v-if="editable"
-        style="padding: 0.5rem"
-        @click="isInputShown = true"
-      >
+      <n-button v-if="editable" style="padding: 0.5rem" @click="isInputShown = true">
         <n-icon size="1.2rem">
           <edit-icon />
         </n-icon>
@@ -20,16 +16,8 @@
           </n-icon>
         </template>
         <template #action>
-          <n-button ghost type="error" size="small" @click="deleteTable">
-            Да
-          </n-button>
-          <n-button
-            ghost
-            size="small"
-            @click="isDeleteConfirmationShown = false"
-          >
-            Нет
-          </n-button>
+          <n-button ghost type="error" size="small" @click="deleteTable"> Да </n-button>
+          <n-button ghost size="small" @click="isDeleteConfirmationShown = false"> Нет </n-button>
         </template>
         <template #trigger>
           <dynamically-typed-button style="padding: 0.5rem" type="error" ghost>
@@ -55,7 +43,7 @@
 import axios from "axios";
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { useMessage, useThemeVars } from "naive-ui";
+import { useMessage, useThemeVars, NEllipsis } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
 import { TableDto } from "@/models/api/responses";
@@ -86,7 +74,7 @@ async function editTableName(name: string): Promise<void> {
   }
   try {
     isInputLoading.value = true;
-    await store.dispatch("user/refreshExpired")
+    await store.dispatch("user/refreshExpired");
     const { data } = await TableApi.update(
       {
         name: name,
@@ -111,7 +99,7 @@ const isDeleteConfirmationShown = ref<boolean>(false);
 
 async function deleteTable(): Promise<void> {
   try {
-    await store.dispatch("user/refreshExpired")
+    await store.dispatch("user/refreshExpired");
     await TableApi.delete({ id: props.id }, store.getters["user/accessToken"]);
     emit("delete", props.id);
     message.success("Таблица удалена");

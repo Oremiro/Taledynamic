@@ -5,8 +5,7 @@ interface ListTransferObject {
 
 function isListTransferObject(item: ListTransferObject): item is ListTransferObject {
   return (
-    (item as ListTransferObject).itemIndex !== undefined &&
-    (item as ListTransferObject).dropZoneName !== undefined
+    (item as ListTransferObject).itemIndex !== undefined && (item as ListTransferObject).dropZoneName !== undefined
   );
 }
 
@@ -36,9 +35,7 @@ export class DraggableList {
   dragEnterHandler(e: DragEvent, index: number): void {
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = "move";
-      const transferObject: ListTransferObject = JSON.parse(
-        e.dataTransfer.getData("transferString")
-      );
+      const transferObject: ListTransferObject = JSON.parse(e.dataTransfer.getData("transferString"));
       if (!isListTransferObject(transferObject)) {
         return;
       }
@@ -58,15 +55,9 @@ export class DraggableList {
     this.dragEnterIndex = undefined;
   }
 
-  dropHandler(
-    e: DragEvent,
-    index: number,
-    callback: (index: number, itemIndex: number) => void
-  ) {
+  dropHandler(e: DragEvent, index: number, callback: (index: number, itemIndex: number) => void) {
     if (e.dataTransfer) {
-      const transferObject: ListTransferObject = JSON.parse(
-        e.dataTransfer.getData("transferString")
-      );
+      const transferObject: ListTransferObject = JSON.parse(e.dataTransfer.getData("transferString"));
       if (!isListTransferObject(transferObject)) {
         return;
       }

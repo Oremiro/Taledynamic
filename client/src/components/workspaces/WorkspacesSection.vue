@@ -1,124 +1,60 @@
 <template>
-  <transition name="fade" mode="out-in">
-    <div v-if="isInitializationSuccess" class="workspaces-section-content">
-      <transition name="fade" mode="out-in">
-        <div v-if="workspaces.length" style="height: 100%">
-          <div class="workspaces-section-content-header">
-            <n-text depth="3"> Ваши рабочие пространства </n-text>
-            <n-popselect
-              v-model:value="popSortValue"
-              trigger="click"
-              :options="popOptions"
-              @update:value="updateHandler"
-            >
-              <n-button text>
-                <n-icon size="1.2rem">
-                  <arrow-sort-icon />
-                </n-icon>
-              </n-button>
-            </n-popselect>
-          </div>
-          <n-scrollbar style="height: 100%">
-            <workspaces-list :workspaces="workspaces" />
-          </n-scrollbar>
+  <n-card style="height: calc(100vh - 8.3rem)" content-style="height: 100%; padding-left: .8rem; padding-right: .8rem">
+    <transition name="fade" mode="out-in">
+      <div v-if="isInitializationSuccess && workspacesLength > 0" class="workspaces-section-content">
+        <div class="workspaces-section-content-header">
+          <n-text> Ваши рабочие пространства </n-text>
+          <workspaces-sort-item />
         </div>
-        <n-empty
-          v-else
-          size="large"
-          description="Рабочих пространств нет"
-          class="workspaces-section-content-empty"
-        />
-      </transition>
-      <div class="workspaces-section-content-footer">
-        <workspace-creating-button />
+        <n-scrollbar style="height: 100%">
+          <workspaces-list />
+        </n-scrollbar>
+        <div class="workspaces-section-content-footer">
+          <workspace-creating-item />
+        </div>
       </div>
-    </div>
-    <workspace-loading
-      v-else
-      :error="isInitializationError"
-      @repeat-loading="getWorkspaces"
-    />
-  </transition>
+      <div v-else-if="isInitializationSuccess && workspacesLength <= 0" class="workspaces-section-empty">
+        <n-empty size="large" description="Рабочих пространств нет">
+          <template #icon>
+            <n-icon>
+              <folder-icon />
+            </n-icon>
+          </template>
+        </n-empty>
+        <workspace-creating-item />
+      </div>
+      <workspace-loading
+        v-else-if="!isInitializationSuccess"
+        :error="isInitializationError"
+        @repeat-loading="initWorkspaces"
+      />
+    </transition>
+  </n-card>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
-import {
-  SelectGroupOption,
-  SelectOption,
-  NScrollbar,
-  NEmpty
-} from "naive-ui";
+import { computed } from "vue";
+import { NScrollbar, NEmpty } from "naive-ui";
 import { useStore } from "@/store";
-import { Workspace, WorkspacesSortType } from "@/models/store";
 import { InitializationStatus } from "@/models";
-import WorkspaceCreatingButton from "@/components/workspaces/WorkspaceCreating.vue";
+import WorkspaceCreatingItem from "@/components/workspaces/WorkspaceCreatingItem.vue";
 import WorkspacesList from "@/components/workspaces/WorkspacesList.vue";
 import WorkspaceLoading from "@/components/workspaces/WorkspacesLoading.vue";
-import ArrowSortIcon from "@/components/icons/ArrowSortIcon.vue";
+import WorkspacesSortItem from "@/components/workspaces/WorkspacesSortItem.vue";
+import { FolderIcon } from "@/components/icons";
 
 const store = useStore();
 
-const workspaces = computed<Workspace[]>(
-  () => store.getters["workspaces/workspaces"]
-);
-const popOptions: Array<SelectOption | SelectGroupOption> = [
-  {
-    type: "group",
-    label: "По дате",
-    key: "sortByDate",
-    children: [
-      {
-        label: "Сначала новые",
-        value: WorkspacesSortType.DateDescending
-      },
-      {
-        label: "Сначала старые",
-        value: WorkspacesSortType.DateAscending
-      }
-    ]
-  },
-  {
-    type: "group",
-    label: "По названию",
-    key: "sortByName",
-    children: [
-      {
-        label: "От A до Z",
-        value: WorkspacesSortType.NameAscending
-      },
-      {
-        label: "От Z до A",
-        value: WorkspacesSortType.NameDescending
-      }
-    ]
-  }
-];
-
-const popSortValueStored: string | null =
-  localStorage.getItem("workspacesSort");
-const popSortValueParsed: number = popSortValueStored
-  ? parseInt(popSortValueStored)
-  : WorkspacesSortType.DateDescending;
-const popSortValue = ref<WorkspacesSortType>(
-  !isNaN(popSortValueParsed)
-    ? popSortValueParsed
-    : WorkspacesSortType.DateDescending
-);
+const workspacesLength = computed<number>(() => store.getters["workspaces/workspacesLength"]);
 
 const isInitializationSuccess = computed<boolean>(
-  () => workspacesInitStatus.value === InitializationStatus.Success
+  () => store.getters["workspaces/initStatus"] === InitializationStatus.Success
 );
 const isInitializationError = computed<boolean>(
-  () => workspacesInitStatus.value === InitializationStatus.Error
+  () => store.getters["workspaces/initStatus"] === InitializationStatus.Error
 );
 
-async function updateHandler(value: number): Promise<void> {
-  localStorage.setItem("workspacesSort", value.toString());
-  await store.dispatch("workspaces/sort", { sortType: value });
-}
-
-async function getWorkspaces(): Promise<void> {
+async function initWorkspaces(): Promise<void> {
   try {
     await store.dispatch("workspaces/init");
   } catch (error) {
@@ -127,52 +63,35 @@ async function getWorkspaces(): Promise<void> {
     }
   }
 }
-
-/* Setting workspaces sort */
-const workspacesInitStatus = computed<InitializationStatus>(
-  () => store.getters["workspaces/initStatus"]
-);
-
-onMounted(async () => {
-  if (workspacesInitStatus.value === InitializationStatus.Success) {
-    await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-  }
-});
-
-watch(workspacesInitStatus, async (value) => {
-  if (value === InitializationStatus.Success) {
-    await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-  }
-});
-
-watch(workspaces, async () => {
-  await store.dispatch("workspaces/sort", { sortType: popSortValue.value });
-});
 </script>
 
 <style lang="scss" scoped>
 .workspaces-section-content {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 }
 
 .workspaces-section-content-header {
-  padding: 1rem;
+  padding: 0 0.5rem 1rem 0.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
 }
 .workspaces-section-content-footer {
-  padding: 1rem;
+  padding: 1rem 0.5rem 0 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.workspaces-section-content-empty {
+.workspaces-section-empty {
   height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
 }
 </style>

@@ -14,8 +14,9 @@
         <n-input
           ref="nameInput"
           v-model:value="newWorkspaceName"
+          :show-count="!isWorkspaceCreatingPending"
           :maxlength="100"
-          placeholder="Название пространства"
+          placeholder="Название"
           @keyup.enter="createWorkspace"
         />
         <n-button v-if="isWorkspaceInputValid" attr-type="submit" style="padding: 0.6rem" @click="createWorkspace">

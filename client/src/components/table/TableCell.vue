@@ -1,9 +1,5 @@
 <template>
-  <n-config-provider
-    :theme-overrides="
-      themeVars.tableColor === '#fff' ? lightThemeOverrides : darkThemeOverrides
-    "
-  >
+  <n-config-provider :theme-overrides="themeVars.tableColor === '#fff' ? lightThemeOverrides : darkThemeOverrides">
     <n-input
       v-if="type === 0"
       ref="textInputRef"
@@ -60,14 +56,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, nextTick, watch } from "vue";
-import {
-  NInputNumber,
-  NDatePicker,
-  GlobalThemeOverrides,
-  useThemeVars,
-  NInput,
-  NTable
-} from "naive-ui";
+import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars, NInput, NTable } from "naive-ui";
 import { TableData, TableDataType } from "@/models/table";
 
 const emit = defineEmits<{
@@ -86,23 +75,15 @@ const cellDataText = ref<string | null>(null);
 const cellDataNumber = ref<number | null>(null);
 const cellDataDate = ref<number | null>(null);
 // const cellDataAttachment = ref<string>();
-watch(() => props.data, () => {
-  cellDataText.value = (
-  props.type === TableDataType.Text && typeof props.data === "string"
-    ? props.data
-    : null
+watch(
+  () => props.data,
+  () => {
+    cellDataText.value = props.type === TableDataType.Text && typeof props.data === "string" ? props.data : null;
+    cellDataNumber.value = props.type === TableDataType.Number && typeof props.data === "number" ? props.data : null;
+    cellDataDate.value = props.type === TableDataType.Date && props.data instanceof Date ? props.data.getTime() : null;
+  },
+  { immediate: true }
 );
-cellDataNumber.value = (
-  props.type === TableDataType.Number && typeof props.data === "number"
-    ? props.data
-    : null
-);
-cellDataDate.value = (
-  props.type === TableDataType.Date && props.data instanceof Date
-    ? props.data.getTime()
-    : null
-);
-}, { immediate: true })
 
 const darkThemeOverrides = reactive<GlobalThemeOverrides>({
   Input: {

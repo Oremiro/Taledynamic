@@ -1,11 +1,5 @@
 <template>
-  <component
-    :is="tag"
-    ref="draggableRef"
-    :style="style"
-    @mousedown.left="mouseDownHandler"
-    @mouseup="mouseUpHandler"
-  >
+  <component :is="tag" ref="draggableRef" :style="style" @mousedown.left="mouseDownHandler" @mouseup="mouseUpHandler">
     <slot />
   </component>
 </template>
@@ -41,10 +35,9 @@ function moveAt(pageX: number, pageY: number) {
 
 async function mouseDownHandler(event: MouseEvent) {
   isDragging.value = true;
-  style.width = draggableRef.value.offsetWidth + 'px';
-  style.height = draggableRef.value.offsetHeight + 'px';
-  shiftX.value =
-    event.clientX - draggableRef.value.getBoundingClientRect().left;
+  style.width = draggableRef.value.offsetWidth + "px";
+  style.height = draggableRef.value.offsetHeight + "px";
+  shiftX.value = event.clientX - draggableRef.value.getBoundingClientRect().left;
   shiftY.value = event.clientY - draggableRef.value.getBoundingClientRect().top;
   style.position = "fixed";
   style.zIndex = 1000;

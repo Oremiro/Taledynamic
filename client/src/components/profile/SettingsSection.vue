@@ -15,9 +15,7 @@
   >
     {{ buttonText }}
   </delayed-button>
-  <n-button v-show="isDeletionConfirmationShown" @click="cancelDeletion">
-    Нет, я передумал
-  </n-button>
+  <n-button v-show="isDeletionConfirmationShown" @click="cancelDeletion"> Нет, я передумал </n-button>
   <n-collapse-transition :show="isDeletionConfirmationShown">
     <div style="margin-top: 1rem">Вы уверены, что хотите удалить аккаунт?</div>
   </n-collapse-transition>

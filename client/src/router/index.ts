@@ -28,34 +28,22 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: "/profile",
-    name: "Profile",
+    path: "/account",
+    name: "Account",
     component: () => import("@/views/ProfileView.vue"),
     meta: { requiresAuth: true },
     children: [
       {
-        path: "",
-        name: "ProfileIndex",
-        component: () => import("@/components/profile/MainSection.vue")
-      },
-      {
         path: "settings",
-        name: "ProfileSettings",
+        name: "AccountSettings",
         component: () => import("@/components/profile/SettingsSection.vue")
       },
       {
         path: "data",
-        name: "ProfileData",
+        name: "AccountData",
         component: () => import("@/components/profile/DataSection.vue")
       }
     ]
-  },
-  {
-    path: "/workspace/:id",
-    name: "Workspace",
-    props: true,
-    meta: { requiresAuth: true },
-    component: () => import("@/views/WorkspaceView.vue")
   },
   {
     path: "/table/:workspaceId/:tableId",

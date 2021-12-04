@@ -109,7 +109,7 @@ function submitForm(): void {
         signinBC.close();
         message.success("Вы успешно вошли!");
         const nextRoute = router.currentRoute.value.query.redirect;
-        router.push(typeof nextRoute === "string" ? nextRoute : "/profile");
+        router.push(typeof nextRoute === "string" ? nextRoute : "/account/data");
       } catch (error) {
         if (error instanceof Error) {
           message.error(error.message);

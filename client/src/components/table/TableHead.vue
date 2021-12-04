@@ -16,7 +16,7 @@
           'enter--right':
             index === draggableList.dragEnterIndex &&
             draggableList.dragStartIndex !== undefined &&
-            index > draggableList.dragStartIndex,
+            index > draggableList.dragStartIndex
         }"
         :draggable="index !== store.getters['table/editableHeaderIndex']"
         @dragstart="draggableList.dragStartHandler($event, index)"
@@ -28,15 +28,8 @@
         <table-header-vue :index="index" @delete="deleteColumn(index)" />
       </th>
       <th :style="!isCreatingInputShown ? { width: '3rem' } : {}">
-        <div
-          style="display: flex; align-items: center; justify-content: center"
-        >
-          <n-form-item
-            v-if="isCreatingInputShown"
-            :show-label="false"
-            :show-feedback="false"
-            :rule="headerNameRule"
-          >
+        <div style="display: flex; align-items: center; justify-content: center">
+          <n-form-item v-if="isCreatingInputShown" :show-label="false" :show-feedback="false" :rule="headerNameRule">
             <n-input
               ref="creatingInput"
               v-model:value="newHeaderName"
@@ -49,13 +42,7 @@
               @keyup.enter="addColumn"
             />
           </n-form-item>
-          <n-button
-            v-else
-            style="padding: 0 0.3rem"
-            size="small"
-            ghost
-            @click="showCreatingInput"
-          >
+          <n-button v-else style="padding: 0 0.3rem" size="small" ghost @click="showCreatingInput">
             <n-icon size="1.2rem">
               <add-icon />
             </n-icon>
@@ -77,9 +64,7 @@ import { stringValidator } from "@/helpers";
 import { useStore } from "@/store";
 
 const store = useStore();
-const tableHeaders = computed<TableHeader[]>(
-  () => store.getters["table/headers"]
-);
+const tableHeaders = computed<TableHeader[]>(() => store.getters["table/headers"]);
 
 const draggableList = reactive<DraggableList>(new DraggableList("headers"));
 async function dropCallback(index: number, itemIndex: number) {

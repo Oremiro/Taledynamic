@@ -15,7 +15,7 @@ export const getters: GetterTree<UserState, State> = {
     return state.accessTokenInMemory.value != "";
   },
   isAccessTokenExpired(state): boolean {
-    if (state.accessTokenInMemory.expiresAt === null) return true; 
+    if (state.accessTokenInMemory.expiresAt === null) return true;
     return state.accessTokenInMemory.expiresAt.getTime() < Date.now();
   }
 };

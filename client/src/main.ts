@@ -9,6 +9,7 @@ import {
   NConfigProvider,
   NGlobalStyle,
   NLayoutHeader,
+  NLayoutFooter,
   NMenu,
   NText,
   NSpace,
@@ -39,7 +40,8 @@ import {
   NLoadingBarProvider,
   NLayoutSider,
   NPopconfirm,
-  NPopselect
+  NPopselect,
+  NEmpty
 } from "naive-ui";
 
 const naive = create({
@@ -48,6 +50,7 @@ const naive = create({
     NConfigProvider,
     NGlobalStyle,
     NLayoutHeader,
+    NLayoutFooter,
     NMenu,
     NText,
     NSpace,
@@ -78,13 +81,9 @@ const naive = create({
     NLoadingBarProvider,
     NLayoutSider,
     NPopconfirm,
-    NPopselect
+    NPopselect,
+    NEmpty
   ]
 });
 
-createApp(App)
-  .use(store, key)
-  .use(router)
-  .use(naive)
-  .use(VueCookieNext)
-  .mount("#app");
+createApp(App).use(store, key).use(router).use(naive).use(VueCookieNext).mount("#app");

@@ -38,6 +38,13 @@ export const actions: ActionTree<WorkspacesState, State> = {
       try {
         await WorkspaceApi.delete({ id: payload.id }, rootGetters["user/accessToken"]);
         commit("delete", { workspaceIndex: workspaceIndex });
+        if (payload.id === state.currentWorkspaceId) {
+          if (state.workspaces.length > 0) {
+            commit("setCurrentId", { workspaceId: state.workspaces[0].id });
+          } else {
+            commit("setCurrentId", { workspaceId: null });
+          }
+        }
       } catch (error) {
         if (axios.isAxiosError(error)) {
           throw new Error(error.response?.statusText);
@@ -60,8 +67,8 @@ export const actions: ActionTree<WorkspacesState, State> = {
           oldWorkspaceIndex: workspaceIndex,
           newWorkspace: data.workspace
         });
-        if (payload.id === state.currentWorkspace?.id) {
-          commit("setCurrent", { workspace: data.workspace });
+        if (payload.id === state.currentWorkspaceId) {
+          commit("setCurrentId", { workspaceId: data.workspace.id });
         }
         await dispatch("sort", { sortType: state.sortType });
       } catch (error) {
