@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.DAL.Models.Responses;
 
@@ -35,6 +37,12 @@ namespace Taledynamic.Api.Middlewares
                     Message = httpException.Message ?? "",
                     StatusCode = httpException.HttpStatusCode
                 };
+                
+                Log.Information($"[{nameof(ExceptionHandlerMiddleware)}]: " +
+                                $"Method '{MethodBase.GetCurrentMethod()?.Name}' have error:" +
+                                $"Exception - {httpException}, Message - {httpException.Message}, " +
+                                $"Status code - {httpException.HttpStatusCode}.");
+                
                 await response.WriteAsJsonAsync(result);
             }
             catch (Exception exception)
@@ -48,6 +56,12 @@ namespace Taledynamic.Api.Middlewares
                     Message = exception.Message ?? "",
                     StatusCode = HttpStatusCode.InternalServerError
                 };
+                
+                Log.Information($"[{nameof(ExceptionHandlerMiddleware)}]: " +
+                                $"Method '{MethodBase.GetCurrentMethod()?.Name}' have error:" +
+                                $"Exception - {exception}, Message - {exception.Message} " +
+                                $"Status code - {HttpStatusCode.InternalServerError}.");
+                
                 await response.WriteAsJsonAsync(result);
             }
         }
