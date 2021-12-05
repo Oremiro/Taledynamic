@@ -11,25 +11,33 @@ namespace TaleDynamicBot.States
         { 
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "You are already logged into the system"
+                text: "Вы уже авторизованы."
             );
         }
 
-        public override void SendingData(ITelegramBotClient botClient, Update update)
+        public override void SendingData(ITelegramBotClient botClient, Message message)
         {
             
              botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
-                text: "Please,Wait"
+                chatId: message.Chat.Id,
+                text: "Продолжаю обработку..."
             );
-             this._user.ChangeState(new StateAuth());
+             this._user.ChangeState(new StateMessageHandling());
         }
 
         public override void StopSendingData(ITelegramBotClient botClient,Update update)
         {
             botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: "You already stopped"
+                text: "Вы уже остановили обработку сообщений."
+            );
+        }
+
+        public override async void DefaultAction(ITelegramBotClient botClient, Message message)
+        {
+            botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Вы можете продолжить обработку с помощью команды /sending ."
             );
         }
     }
