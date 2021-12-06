@@ -24,7 +24,7 @@ namespace Taledynamic.Core.Services
 
         public async Task<CreateTableResponse> CreateTableAsync(CreateTableRequest request)
         {
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableService)}]: Method 'CreateTableAsync' started.");
             
             var validator = request.IsValid();
             if (!validator.Status)
@@ -43,7 +43,7 @@ namespace Taledynamic.Core.Services
 
             await this.CreateAsync(table);
             
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableService)}]: Method 'CreateTableAsync' ended.");
 
             return new CreateTableResponse
             {
@@ -55,7 +55,7 @@ namespace Taledynamic.Core.Services
 
         public async Task<GetTablesByWorkspaceResponse> GetTablesByWorkspaceAsync(GetTablesByWorkspaceRequest request)
         {
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTablesByWorkspaceAsync' started.");
             
             var validator = request.IsValid();
             if (!validator.Status)
@@ -74,7 +74,7 @@ namespace Taledynamic.Core.Services
                 })
                 .ToListAsync();
             
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTablesByWorkspaceAsync' ended.");
             
             return new GetTablesByWorkspaceResponse()
             {
@@ -86,7 +86,7 @@ namespace Taledynamic.Core.Services
 
         public async Task<GetTableResponse> GetTableAsync(GetTableRequest request)
         {
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTableAsync' started.");
             
             var validator = request.IsValid();
             if (!validator.Status)
@@ -106,7 +106,7 @@ namespace Taledynamic.Core.Services
 
             var tableDto = new TableDto(table);
             
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTableAsync' ended.");
             
             return new GetTableResponse()
             {
@@ -118,7 +118,7 @@ namespace Taledynamic.Core.Services
 
         public async Task<DeleteTableResponse> DeleteTableAsync(DeleteTableRequest request)
         {
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableService)}]: Method 'DeleteTableAsync' started.");
             
             var validator = request.IsValid();
             if (!validator.Status)
@@ -128,7 +128,7 @@ namespace Taledynamic.Core.Services
 
             await DeleteAsync(request.Id);
             
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableService)}]: Method 'DeleteTableAsync' ended.");
             
             return new DeleteTableResponse()
             {
@@ -143,7 +143,7 @@ namespace Taledynamic.Core.Services
             // нет, мне просто лень писать через soft update без очереди, иначе вообще с ума сойти можно с
             // обновлением строк
             
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableService)}]: Method 'UpdateTableAsync' started.");
             
             var validator = request.IsValid();
             if (!validator.Status)
@@ -165,7 +165,7 @@ namespace Taledynamic.Core.Services
             table.Name = request.Name ?? table.Name;
             await UpdateAsync(table);
             
-            Log.Information($"[{nameof(TableService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableService)}]: Method 'UpdateTableAsync' ended.");
             
             return new UpdateTableResponse()
             {

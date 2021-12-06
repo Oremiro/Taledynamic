@@ -26,7 +26,7 @@ namespace Taledynamic.Core.Services
         public async Task<GetWorkspacesByUserResponse> GetFilteredByUserIdAsync(GetWorkspacesByUserRequest request,
             User user)
         {
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'GetFilteredByUserIdAsync' started.");
             
             if (user == null)
             {
@@ -52,14 +52,14 @@ namespace Taledynamic.Core.Services
                 Workspaces = workspaces
             };
             
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'GetFilteredByUserIdAsync' ended.");
 
             return response;
         }
 
         public async Task<GetWorkspaceByIdResponse> GetUserWorkspaceByIdAsync(GetWorkspaceByIdRequest request, User user)
         {
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'GetUserWorkspaceByIdAsync' started.");
             
             if (user == null)
             {
@@ -82,7 +82,7 @@ namespace Taledynamic.Core.Services
                 throw new NotFoundException("Workspace is not found");
             }
             
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'GetUserWorkspaceByIdAsync' ended.");
             
             return new GetWorkspaceByIdResponse
             {
@@ -94,7 +94,7 @@ namespace Taledynamic.Core.Services
 
         public async Task<CreateWorkspaceResponse> CreateWorkspaceAsync(CreateWorkspaceRequest request, User user)
         {
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'CreateWorkspaceAsync' started.");
             
             if (user == null)
             {
@@ -118,7 +118,7 @@ namespace Taledynamic.Core.Services
 
             await this.CreateAsync(workspace);
             
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'CreateWorkspaceAsync' ended.");
 
             return new CreateWorkspaceResponse
             {
@@ -130,7 +130,7 @@ namespace Taledynamic.Core.Services
 
         public async Task<UpdateWorkspaceResponse> UpdateWorkspaceAsync(UpdateWorkspaceRequest request)
         {
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'UpdateWorkspaceAsync' started.");
 
             var validator = request.IsValid();
             if (!validator.Status)
@@ -174,14 +174,14 @@ namespace Taledynamic.Core.Services
                 Message = "Success."
             };
             
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'UpdateWorkspaceAsync' ended.");
 
             return response;
         }
         
         private async Task UpdateTablesForWorkspace(Workspace oldWorkspace, Workspace newWorkspace)
         {
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'UpdateTablesForWorkspace' started.");
             
             if (oldWorkspace == null || newWorkspace == null)
             {
@@ -198,12 +198,12 @@ namespace Taledynamic.Core.Services
 
             await _context.SaveChangesAsync();
             
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'UpdateTablesForWorkspace' ended.");
         }
 
         public async Task<DeleteWorkspaceResponse> DeleteWorkspaceAsync(DeleteWorkspaceRequest request)
         {
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'DeleteWorkspaceAsync' started.");
             
             var validator = request.IsValid();
             if (!validator.Status)
@@ -213,7 +213,7 @@ namespace Taledynamic.Core.Services
 
             await DeleteAsync(request.Id);
             
-            Log.Information($"[{nameof(WorkspaceService)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(WorkspaceService)}]: Method 'DeleteWorkspaceAsync' ended.");
             
             return new DeleteWorkspaceResponse()
             {

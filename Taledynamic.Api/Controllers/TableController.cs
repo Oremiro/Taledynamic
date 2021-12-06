@@ -24,43 +24,43 @@ namespace Taledynamic.Api.Controllers
         [HttpGet("get-filtered-by-workspace")]
         public async Task<GetTablesByWorkspaceResponse> GetFilteredByWorkspace([FromQuery] GetTablesByWorkspaceRequest request)
         {
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableController)}]: Method 'GetFilteredByWorkspace' started.");
             var response = await _tableService.GetTablesByWorkspaceAsync(request);
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableController)}]: Method 'GetFilteredByWorkspace' ended.");
             return response;
         }
         
         [HttpGet("get")]
         public async Task<GetTableResponse> Get([FromQuery] GetTableRequest request)
         {
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Get' started.");
             var response = await _tableService.GetTableAsync(request);
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Get' ended.");
             return response;
         }
         
         [HttpPost("create")]
         public async Task<CreateTableResponse> Create([FromBody] CreateTableRequest request)
         {
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Create' started.");
             var response = await _tableService.CreateTableAsync(request);
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Create' ended.");
             return response;
         }
         [HttpPut("update")]
         public async Task<UpdateTableResponse> Update([FromBody] UpdateTableRequest request)
         {
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Update' started.");
             var response = await _tableService.UpdateTableAsync(request);
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Update' ended.");
             return response;
         }
         [HttpDelete("delete")]
         public async Task<DeleteTableResponse> Delete([FromQuery] DeleteTableRequest request)
         {
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' started.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Delete' started.");
             var response = await _tableService.DeleteTableAsync(request);
-            Log.Information($"[{nameof(TableController)}]: Method '{MethodBase.GetCurrentMethod()?.Name}' ended.");
+            Log.Information($"[{nameof(TableController)}]: Method 'Delete' ended.");
             return response;
         }
     }
