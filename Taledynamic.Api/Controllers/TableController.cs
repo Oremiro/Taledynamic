@@ -2,7 +2,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Taledynamic.Api.Attributes;
 using Taledynamic.Core.Interfaces;
+using Taledynamic.DAL.Models.DTOs;
 using Taledynamic.DAL.Models.Requests.TableRequests;
+using Taledynamic.DAL.Models.Responses;
 using Taledynamic.DAL.Models.Responses.TableResponses;
 
 namespace Taledynamic.Api.Controllers
@@ -13,9 +15,11 @@ namespace Taledynamic.Api.Controllers
     public class TableController: BaseController
     {
         private ITableService _tableService { get;  }
-        public TableController(ITableService tableService)
+        private ITableDataService _tableDataService { get; }
+        public TableController(ITableService tableService, ITableDataService tableDataService)
         {
             _tableService = tableService;
+            _tableDataService = tableDataService;
         }
 
         [HttpGet("get-filtered-by-workspace")]
@@ -48,6 +52,32 @@ namespace Taledynamic.Api.Controllers
         public async Task<DeleteTableResponse> Delete([FromQuery] DeleteTableRequest request)
         {
             var response = await _tableService.DeleteTableAsync(request);
+            return response;
+        }
+        
+        [HttpGet("data/get")]
+        public async Task<GenericGetResponse<TableDataDto>> GetData([FromQuery] GetTableDataRequest request)
+        {
+            var response = await _tableDataService.ReadTableDataAsync(request);
+            return response;
+        }
+        
+        [HttpPost("data/create")]
+        public async Task<GenericCreateResponse<TableDataDto>> CreateData([FromBody] CreateTableDataRequest request)
+        {
+            var response = await _tableDataService.CreateTableDataAsync(request);
+            return response;
+        }
+        [HttpPut("data/update")]
+        public async Task<GenericUpdateResponse<TableDataDto>> UpdateData([FromBody] UpdateTableDataRequest request)
+        {
+            var response = await _tableDataService.UpdateTableDataAsync(request);
+            return response;
+        }
+        [HttpDelete("data/delete")]
+        public async Task<GenericDeleteResponse<TableDataDto>> DeleteData([FromQuery] DeleteTableDataRequest request)
+        {
+            var response = await _tableDataService.DeleteTableDataAsync(request);
             return response;
         }
     }
