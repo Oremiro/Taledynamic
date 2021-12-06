@@ -75,7 +75,25 @@ namespace TaleDynamicBot.States
             else
             {
                 var file = await botClient.GetFileAsync(message.Photo[^1].FileId);
-                await botClient.DownloadFileAsync(file.FilePath, File.OpenWrite("file.jpg"));
+                
+                using (var saveImageStream = new FileStream($"{message.Chat.Username}_file.jpg", FileMode.Create))
+                {
+                    await botClient.DownloadFileAsync(file.FilePath,saveImageStream);
+                }
+                string base64Image = Convert.ToBase64String(File.ReadAllBytes($"{message.Chat.Username}_file.jpg"));
+                
+                /*var values = new Dictionary<string, string>
+                {
+                    { "Image", base64Image } //не знаю как будет называться value
+                };
+
+                var content = new FormUrlEncodedContent(values);
+
+                var response = await client.PostAsync("auth/User/send", content); //post запрос
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                
+                Log.Information($"Response : {responseString}");*/
             }
         }
     }
