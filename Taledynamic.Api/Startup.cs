@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Taledynamic.Api.Middlewares;
 using Taledynamic.Core;
 using Taledynamic.Core.Helpers;
@@ -62,6 +63,8 @@ namespace Taledynamic.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSerilogRequestLogging();
 
             app.UseStaticFiles();
 

@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Serilog;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.Core.Helpers;
@@ -30,6 +32,8 @@ namespace Taledynamic.Core.Services
 
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest request, string ipAddress)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'AuthenticateAsync' started.");
+            
             var response = new AuthenticateResponse();
 
             var validator = request.IsValid();
@@ -56,11 +60,16 @@ namespace Taledynamic.Core.Services
                 Message = "Authenticate proccess ended with success.",
                 StatusCode = HttpStatusCode.OK
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'AuthenticateAsync' ended.");
+            
             return response;
         }
 
         public async Task<RefreshTokenResponse> RefreshTokenAsync(string token, string ipAddress)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'RefreshTokenAsync' started.");
+            
             var response = new RefreshTokenResponse();
 
             var user = await _context
@@ -95,6 +104,8 @@ namespace Taledynamic.Core.Services
             await _context.SaveChangesAsync();
 
             var jwtToken = _userHelper.GenerateJwtToken(user);
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'RefreshTokenAsync' ended.");
 
             return new RefreshTokenResponse
             {
@@ -109,6 +120,8 @@ namespace Taledynamic.Core.Services
 
         public async Task<RevokeTokenResponse> RevokeTokenAsync(string token, string ipAddress)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'RevokeTokenAsync' started.");
+            
             var response = new RevokeTokenResponse
             {
                 StatusCode = HttpStatusCode.OK,
@@ -139,11 +152,16 @@ namespace Taledynamic.Core.Services
 
             response.IsSuccess = true;
             response.Message = "Success.";
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'RevokeTokenAsync' ended.");
+            
             return response;
         }
 
         public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request, string ipAddress)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'CreateUserAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -173,21 +191,29 @@ namespace Taledynamic.Core.Services
                 StatusCode = (HttpStatusCode) 200,
                 Message = "Success."
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'CreateUserAsync' ended.");
 
             return response;
         }
 
         private async Task<bool> IsUserEmailExistAsync(string email)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'IsUserEmailExistAsync' started.");
+            
             var isExist = await _context
                 .Users
                 .AsQueryable()
                 .AnyAsync(u => u.Email == email && u.IsActive);
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'IsUserEmailExistAsync' ended.");
 
             return isExist;
         }
         public async Task<DeleteUserResponse> DeleteUserAsync(DeleteUserRequest request)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'DeleteUserAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -201,12 +227,16 @@ namespace Taledynamic.Core.Services
                 StatusCode = (HttpStatusCode) 200,
                 Message = "Success."
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'DeleteUserAsync' ended.");
 
             return response;
         }
 
         private async Task<User> GetUserByEmailAndPassword(string email, string password)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUserByEmailAndPassword' started.");
+            
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 throw new BadRequestException(
@@ -221,12 +251,16 @@ namespace Taledynamic.Core.Services
             {
                 throw new NotFoundException("Active user with this email is not found.");
             }
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUserByEmailAndPassword' ended.");
 
             return user;
         }
 
         private async Task<User> GetUserByIdAndPassword(int id, string password)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUserByIdAndPassword' started.");
+            
             if (id == default || string.IsNullOrEmpty(password))
             {
                 throw new BadRequestException(
@@ -242,11 +276,15 @@ namespace Taledynamic.Core.Services
             {
                 throw new NotFoundException("Active user with this id is not found.");
             }
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUserByIdAndPassword' ended.");
 
             return user;
         }
         public async Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'UpdateUserAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -294,12 +332,16 @@ namespace Taledynamic.Core.Services
                 Message = "Success.",
                 User = new UserDto(newUser) 
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'UpdateUserAsync' ended.");
 
             return response;
         }
 
         private async Task UpdateWorkspacesForUser(User oldUser, User newUser)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'UpdateWorkspacesForUser' started.");
+            
             if (oldUser == null || newUser == null)
             {
                 throw new BadRequestException("User is not set");
@@ -314,9 +356,13 @@ namespace Taledynamic.Core.Services
             }
 
             await _context.SaveChangesAsync();
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'UpdateWorkspacesForUser' ended.");
         }
         public async Task<GetUserResponse> GetUserByIdAsync(GetUserRequest request)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUserByIdAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -342,12 +388,16 @@ namespace Taledynamic.Core.Services
                     Id = user.Id
                 }
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUserByIdAsync' ended.");
 
             return response;
         }
 
         public async Task<GetUsersResponse> GetUsersAsync(GetUsersRequest request)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUsersAsync' started.");
+            
             var users = (await this.GetAllAsync())
                 .Where(u => u.IsActive)
                 .Select(u => new UserDto()
@@ -363,12 +413,16 @@ namespace Taledynamic.Core.Services
                 Message = "Success.",
                 Users = users
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'GetUsersAsync' ended.");
 
             return response;
         }
 
         public async Task<IsEmailUsedResponse> IsEmailUsedAsync(IsEmailUsedRequest request)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'IsEmailUsedAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -386,12 +440,16 @@ namespace Taledynamic.Core.Services
                 Message = "Success.",
                 IsEmailUsed = user != null
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'IsEmailUsedAsync' ended.");
 
             return response;
         }
 
         public async Task<GetUserResponse> GetActiveUserByEmailAsync(GetActiveUserByEmailRequest request)
         {
+            Log.Information($"[{nameof(UserService)}]: Method 'GetActiveUserByEmailAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -421,6 +479,8 @@ namespace Taledynamic.Core.Services
                 Message = "User was found.",
                 User = userDto
             };
+            
+            Log.Information($"[{nameof(UserService)}]: Method 'GetActiveUserByEmailAsync' ended.");
 
             return response;
         }
