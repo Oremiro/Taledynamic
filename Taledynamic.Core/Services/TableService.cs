@@ -12,7 +12,7 @@ using Taledynamic.DAL.Models.Responses.TableResponses;
 
 namespace Taledynamic.Core.Services
 {
-    public class TableService: BaseService<Table>, ITableService 
+    public partial class TableService: BaseService<Table>, ITableService 
     {
         private TaledynamicContext _context { get; }
         public TableService(TaledynamicContext context) : base(context)
