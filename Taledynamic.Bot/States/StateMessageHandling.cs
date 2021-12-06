@@ -46,15 +46,15 @@ namespace TaleDynamicBot.States
 
         public override async void DefaultAction(ITelegramBotClient botClient, Message message)
         {
+            var options = new JsonSerializerOptions
+            {
+                IgnoreNullValues = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                WriteIndented = true
+            };
 
             if (message.Type == MessageType.Text)
             {
-                var options = new JsonSerializerOptions
-                {
-                    IgnoreNullValues = true,
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    WriteIndented = true
-                };
                 string json = JsonSerializer.Serialize<Message>(message, options);
 
                 Log.Information(json);
@@ -74,6 +74,10 @@ namespace TaleDynamicBot.States
             }
             else
             {
+                string json = JsonSerializer.Serialize<Message>(message, options);
+
+                Log.Information(json);
+                
                 var file = await botClient.GetFileAsync(message.Photo[^1].FileId);
                 
                 using (var saveImageStream = new FileStream($"{message.Chat.Username}_file.jpg", FileMode.Create))
