@@ -5,6 +5,7 @@ using Taledynamic.Api.Attributes;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.DAL.Models.DTOs;
 using Taledynamic.DAL.Entities;
+using Serilog;
 using Taledynamic.DAL.Models.Requests.TableRequests;
 using Taledynamic.DAL.Models.Responses;
 using Taledynamic.DAL.Models.Responses.TableResponses;
