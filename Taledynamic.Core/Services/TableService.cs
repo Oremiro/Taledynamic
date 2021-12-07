@@ -3,21 +3,31 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.DAL.Entities;
 using Taledynamic.DAL.Models.DTOs;
+using Taledynamic.DAL.Models.Internal;
 using Taledynamic.DAL.Models.Requests.TableRequests;
 using Taledynamic.DAL.Models.Responses.TableResponses;
+using Taledynamic.DAL.MongoModels;
 
 namespace Taledynamic.Core.Services
 {
     public partial class TableService: BaseService<Table>, ITableService 
     {
         private TaledynamicContext _context { get; }
-        public TableService(TaledynamicContext context) : base(context)
+        private IMongoCollection<JsonModel> _documents { get; }
+        public TableService(TaledynamicContext context, IMongoDbSettings settings) : base(context)
         {
             _context = context;
+            
+            var client = new MongoClient(settings.ConnectionString);
+            
+            // TODO: better approach to handle it with ioc containers
+            var database = client.GetDatabase(settings.DatabaseName);
+            _documents = database.GetCollection<JsonModel>(settings.DatabaseName);
         }
 
         public async Task<CreateTableResponse> CreateTableAsync(CreateTableRequest request)
