@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot;
@@ -9,6 +10,7 @@ namespace TaleDynamicBot.States
 {
     public class StateNonAuth:State
     {
+        private static readonly HttpClient client = new HttpClient();
         public override async void Auth(ITelegramBotClient botClient, Update update)
         {
             //авторизация в проекте.

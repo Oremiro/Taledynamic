@@ -41,7 +41,7 @@ namespace TaleDynamicBot
         {
             try
             {
-                await BotOnMessageReceived(botClient, update);
+                await BotOnMessageReceived(botClient,update);
             }
             catch (Exception exception)
             {
@@ -52,9 +52,6 @@ namespace TaleDynamicBot
         public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Update update)
         {
             Log.Information($"Receive message type: {update.Message.Type}");
-
-            if (update.Message.Type != MessageType.Text)
-                return;
 
             switch (update.Message.Text)
             {
