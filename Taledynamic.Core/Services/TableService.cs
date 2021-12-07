@@ -27,7 +27,7 @@ namespace Taledynamic.Core.Services
             
             // TODO: better approach to handle it with ioc containers
             var database = client.GetDatabase(settings.DatabaseName);
-            _documents = database.GetCollection<JsonModel>(settings.DatabaseName);
+            _documents = database.GetCollection<JsonModel>(settings.JsonCollectionName);
         }
 
         public async Task<CreateTableResponse> CreateTableAsync(CreateTableRequest request)

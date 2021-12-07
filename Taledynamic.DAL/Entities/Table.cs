@@ -9,7 +9,7 @@ namespace Taledynamic.DAL.Entities
         public string Name { get; set; }
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
-        
+        public string MongoDbUId { get; set; }
         [ForeignKey("WorkspaceId")]
         public virtual Workspace Workspace { get; set; }
         [Required]

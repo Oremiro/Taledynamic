@@ -31,6 +31,8 @@ namespace Taledynamic.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
+            //services.AddControllers().AddNewtonsoftJson();
+
             var connectionStrings = Configuration.GetSection("ConnectionStrings");
             
             # region mongodb

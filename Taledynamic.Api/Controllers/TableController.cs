@@ -55,21 +55,22 @@ namespace Taledynamic.Api.Controllers
             return response;
         }
         
-        [HttpGet("data/get")]
-        public async Task<GenericGetResponse<TableDataDto>> GetData([FromQuery] GetTableDataRequest request)
+        [HttpGet("{id:int}/data/get")]
+        public async Task<GenericGetResponse<TableDataDto>> GetData([FromQuery] GetTableDataRequest request, int? id)
         {
-            var response = await _tableDataService.ReadTableDataAsync(request);
+            var response = await _tableDataService.ReadTableDataAsync(request, id);
             return response;
         }
         
-        [HttpPost("data/create")]
-        public async Task<GenericCreateResponse<TableDataDto>> CreateData([FromBody] CreateTableDataRequest request)
+        [HttpPost("{id:int}/data/create")]
+        public async Task<GenericCreateResponse<TableDataDto>> CreateData([FromBody] CreateTableDataRequest request, int? id)
         {
-            var response = await _tableDataService.CreateTableDataAsync(request);
+            var response = await _tableDataService.CreateTableDataAsync(request, id);
             return response;
         }
+        
         [HttpPut("data/update")]
-        public async Task<GenericUpdateResponse<TableDataDto>> UpdateData([FromBody] UpdateTableDataRequest request)
+        public async Task<EmptyUpdateResponse> UpdateData([FromBody] UpdateTableDataRequest request)
         {
             var response = await _tableDataService.UpdateTableDataAsync(request);
             return response;
