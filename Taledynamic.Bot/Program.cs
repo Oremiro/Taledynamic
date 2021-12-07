@@ -21,6 +21,8 @@ namespace TaleDynamicBot
 
             using var cts = new CancellationTokenSource();
             
+            
+            
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .WriteTo.File(fullpath + @"\Logs.txt",rollingInterval: RollingInterval.Day)
@@ -34,6 +36,7 @@ namespace TaleDynamicBot
             Console.ReadLine();
             
             cts.Cancel();
+            Log.CloseAndFlush();
         }
     }
 }

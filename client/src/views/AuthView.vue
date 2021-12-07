@@ -1,11 +1,7 @@
 <template>
   <div class="container">
     <n-card hoverable style="max-width: 30rem">
-      <n-tabs
-        v-model:value="activeTab"
-        size="large"
-        @update:value="handleUpdateTab"
-      >
+      <n-tabs v-model:value="activeTab" size="large" @update:value="handleUpdateTab">
         <n-tab-pane name="signin" tab="Вход" />
         <n-tab-pane name="signup" tab="Регистрация" />
       </n-tabs>
@@ -23,9 +19,7 @@ import { ref } from "vue";
 import { onBeforeRouteUpdate, useRouter } from "vue-router";
 
 const router = useRouter();
-const activeTab = ref(
-  router.currentRoute.value.name === "AuthSignIn" ? "signin" : "signup"
-);
+const activeTab = ref(router.currentRoute.value.name === "AuthSignIn" ? "signin" : "signup");
 
 function handleUpdateTab(value: string): void {
   router.push({ name: value === "signin" ? "AuthSignIn" : "AuthSignUp" });

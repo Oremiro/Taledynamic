@@ -1,55 +1,57 @@
 <template>
   <transition name="fade" mode="out-in">
     <div v-if="isInitializationSuccess && tables.length">
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 1.5rem;
-        "
-      >
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem">
         <n-text>Ваши таблицы</n-text>
         <n-tag>{{ tables.length }} / 100</n-tag>
       </div>
       <div style="display: flex; gap: 1rem; flex-wrap: wrap">
-        <tables-list-item
-          v-for="table of tables"
-          :id="table.id"
-          :key="table.id"
-          :name="table.name"
-          :editable="editable"
-          @update="updateListItem"
-          @delete="deleteListItem"
-        />
         <table-creating-item
           v-if="tables.length < 100"
           :workspace-id="props.workspaceId"
           :tables-count="tables.length"
           tertiary
           type="primary"
+          style="max-width: 12rem"
           @create="pushTableToList"
         >
           <n-icon size="1.2rem">
             <add-icon />
           </n-icon>
         </table-creating-item>
+        <tables-list-item
+          v-for="table of tables"
+          :id="table.id"
+          :key="table.id"
+          :workspace-id="workspaceId"
+          :name="table.name"
+          :editable="editable"
+          @update="updateListItem"
+          @delete="deleteListItem"
+        />
       </div>
     </div>
     <n-empty
       v-else-if="isInitializationSuccess && !tables.length"
       size="large"
-      description="Здесь пока что нет таблиц"
-      style="height: 15rem; display: flex; justify-content: center"
+      description="В выбранном рабочем пространстве нет таблиц"
+      style="height: 15rem; display: flex; justify-content: center; text-align: start"
     >
+      <template #icon>
+        <n-icon>
+          <apps-list-icon />
+        </n-icon>
+      </template>
       <template #extra>
-        <table-creating-item
-          :workspace-id="props.workspaceId"
-          :tables-count="tables.length"
-          @create="pushTableToList"
-        >
-          Создать таблицу
-        </table-creating-item>
+        <div style="max-width: 15rem; text-align: initial">
+          <table-creating-item
+            :workspace-id="props.workspaceId"
+            :tables-count="tables.length"
+            @create="pushTableToList"
+          >
+            Создать таблицу
+          </table-creating-item>
+        </div>
       </template>
     </n-empty>
     <tables-loading-item
@@ -63,22 +65,22 @@
 
 <script setup lang="ts">
 import axios from "axios";
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import { useMessage, NEmpty, NTag } from "naive-ui";
-import { TableDto } from "@/interfaces/api/responses";
+import { TableDto } from "@/models/api/responses";
 import { TableApi } from "@/helpers/api/table";
 import { useStore } from "@/store";
 import { debounce } from "@/helpers";
-import { InitializationStatus, TablesSortType } from "@/interfaces";
+import { InitializationStatus, TablesSortType } from "@/models";
 import TablesLoadingItem from "@/components/tables/TablesLoadingItem.vue";
 import TableCreatingItem from "@/components/tables/TableCreatingItem.vue";
 import TablesListItem from "@/components/tables/TablesListItem.vue";
-import { AddIcon } from "@/components/icons";
+import { AddIcon, AppsListIcon } from "@/components/icons";
 
 const props = defineProps<{
   workspaceId: number;
   editable?: boolean;
-  sortType?: TablesSortType
+  sortType?: TablesSortType;
 }>();
 
 const tables = ref<TableDto[]>([]);
@@ -86,13 +88,13 @@ const tables = ref<TableDto[]>([]);
 const store = useStore();
 const message = useMessage();
 
-const tablesInitializationStatus = ref<InitializationStatus>(
-  InitializationStatus.Pending
-);
+const tablesInitializationStatus = ref<InitializationStatus>(InitializationStatus.Pending);
 
 async function initializeTablesList(): Promise<void> {
+  if (isNaN(props.workspaceId)) return;
   tablesInitializationStatus.value = InitializationStatus.Pending;
   try {
+    await store.dispatch("user/refreshExpired");
     const { data } = await TableApi.getList(
       {
         workspaceId: props.workspaceId
@@ -103,7 +105,6 @@ async function initializeTablesList(): Promise<void> {
     tablesInitializationStatus.value = InitializationStatus.Success;
   } catch (error) {
     tablesInitializationStatus.value = InitializationStatus.Error;
-    // TODO: 401 Handler
     if (axios.isAxiosError(error)) {
       message.error(error.message);
     }
@@ -132,28 +133,18 @@ function deleteListItem(id: number) {
 
 async function sortList(sortType: TablesSortType) {
   if (sortType === TablesSortType.NameAscending) {
-    tables.value.sort((itemFirst, itemSecond) =>
-      itemFirst.name.localeCompare(itemSecond.name)
-    );
+    tables.value.sort((itemFirst, itemSecond) => itemFirst.name.localeCompare(itemSecond.name));
   } else if (sortType === TablesSortType.NameDescending) {
-    tables.value.sort((itemFirst, itemSecond) =>
-      itemSecond.name.localeCompare(itemFirst.name)
-    );
+    tables.value.sort((itemFirst, itemSecond) => itemSecond.name.localeCompare(itemFirst.name));
   }
 }
 
-const isInitializationError = computed<boolean>(
-  () => tablesInitializationStatus.value === InitializationStatus.Error
-);
+const isInitializationError = computed<boolean>(() => tablesInitializationStatus.value === InitializationStatus.Error);
 const isInitializationSuccess = computed<boolean>(
   () => tablesInitializationStatus.value === InitializationStatus.Success
 );
 
 const initializeTableListDebounced = debounce(initializeTablesList, 1000);
-onMounted(async () => {
-  await initializeTableListDebounced();
-  await sortList(props.sortType ?? TablesSortType.NameAscending);
-});
 
 watch(
   () => props.workspaceId,
@@ -161,10 +152,12 @@ watch(
     tablesInitializationStatus.value = InitializationStatus.Pending;
     await initializeTableListDebounced();
     await sortList(props.sortType ?? TablesSortType.NameAscending);
-  }
+  },
+  { immediate: true }
 );
 
 defineExpose({
-  sortList
+  sortList,
+  tables
 });
 </script>

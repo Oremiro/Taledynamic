@@ -1,12 +1,13 @@
-import { InitializationStatus } from "@/interfaces";
+import { InitializationStatus } from "@/models";
 import { store } from "@/store";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "Home",
-    component: () => import("@/views/HomeView.vue")
+    name: "Main",
+    meta: { requiresAuth: true },
+    component: () => import("@/views/MainView.vue")
   },
   {
     path: "/auth",
@@ -27,34 +28,29 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: "/profile",
-    name: "Profile",
+    path: "/account",
+    name: "Account",
     component: () => import("@/views/ProfileView.vue"),
     meta: { requiresAuth: true },
     children: [
       {
-        path: "",
-        name: "ProfileIndex",
-        component: () => import("@/components/profile/MainSection.vue")
-      },
-      {
         path: "settings",
-        name: "ProfileSettings",
+        name: "AccountSettings",
         component: () => import("@/components/profile/SettingsSection.vue")
       },
       {
         path: "data",
-        name: "ProfileData",
+        name: "AccountData",
         component: () => import("@/components/profile/DataSection.vue")
       }
     ]
   },
   {
-    path: "/workspace/:id",
-    name: "Workspace",
+    path: "/table/:workspaceId/:tableId",
+    name: "Table",
     props: true,
-    meta: { requiresAuth: true },
-    component: () => import("@/views/WorkspaceView.vue")
+    meta: { requiresAuth: false },
+    component: () => import("@/views/TableView.vue")
   },
   {
     path: "/:pathMatch(.*)*",
@@ -79,10 +75,7 @@ router.beforeResolve(async (to) => {
       name: "Auth",
       query: { redirect: to.fullPath }
     };
-  } else if (
-    (to.name === "AuthSignIn" || to.name === "AuthSignUp") &&
-    isLoggedIn
-  ) {
+  } else if ((to.name === "AuthSignIn" || to.name === "AuthSignUp") && isLoggedIn) {
     return {
       name: "ProfileIndex"
     };
@@ -94,8 +87,7 @@ router.afterEach(
   () =>
     new Promise<void>((resolve) => {
       const isLoggedIn: boolean = store.getters["user/isLoggedIn"];
-      const workspacesInitStatus: InitializationStatus =
-        store.getters["workspaces/initStatus"];
+      const workspacesInitStatus: InitializationStatus = store.getters["workspaces/initStatus"];
       if (isLoggedIn && workspacesInitStatus !== InitializationStatus.Success) {
         setTimeout(async () => {
           try {

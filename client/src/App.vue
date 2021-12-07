@@ -2,22 +2,19 @@
   <n-config-provider :theme="currentTheme">
     <n-global-style />
     <n-message-provider>
-      <n-layout style="min-height: 100vh">
+      <n-layout style="min-height: 100vh" position="absolute">
         <n-loading-bar-provider>
-          <layout-header
-            :current-theme="currentTheme"
-            @change-theme="setTheme"
-          />
+          <layout-header :current-theme="currentTheme" @change-theme="setTheme" />
         </n-loading-bar-provider>
-        <n-layout has-sider position="absolute" style="top: 3.3rem">
-          <layout-sider />
-          <n-layout-content embedded :native-scrollbar="false" content-style="min-height: 100%">
+        <n-layout position="absolute" :native-scrollbar="false" style="top: 3.3rem">
+          <n-layout-content embedded content-style="min-height: calc(100vh - 3.3rem)">
             <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
                 <component :is="Component" />
               </transition>
             </router-view>
           </n-layout-content>
+          <layout-footer />
         </n-layout>
       </n-layout>
     </n-message-provider>
@@ -30,10 +27,10 @@ import { ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { darkTheme, useOsTheme } from "naive-ui";
 import LayoutHeader from "@/layouts/LayoutHeader.vue";
-import LayoutSider from "@/layouts/LayoutSider.vue";
-import { Theme } from "@/interfaces";
+import LayoutFooter from "@/layouts/LayoutFooter.vue";
+import { Theme } from "@/models";
 import { useStore } from "@/store";
-import { UserState } from "@/interfaces/store";
+import { LoginState } from "@/models/store";
 
 const currentTheme = ref<Theme>(darkTheme);
 const storedTheme: string | null = localStorage.getItem("theme");
@@ -65,17 +62,14 @@ onstorage = (event: StorageEvent): void => {
 };
 
 const signinBC = new BroadcastChannel("signin");
-signinBC.onmessage = (ev: MessageEvent<UserState>): void => {
+signinBC.onmessage = (ev: MessageEvent<LoginState>): void => {
   if (!store.getters["user/isLoggedIn"]) {
-    const userState: UserState = ev.data;
+    const userState = ev.data;
     store.commit("user/login", {
       user: userState.user,
       accessToken: userState.accessTokenInMemory
     });
-    if (
-      router.currentRoute.value.name === "AuthSignIn" ||
-      router.currentRoute.value.name === "AuthSignUp"
-    ) {
+    if (router.currentRoute.value.name === "AuthSignIn" || router.currentRoute.value.name === "AuthSignUp") {
       router.push({ name: "ProfileIndex" });
     }
   }
@@ -103,10 +97,8 @@ onUnmounted(() => {
 }
 
 .container {
-  width: 100%;
-  height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding: 2.5rem 3.5rem;
 }
 </style>

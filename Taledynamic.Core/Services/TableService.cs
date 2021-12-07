@@ -1,27 +1,41 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using MongoDB.Driver;
 using Taledynamic.Core.Exceptions;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.DAL.Entities;
 using Taledynamic.DAL.Models.DTOs;
+using Taledynamic.DAL.Models.Internal;
 using Taledynamic.DAL.Models.Requests.TableRequests;
 using Taledynamic.DAL.Models.Responses.TableResponses;
+using Taledynamic.DAL.MongoModels;
 
 namespace Taledynamic.Core.Services
 {
-    public class TableService: BaseService<Table>, ITableService 
+    public partial class TableService: BaseService<Table>, ITableService 
     {
         private TaledynamicContext _context { get; }
-        public TableService(TaledynamicContext context) : base(context)
+        private IMongoCollection<JsonModel> _documents { get; }
+        public TableService(TaledynamicContext context, IMongoDbSettings settings) : base(context)
         {
             _context = context;
+            
+            var client = new MongoClient(settings.ConnectionString);
+            
+            // TODO: better approach to handle it with ioc containers
+            var database = client.GetDatabase(settings.DatabaseName);
+            _documents = database.GetCollection<JsonModel>(settings.JsonCollectionName);
         }
 
         public async Task<CreateTableResponse> CreateTableAsync(CreateTableRequest request)
         {
+            Log.Information($"[{nameof(TableService)}]: Method 'CreateTableAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -38,6 +52,8 @@ namespace Taledynamic.Core.Services
             };
 
             await this.CreateAsync(table);
+            
+            Log.Information($"[{nameof(TableService)}]: Method 'CreateTableAsync' ended.");
 
             return new CreateTableResponse
             {
@@ -49,6 +65,8 @@ namespace Taledynamic.Core.Services
 
         public async Task<GetTablesByWorkspaceResponse> GetTablesByWorkspaceAsync(GetTablesByWorkspaceRequest request)
         {
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTablesByWorkspaceAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -66,6 +84,8 @@ namespace Taledynamic.Core.Services
                 })
                 .ToListAsync();
             
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTablesByWorkspaceAsync' ended.");
+            
             return new GetTablesByWorkspaceResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
@@ -76,6 +96,8 @@ namespace Taledynamic.Core.Services
 
         public async Task<GetTableResponse> GetTableAsync(GetTableRequest request)
         {
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTableAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -94,6 +116,8 @@ namespace Taledynamic.Core.Services
 
             var tableDto = new TableDto(table);
             
+            Log.Information($"[{nameof(TableService)}]: Method 'GetTableAsync' ended.");
+            
             return new GetTableResponse()
             {
                 StatusCode = (HttpStatusCode) 200,
@@ -104,6 +128,8 @@ namespace Taledynamic.Core.Services
 
         public async Task<DeleteTableResponse> DeleteTableAsync(DeleteTableRequest request)
         {
+            Log.Information($"[{nameof(TableService)}]: Method 'DeleteTableAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -111,6 +137,8 @@ namespace Taledynamic.Core.Services
             }
 
             await DeleteAsync(request.Id);
+            
+            Log.Information($"[{nameof(TableService)}]: Method 'DeleteTableAsync' ended.");
             
             return new DeleteTableResponse()
             {
@@ -124,6 +152,9 @@ namespace Taledynamic.Core.Services
             // не уверен что изменяемость нужна в этой таблице, сделаю через дефолтный update
             // нет, мне просто лень писать через soft update без очереди, иначе вообще с ума сойти можно с
             // обновлением строк
+            
+            Log.Information($"[{nameof(TableService)}]: Method 'UpdateTableAsync' started.");
+            
             var validator = request.IsValid();
             if (!validator.Status)
             {
@@ -143,6 +174,8 @@ namespace Taledynamic.Core.Services
             table.Modified = DateTime.Now;
             table.Name = request.Name ?? table.Name;
             await UpdateAsync(table);
+            
+            Log.Information($"[{nameof(TableService)}]: Method 'UpdateTableAsync' ended.");
             
             return new UpdateTableResponse()
             {

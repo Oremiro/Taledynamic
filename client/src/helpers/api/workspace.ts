@@ -3,14 +3,14 @@ import {
   DeleteWorkspaceRequest,
   GetWorkspaceByIdRequest,
   UpdateWorkspaceRequest
-} from "@/interfaces/api/requests";
+} from "@/models/api/requests";
 import {
   CreateWorkspaceResponse,
   UpdateWorkspaceResponse,
   DeleteWorkspaceResponse,
   GetWorkspaceByIdResponse,
   GetWorkspacesByUserResponse
-} from "@/interfaces/api/responses";
+} from "@/models/api/responses";
 import axios, { AxiosPromise } from "axios";
 
 export class WorkspaceApi {
@@ -19,10 +19,7 @@ export class WorkspaceApi {
     withCredentials: true
   });
 
-  static create(
-    data: CreateWorkspaceRequest,
-    accessToken: string
-  ): AxiosPromise<CreateWorkspaceResponse> {
+  static create(data: CreateWorkspaceRequest, accessToken: string): AxiosPromise<CreateWorkspaceResponse> {
     return this.axiosInstance.post<CreateWorkspaceResponse>("/create", data, {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -30,10 +27,7 @@ export class WorkspaceApi {
     });
   }
 
-  static delete(
-    params: DeleteWorkspaceRequest,
-    accessToken: string
-  ): AxiosPromise<DeleteWorkspaceResponse> {
+  static delete(params: DeleteWorkspaceRequest, accessToken: string): AxiosPromise<DeleteWorkspaceResponse> {
     return this.axiosInstance.delete<DeleteWorkspaceResponse>("/delete", {
       params,
       headers: {
@@ -42,10 +36,7 @@ export class WorkspaceApi {
     });
   }
 
-  static update(
-    data: UpdateWorkspaceRequest,
-    accessToken: string
-  ): AxiosPromise<UpdateWorkspaceResponse> {
+  static update(data: UpdateWorkspaceRequest, accessToken: string): AxiosPromise<UpdateWorkspaceResponse> {
     return this.axiosInstance.put<UpdateWorkspaceResponse>("/update", data, {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -53,10 +44,7 @@ export class WorkspaceApi {
     });
   }
 
-  static get(
-    params: GetWorkspaceByIdRequest,
-    accessToken: string
-  ): AxiosPromise<GetWorkspaceByIdResponse> {
+  static get(params: GetWorkspaceByIdRequest, accessToken: string): AxiosPromise<GetWorkspaceByIdResponse> {
     return this.axiosInstance.get<GetWorkspaceByIdResponse>("/get", {
       params,
       headers: {
@@ -65,16 +53,11 @@ export class WorkspaceApi {
     });
   }
 
-  static getByUser(
-    accessToken: string
-  ): AxiosPromise<GetWorkspacesByUserResponse> {
-    return this.axiosInstance.get<GetWorkspacesByUserResponse>(
-      "/get-filtered-by-user",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
+  static getByUser(accessToken: string): AxiosPromise<GetWorkspacesByUserResponse> {
+    return this.axiosInstance.get<GetWorkspacesByUserResponse>("/get-filtered-by-user", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
       }
-    );
+    });
   }
 }

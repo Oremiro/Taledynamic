@@ -1,30 +1,26 @@
 <template>
-  <n-form-item
-    ref="tableNameFormItem"
-    :show-label="false"
-    :show-feedback="false"
-    :rule="tableNameRule"
-  >
+  <n-form-item ref="tableNameFormItem" :show-label="false" :show-feedback="false" :rule="tableNameRule">
     <n-input-group>
       <n-input
         ref="tableNameInput"
         v-model:value="tableName"
-        autosize
         :show-count="!loading"
-        :maxlength="30"
-        placeholder=""
-        :loading="loading"
+        :maxlength="50"
+        placeholder="Название"
         :disabled="loading"
         @blur="emit('blur', $event)"
         @keyup.enter="validate"
       />
       <n-button
-        v-if="isTableNameValid && !loading"
+        v-if="isTableNameValid"
         attr-type="submit"
+        :disabled="loading"
         style="padding: 0.6rem"
+        :focusable="false"
         @click="validate"
       >
-        <n-icon size="1.2rem">
+        <n-spin v-if="loading" :size="16" />
+        <n-icon v-else size="1.2rem">
           <checkmark-icon />
         </n-icon>
       </n-button>
@@ -34,7 +30,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { NInput, NFormItem, FormItemRule, useMessage } from "naive-ui";
+import { NInput, NFormItem, FormItemRule, useMessage, NSpin } from "naive-ui";
 import { stringValidator } from "@/helpers";
 import { CheckmarkIcon } from "@/components/icons";
 

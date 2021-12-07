@@ -13,9 +13,7 @@
             </n-icon>
           </n-text>
           <n-text type="error">Ошибка загрузки списка таблиц</n-text>
-          <n-button style="margin-top: 1rem" @click="$emit('repeatInitialization')">
-            Попробовать снова
-          </n-button>
+          <n-button style="margin-top: 1rem" @click="$emit('repeatInitialization')"> Попробовать снова </n-button>
         </div>
       </transition>
     </div>

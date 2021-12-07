@@ -41,15 +41,11 @@ namespace TaleDynamicBot
         {
             try
             {
-                await BotOnMessageReceived(botClient, update);
+                await BotOnMessageReceived(botClient,update);
             }
             catch (Exception exception)
             {
                 await HandleErrorAsync(botClient, exception, cancellationToken);
-            }
-            finally
-            {
-                Log.CloseAndFlush();
             }
         }
 
@@ -57,10 +53,7 @@ namespace TaleDynamicBot
         {
             Log.Information($"Receive message type: {update.Message.Type}");
 
-            if (update.Message.Type != MessageType.Text)
-                return;
-
-            switch (update.Message.Text) //KEK)))))))))))))))
+            switch (update.Message.Text)
             {
                 case "/auth":
                     user.Auth(botClient, update);
@@ -71,53 +64,24 @@ namespace TaleDynamicBot
                 case "/stop_sending":
                     user.StopSendingData(botClient, update);
                     break;
-                case "/keyboard":
-                    await SendReplyKeyboard(botClient, update.Message);
-                    break;
-                case "/remove":
-                    await RemoveKeyboard(botClient, update.Message);
+                case "/usage":
+                    await Usage(botClient, update.Message);
                     break;
                 default:
-                    await Usage(botClient, update.Message);
+                    user.DefaultAction(botClient,update);
                     break;
             }
         }
-        public static async Task<Message> SendReplyKeyboard(ITelegramBotClient botClient, Message message)
-        {
-            var replyKeyboardMarkup = new ReplyKeyboardMarkup(
-                new KeyboardButton[][]
-                {
-                    new KeyboardButton[] { "Авторизация         ", "Обработка сообщений  " },
-                    new KeyboardButton[] { "Остановить обработку", "Здесь какая-то кнопка" },
-                })
-            {
-                ResizeKeyboard = true
-            };
-
-            return await botClient.SendTextMessageAsync(chatId: message.Chat.Id,
-                text: "Choose",
-                replyMarkup: replyKeyboardMarkup);
-        }
-        static async Task<Message> RemoveKeyboard(ITelegramBotClient botClient, Message message)
-        {
-            return await botClient.SendTextMessageAsync(chatId: message.Chat.Id,
-                text: "Removing keyboard",
-                replyMarkup: new ReplyKeyboardRemove());
-        }
-
         static async Task<Message> Usage(ITelegramBotClient botClient, Message message)
         {
             const string usage = "Usage:\n" +
                                  "/auth     - authorize in project\n" +
                                  "/sending  - start sending message on TaleDynamic\n"+
-                                 "/stop_sending - stop receiving your messages\n"+
-                                 "/keyboard - send custom keyboard\n" +
-                                 "/remove   - remove custom keyboard\n";
+                                 "/stop_sending - stop receiving your messages\n";
 
             return await botClient.SendTextMessageAsync(chatId: message.Chat.Id, 
                 text: usage,
                 replyMarkup: new ReplyKeyboardRemove());
         }
-
     }
 }

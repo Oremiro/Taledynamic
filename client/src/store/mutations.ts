@@ -1,4 +1,4 @@
-import { State } from "@/interfaces/store";
+import { State } from "@/models/store";
 import { MutationTree } from "vuex";
 
 export const mutations: MutationTree<State> = {

@@ -1,4 +1,4 @@
-import { State, UserState } from "@/interfaces/store";
+import { State, UserState } from "@/models/store";
 import { GetterTree } from "vuex";
 
 export const getters: GetterTree<UserState, State> = {
@@ -9,9 +9,13 @@ export const getters: GetterTree<UserState, State> = {
     return state.user.email;
   },
   accessToken(state): string {
-    return state.accessTokenInMemory;
+    return state.accessTokenInMemory.value;
   },
   isLoggedIn(state): boolean {
-    return state.accessTokenInMemory != "";
+    return state.accessTokenInMemory.value != "";
+  },
+  isAccessTokenExpired(state): boolean {
+    if (state.accessTokenInMemory.expiresAt === null) return true;
+    return state.accessTokenInMemory.expiresAt.getTime() < Date.now();
   }
 };

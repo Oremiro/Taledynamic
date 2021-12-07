@@ -6,40 +6,35 @@
         type="password"
         show-password-on="click"
         placeholder=""
+        :maxlength="100"
         :loading="isNewPwdValidationPending"
         @input="handlePasswordInput"
       >
         <template v-if="!formData.newPassword.isValid" #prefix>
           <question-tooltip>
-            Пароль должен содержать минимум 8 символов, заглавную букву,
-            строчную букву, цифру и специальный символ.
+            Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ.
           </question-tooltip>
         </template>
       </n-input>
     </n-form-item>
-    <n-form-item
-      ref="confirmedPasswordRef"
-      first
-      label="Повторите новый пароль"
-      path="confirmedPassword.value"
-    >
+    <n-form-item ref="confirmedPasswordRef" first label="Повторите новый пароль" path="confirmedPassword.value">
       <n-input
         v-model:value="formData.confirmedPassword.value"
         type="password"
         show-password-on="click"
         placeholder=""
+        :maxlength="100"
         :loading="isConfirmedPwdValidationPending"
       />
     </n-form-item>
-    <n-collapse-transition
-      :show="formData.newPassword.isValid && formData.confirmedPassword.isValid"
-    >
+    <n-collapse-transition :show="formData.newPassword.isValid && formData.confirmedPassword.isValid">
       <n-form-item first label="Текущий пароль" path="currentPassword.value">
         <n-input
           v-model:value="formData.currentPassword.value"
           type="password"
           show-password-on="click"
           placeholder=""
+          :maxlength="100"
         />
       </n-form-item>
       <delayed-button
@@ -71,7 +66,7 @@ import { reactive, ref } from "vue";
 import { FormRules, NForm, NFormItem, useMessage } from "naive-ui";
 import { useStore } from "@/store";
 import { debounce, passwordRegex } from "@/helpers";
-import { PasswordEditFormData } from "@/interfaces";
+import { PasswordEditFormData } from "@/models";
 import QuestionTooltip from "@/components/QuestionTooltip.vue";
 import DelayedButton from "@/components/DelayedButton.vue";
 
@@ -162,9 +157,7 @@ const isSubmitButtonLoading = ref<boolean>(false);
 
 function handlePasswordInput(): void {
   if (formData.confirmedPassword.value != "") {
-    confirmedPasswordRef.value
-      ?.validate({ trigger: "password-input" })
-      .catch(() => true);
+    confirmedPasswordRef.value?.validate({ trigger: "password-input" }).catch(() => true);
   }
 }
 
