@@ -15,10 +15,51 @@ namespace Taledynamic.Api.Controllers
             
         }
 
-        [HttpPost("register")]
-        public Task RegisterTgUser()
+        [HttpPost("create")]
+        public void Create()
         {
             throw new NotImplementedException();
         }
+
+        [HttpGet("get")]
+        public void Get()
+        {
+            throw new NotImplementedException();
+        }
+        [HttpPut("update")]
+        public void Update()
+        {
+            throw new NotImplementedException();
+        }
+        [HttpDelete("delete")]
+        public void Delete()
+        {
+            throw new NotImplementedException();
+        }
+        
+        [HttpPost("data/create")]
+        public void CreateData()
+        {
+            throw new NotImplementedException();
+        }
+        
+        [HttpGet("data/get")]
+        public void GetData()
+        {
+            throw new NotImplementedException();
+        }
+        
+        [HttpPut("data/update")]
+        public void UpdateData()
+        {
+            throw new NotImplementedException();
+        }
+        
+        [HttpDelete("data/delete")]
+        public void DeleteData()
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }
