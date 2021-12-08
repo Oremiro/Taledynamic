@@ -68,6 +68,5 @@ async function onSortTypeUpdate(value: TablesSortType): Promise<void> {
 
 const isInitializationSuccess = computed<boolean>(() => workspacesInitStatus.value === InitializationStatus.Success);
 
-/* Setting current workspace */
 const workspacesInitStatus = computed<InitializationStatus>(() => store.getters["workspaces/initStatus"]);
 </script>
