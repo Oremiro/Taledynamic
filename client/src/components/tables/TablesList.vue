@@ -90,6 +90,8 @@ const message = useMessage();
 
 const tablesInitializationStatus = ref<InitializationStatus>(InitializationStatus.Pending);
 
+const cachedTablesMap = new Map<number, TableDto[]>();
+
 async function initializeTablesList(): Promise<void> {
   if (isNaN(props.workspaceId)) return;
   tablesInitializationStatus.value = InitializationStatus.Pending;
@@ -102,6 +104,7 @@ async function initializeTablesList(): Promise<void> {
       store.getters["user/accessToken"]
     );
     tables.value = data.tables;
+    cachedTablesMap.set(props.workspaceId, data.tables);
     tablesInitializationStatus.value = InitializationStatus.Success;
   } catch (error) {
     tablesInitializationStatus.value = InitializationStatus.Error;
@@ -149,8 +152,14 @@ const initializeTableListDebounced = debounce(initializeTablesList, 1000);
 watch(
   () => props.workspaceId,
   async () => {
-    tablesInitializationStatus.value = InitializationStatus.Pending;
-    await initializeTableListDebounced();
+    const cachedTables = cachedTablesMap.get(props.workspaceId);
+    if (cachedTables !== undefined) {
+      tables.value = cachedTables;
+      tablesInitializationStatus.value = InitializationStatus.Success;
+    } else {
+      tablesInitializationStatus.value = InitializationStatus.Pending;
+      await initializeTableListDebounced();
+    }
     await sortList(props.sortType ?? TablesSortType.NameAscending);
   },
   { immediate: true }

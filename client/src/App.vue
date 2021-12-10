@@ -6,7 +6,7 @@
         <n-loading-bar-provider>
           <layout-header :current-theme="currentTheme" @change-theme="setTheme" />
         </n-loading-bar-provider>
-        <n-layout position="absolute" :native-scrollbar="false" style="top: 3.3rem">
+        <n-layout position="absolute" style="top: 3.3rem;" :native-scrollbar="false">
           <n-layout-content embedded content-style="min-height: calc(100vh - 3.3rem)">
             <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
