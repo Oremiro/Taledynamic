@@ -1,28 +1,32 @@
 <template>
   <n-layout>
-      <n-scrollbar x-scrollable style="padding-bottom: 1rem;">
-        <n-table :single-line="false" style="width: max-content; margin-right: 1rem;">
-          <table-head-vue />
-          <table-body-vue />
-        </n-table>
-      </n-scrollbar>
+    <n-scrollbar x-scrollable style="padding-bottom: 1rem">
+      <table-menu :workspace-id="workspaceId" :table-id="tableId" />
+      <n-table :single-line="false" style="width: max-content; margin-right: 1rem">
+        <table-head-vue />
+        <table-body-vue />
+      </n-table>
+    </n-scrollbar>
   </n-layout>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { NTable } from "naive-ui";
 import { TableRow, TableHeader, TableDataType, TableCell } from "@/models/table";
+import { useStore } from "@/store";
 import TableHeadVue from "@/components/table/TableHead.vue";
 import TableBodyVue from "@/components/table/TableBody.vue";
-import { useStore } from "@/store";
+import TableMenu from "@/components/table/TableMenu.vue";
+import { onBeforeRouteUpdate } from "vue-router";
 
-defineProps<{
+const props = defineProps<{
   workspaceId: string;
   tableId: string;
 }>();
 
-// const workspaceId = computed<number>(() => parseInt(props.workspaceId));
-// const tableId = computed<number>(() => parseInt(props.tableId));
+const workspaceId = computed<number>(() => parseInt(props.workspaceId));
+const tableId = computed<number>(() => parseInt(props.tableId));
 
 const tableHeaders: TableHeader[] = [
   new TableHeader("Товар", TableDataType.Text),
@@ -44,6 +48,10 @@ const tableRows: TableRow[] = [
     new TableCell(new Date(2021, 1, 10), TableDataType.Date)
   ])
 ];
+
+onBeforeRouteUpdate(() => {
+  return true;
+});
 
 const store = useStore();
 store.commit("table/setTable", { headers: tableHeaders, rows: tableRows });
