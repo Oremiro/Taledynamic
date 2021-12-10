@@ -7,7 +7,7 @@
       'enter--top': draggableClass === 'enter--top' && !last,
       'enter--bottom': draggableClass === 'enter--bottom' && !last
     }"
-    style="padding: 0 0.3rem"
+    style="padding: 0 0.5rem"
   >
     <div style="display: flex; align-items: center; justify-content: center">
       <span v-if="!last">{{ index + 1 }}</span>

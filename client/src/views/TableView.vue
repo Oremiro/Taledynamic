@@ -1,10 +1,12 @@
 <template>
-  <div class="container">
-    <n-table :single-line="false">
-      <table-head-vue />
-      <table-body-vue />
-    </n-table>
-  </div>
+  <n-layout>
+      <n-scrollbar x-scrollable style="padding-bottom: 1rem;">
+        <n-table :single-line="false" style="width: max-content; margin-right: 1rem;">
+          <table-head-vue />
+          <table-body-vue />
+        </n-table>
+      </n-scrollbar>
+  </n-layout>
 </template>
 
 <script setup lang="ts">
