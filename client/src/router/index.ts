@@ -46,6 +46,11 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: "/account/binding",
+    name: "AccountBinding",
+    component: () => import("@/views/AccountBindingView.vue")
+  },
+  {
     path: "/table/:workspaceId/:tableId",
     name: "Table",
     props: true,

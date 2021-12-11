@@ -1,8 +1,8 @@
 <template>
   <n-h4>
-    <n-text type="primary"> Синхронизация с ботом </n-text>
+    <n-text type="primary"> Подключение аккаунта Telegram </n-text>
   </n-h4>
-  <n-text code> Тут что-то будет </n-text>
+  <n-button @click="router.push({ name: 'AccountBinding' })">Подключить</n-button>
   <n-h4>
     <n-text type="primary"> Удаление аккаунта </n-text>
   </n-h4>
