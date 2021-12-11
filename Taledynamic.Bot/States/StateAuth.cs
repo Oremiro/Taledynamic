@@ -12,37 +12,42 @@ namespace TaleDynamicBot.States
 {
     public class StateAuth:State
     {
-        public override void Auth(ITelegramBotClient botClient, Update update)
+        public override async Task Auth(ITelegramBotClient botClient, Message message)
         {
-            botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
                 text: "Вы уже авторизованы. Чтобы начать обработку сообщений, введите команду /sending ."
             );
         }
 
-        public override void SendingData(ITelegramBotClient botClient, Message message)
+        public override async Task SendingData(ITelegramBotClient botClient, Message message)
         {
-            botClient.SendTextMessageAsync(
+            await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Начинаю обработку..."
             );
             this._user.ChangeState(new StateMessageHandling());
         }
 
-        public override void StopSendingData(ITelegramBotClient botClient,Update update)
+        public override async Task StopSendingData(ITelegramBotClient botClient,Message message)
         {
-            botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
                 text: "Вы ещё не начали обработку сообщений."
             );
         }
 
-        public override async void  DefaultAction(ITelegramBotClient botClient, Message message)
+        public override async Task  DefaultAction(ITelegramBotClient botClient, Message message)
         {
             await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Чтобы начать обработку сообщений, введите команду /sending ."
             );
+        }
+
+        public override async Task CallbackQueryHandler(ITelegramBotClient botclient, CallbackQuery callbackQuery)
+        {
+            Log.Information($"{callbackQuery.From}");
         }
     }
 }

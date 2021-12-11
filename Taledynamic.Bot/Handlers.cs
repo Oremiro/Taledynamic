@@ -39,9 +39,15 @@ namespace TaleDynamicBot
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
             CancellationToken cancellationToken)
         {
+            var handler = update.Type switch
+            {
+                UpdateType.Message            => BotOnMessageReceived(botClient, update.Message!),
+                UpdateType.CallbackQuery      => BotOnCallbackQueryReceived(botClient, update.CallbackQuery!),
+            };
+
             try
             {
-                await BotOnMessageReceived(botClient,update);
+                await handler;
             }
             catch (Exception exception)
             {
@@ -49,26 +55,31 @@ namespace TaleDynamicBot
             }
         }
 
-        public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Update update)
+        private static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery)
         {
-            Log.Information($"Receive message type: {update.Message.Type}");
+            await user.CallbackQueryHandler(botClient, callbackQuery);
+        }
 
-            switch (update.Message.Text)
+        public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
+        {
+            Log.Information($"Receive message type: message");
+
+            switch (message.Text)
             {
                 case "/auth":
-                    user.Auth(botClient, update);
+                    await user.Auth(botClient, message);
                     break;
                 case "/sending":
-                    user.SendingData(botClient, update);
+                    await user.SendingData(botClient, message);
                     break;
                 case "/stop_sending":
-                    user.StopSendingData(botClient, update);
+                    await user.StopSendingData(botClient, message);
                     break;
                 case "/usage":
-                    await Usage(botClient, update.Message);
+                    await Usage(botClient, message);
                     break;
                 default:
-                    user.DefaultAction(botClient,update);
+                    await user.DefaultAction(botClient,message);
                     break;
             }
         }

@@ -19,32 +19,32 @@ namespace TaleDynamicBot.States
     public class StateMessageHandling:State
     {
         private static readonly HttpClient client = new HttpClient();
-        public override void Auth(ITelegramBotClient botClient, Update update)
+        public override async Task Auth(ITelegramBotClient botClient, Message message)
         {
-            botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
                 text: "Вы уже авторизованы."
             );
         }
 
-        public override void SendingData(ITelegramBotClient botClient, Message message)
+        public override async Task SendingData(ITelegramBotClient botClient, Message message)
         {
-            botClient.SendTextMessageAsync(
+            await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Обработка уже запущена."
             );
         }
 
-        public override void StopSendingData(ITelegramBotClient botClient, Update update)
+        public override async Task StopSendingData(ITelegramBotClient botClient, Message message)
         {
-            botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
                 text: "Останавливаю обработку..."
             );
             this._user.ChangeState(new StateStopped());
         }
 
-        public override async void DefaultAction(ITelegramBotClient botClient, Message message)
+        public override async Task DefaultAction(ITelegramBotClient botClient, Message message)
         {
             var options = new JsonSerializerOptions
             {
@@ -99,6 +99,11 @@ namespace TaleDynamicBot.States
                 
                 Log.Information($"Response : {responseString}");*/
             }
+        }
+
+        public override async Task CallbackQueryHandler(ITelegramBotClient botclient, CallbackQuery callbackQuery)
+        {
+            Log.Information($"{callbackQuery.From}");
         }
     }
 }
