@@ -25,14 +25,14 @@ namespace TaleDynamicBot
         public static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
             CancellationToken cancellationToken)
         {
-            var ErrorMessage = exception switch
+            var errorMessage = exception switch
             {
                 ApiRequestException apiRequestException =>
                     $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
                 _ => exception.ToString()
             };
 
-            Log.Error(ErrorMessage);
+            Log.Error(errorMessage);
             return Task.CompletedTask;
         }
 
@@ -43,6 +43,7 @@ namespace TaleDynamicBot
             {
                 UpdateType.Message            => BotOnMessageReceived(botClient, update.Message!),
                 UpdateType.CallbackQuery      => BotOnCallbackQueryReceived(botClient, update.CallbackQuery!),
+                _ => throw new ArgumentOutOfRangeException()
             };
 
             try
@@ -55,15 +56,13 @@ namespace TaleDynamicBot
             }
         }
 
-        private static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery)
+        public static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery)
         {
             await user.CallbackQueryHandler(botClient, callbackQuery);
         }
 
         public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
         {
-            Log.Information($"Receive message type: message");
-
             switch (message.Text)
             {
                 case "/auth":
@@ -77,6 +76,12 @@ namespace TaleDynamicBot
                     break;
                 case "/usage":
                     await Usage(botClient, message);
+                    break;
+                case "/start":
+                    await botClient.SendTextMessageAsync
+                    (   chatId:message.Chat.Id, 
+                        text:"Привет, я бот проекта TaleDynamic, пожалуйста, зарегестрируйтесь с помощью команды /auth."
+                    );
                     break;
                 default:
                     await user.DefaultAction(botClient,message);

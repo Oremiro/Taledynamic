@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -7,6 +8,7 @@ namespace TaleDynamicBot.States
 {
     public class StateStopped:State
     {
+        private static readonly HttpClient client = new HttpClient();
 
         public override async Task Auth(ITelegramBotClient botClient, Message message)
         { 
@@ -44,7 +46,18 @@ namespace TaleDynamicBot.States
 
         public override async Task CallbackQueryHandler(ITelegramBotClient botclient, CallbackQuery callbackQuery)
         {
-            Log.Information($"{callbackQuery.From}");
+            /*var response = await client.GetAsync("auth/User/send"); //get запрос
+ 
+             var responseString = await response.Content.ReadAsStringAsync();
+             
+             if (responseString == "Success")
+             {
+                 await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "Success");
+             }
+             else 
+            {
+                this._user.ChangeState(new StateNonAuth());
+            }*/
         }
     }
 }

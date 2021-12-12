@@ -32,8 +32,7 @@ namespace TaleDynamicBot
             
             ReceiverOptions receiverOptions = new()
             {
-                AllowedUpdates = new[]{ UpdateType.Message, UpdateType.CallbackQuery },
-                ThrowPendingUpdates = true
+                AllowedUpdates = new[]{ UpdateType.Message, UpdateType.CallbackQuery }
             };
 
             botClient.StartReceiving(Handlers.HandleUpdateAsync,

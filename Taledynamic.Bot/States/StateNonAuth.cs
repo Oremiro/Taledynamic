@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -23,12 +26,17 @@ namespace TaleDynamicBot.States
                         InlineKeyboardButton.WithCallbackData("Проверить статус", "Auth"),
                     }
                 });
-            Log.Information($"Username {message.Chat.Username} has logged");
-            this._user.ChangeState(new StateAuth());
+            string uri = HttpUtility.UrlEncode("http://localhost:3000/account/binding?tgId=" + message.Chat.Id + "&tgName=" +
+                         message.Chat.Username);
+            
+            var response = await client.GetAsync("https://clck.ru/--?url="+uri);
 
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            Log.Information($"Response : {responseString}");
             await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "https://clck.ru/ZHbgx",
+                text: responseString,
                 replyMarkup:inlineKeyboard
             );
         }
@@ -50,23 +58,30 @@ namespace TaleDynamicBot.States
         }
 
         public override async Task DefaultAction(ITelegramBotClient botClient, Message message)
-        { 
-            
+        {
             await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Пожалуйста, авторизуйтесь с помощью команды /auth ."
             );
         }
 
-        public override async Task CallbackQueryHandler(ITelegramBotClient botclient, CallbackQuery callbackQuery)
+        public override async Task CallbackQueryHandler(ITelegramBotClient botClient, CallbackQuery callbackQuery)
         {
             Log.Information($"{callbackQuery.From}");
 
-            var response = await client.GetAsync("auth/User/send"); //post запрос
+            /*var response = await client.GetAsync("auth/User/send"); //post запрос
 
             var responseString = await response.Content.ReadAsStringAsync();
                 
-            Log.Information($"Response : {responseString}");
+            Log.Information($"Response : {responseString}");*/
+
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "Success");
+            /*if (responseString == "Success")
+            {
+                Log.Information($"Username {callbackQuery.From} has logged");
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "Success");
+                this._user.ChangeState(new StateAuth());
+            }*/
         }
     }
 }

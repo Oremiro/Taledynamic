@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Serilog;
@@ -12,6 +13,7 @@ namespace TaleDynamicBot.States
 {
     public class StateAuth:State
     {
+        private static readonly HttpClient client = new HttpClient();
         public override async Task Auth(ITelegramBotClient botClient, Message message)
         {
             await botClient.SendTextMessageAsync(
@@ -47,7 +49,18 @@ namespace TaleDynamicBot.States
 
         public override async Task CallbackQueryHandler(ITelegramBotClient botclient, CallbackQuery callbackQuery)
         {
-            Log.Information($"{callbackQuery.From}");
+            /*var response = await client.GetAsync("auth/User/send"); //get запрос
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            
+            if (responseString == "Success")
+            {
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "Success");
+            }
+            else 
+            {
+                this._user.ChangeState(new StateNonAuth());
+            }*/
         }
     }
 }
