@@ -80,7 +80,7 @@ namespace TaleDynamicBot
                 case "/start":
                     await botClient.SendTextMessageAsync
                     (   chatId:message.Chat.Id, 
-                        text:"Привет, я бот проекта TaleDynamic, пожалуйста, зарегестрируйтесь с помощью команды /auth."
+                        text:"Привет, я бот проекта TaleDynamic, пожалуйста, авторизуйтесь с помощью команды /auth."
                     );
                     break;
                 default:
