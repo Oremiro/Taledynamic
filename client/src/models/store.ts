@@ -70,4 +70,5 @@ export interface TableState {
   editableRowIndex?: number;
   editableHeaderIndex?: number;
   sortStatus?: TableSortStatus;
+  isUpdated: boolean;
 }

@@ -9,11 +9,18 @@
             </n-icon>
           </template>
         </n-spin>
-        <n-button v-else :type="savingStatus == 2 ? 'error' : 'default'" text @click="pushTable">
-          <n-icon size="1.4rem">
-            <save-icon />
-          </n-icon>
-        </n-button>
+        <n-tooltip v-else :show-arrow="false">
+          <template #default>
+            Последнее сохранение: {{ lastSavingDateTime.toLocaleString() }}
+          </template>
+          <template #trigger>
+            <n-button :type="savingStatus == 2 ? 'error' : 'default'" text @click="pushTable">
+              <n-icon size="1.4rem">
+                <save-icon />
+              </n-icon>
+            </n-button>
+          </template>
+        </n-tooltip>
         <n-menu :value="currentTable?.id" mode="horizontal" :options="tablesListMenu" />
       </div>
     </template>
@@ -21,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, h } from "vue";
+import { ref, computed, onMounted, h, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { NPageHeader, useMessage, MenuOption, NSpin } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
@@ -62,7 +69,7 @@ const currentTable = computed<TableDto | undefined>(() => tablesList.value.find(
 
 const store = useStore();
 const message = useMessage();
-async function setTableName(): Promise<void> {
+async function getTablesList(): Promise<void> {
   try {
     await store.dispatch("user/refreshExpired");
     const { data } = await TableApi.getList({ workspaceId: props.workspaceId }, store.getters["user/accessToken"]);
@@ -86,11 +93,12 @@ const pushTable = debounce(
     try {
       await store.dispatch("table/pushTable");
       savingStatus.value = InitializationStatus.Success;
-      message.success("Изменения сохранены")
+      lastSavingDateTime.value = new Date(Date.now());
+      message.success("Изменения сохранены");
     } catch (error) {
       savingStatus.value = InitializationStatus.Error;
       if (error instanceof Error) {
-        message.error("При сохранении произошла ошибка")
+        message.error("При сохранении произошла ошибка");
       }
     }
   },
@@ -103,6 +111,23 @@ const pushTable = debounce(
 );
 
 onMounted(async () => {
-  await setTableName();
+  await getTablesList();
 });
+
+const autoSavingTimer = ref<ReturnType<typeof setInterval>>();
+
+const lastSavingDateTime = ref<Date>(new Date(Date.now()));
+
+watch(
+  () => props.tableId,
+  () => {
+    if (autoSavingTimer.value !== undefined) {
+      clearInterval(autoSavingTimer.value);
+    }
+    autoSavingTimer.value = setInterval(async () => {
+      await pushTable();
+    }, 120000);
+  },
+  { immediate: true }
+);
 </script>

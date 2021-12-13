@@ -20,5 +20,8 @@ export const getters: GetterTree<TableState, State> = {
   },
   tableJson(state: TableState): TableJson {
     return JSON.parse(JSON.stringify({ headers: state.headers, rows: state.rows.slice(0, -1) }));
+  },
+  isUpdated(state: TableState): boolean {
+    return state.isUpdated;
   }
 };

@@ -13,7 +13,7 @@ import axios from "axios";
 import { ActionTree } from "vuex";
 
 export const actions: ActionTree<TableState, State> = {
-  async setJsonTable({ commit }, payload: { dataId: string; jsonTable: string }): Promise<void> {
+  async setJsonTable({ state, commit }, payload: { dataId: string; jsonTable: string }): Promise<void> {
     const parsedTable: Partial<TableJson> = JSON.parse(payload.jsonTable);
 
     const tableRows: TableRow[] = [];
@@ -39,18 +39,21 @@ export const actions: ActionTree<TableState, State> = {
     } else {
       tableHeaders = parsedTable.headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
     }
+    state.isUpdated = true;
     commit("setDataId", { dataId: payload.dataId });
     commit("setTable", { headers: tableHeaders, rows: tableRows });
   },
   async addRow({ state, commit }): Promise<void> {
     const row: TableRow = new TableRow(state.headers.map((item) => new TableCell(null, item.type)));
     commit("pushRow", { row: row });
+    state.isUpdated = false;
   },
   async deleteRow({ commit, state }, payload: { index: number }): Promise<void> {
     if (payload.index < 0 || payload.index > state.rows.length - 1) {
       throw new Error("Row index is out of range");
     }
     commit("deleteRow", payload);
+    state.isUpdated = false;
   },
   async addColumn({ commit, state }, payload: { name: string; type: TableDataType }): Promise<void> {
     commit("pushHeader", {
@@ -62,6 +65,7 @@ export const actions: ActionTree<TableState, State> = {
         cell: new TableCell(null, payload.type)
       });
     }
+    state.isUpdated = false;
   },
   async deleteColumn({ commit, state }, payload: { index: number }): Promise<void> {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
@@ -74,6 +78,7 @@ export const actions: ActionTree<TableState, State> = {
     for (let rowIndex = 0; rowIndex < state.rows.length; rowIndex++) {
       commit("deleteCell", { rowIndex: rowIndex, cellIndex: payload.index });
     }
+    state.isUpdated = false;
   },
   async moveColumn({ commit, state }, payload: { oldIndex: number; newIndex: number }): Promise<void> {
     if (
@@ -95,6 +100,7 @@ export const actions: ActionTree<TableState, State> = {
         newIndex: payload.newIndex
       });
     }
+    state.isUpdated = false;
   },
   async moveRow({ commit, state }, payload: { oldIndex: number; newIndex: number }): Promise<void> {
     if (
@@ -110,6 +116,7 @@ export const actions: ActionTree<TableState, State> = {
     }
     commit("moveRow", payload);
     commit("clearSortStatus");
+    state.isUpdated = false;
   },
   async sortRows({ commit, state }, payload: { index: number; sortType: TableRowsSortType }): Promise<void> {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
@@ -117,6 +124,7 @@ export const actions: ActionTree<TableState, State> = {
     }
     commit("sortRows", payload);
     commit("setSortStatus", { index: payload.index, type: payload.sortType });
+    state.isUpdated = false;
   },
   async updateHeader(
     { state, commit },
@@ -133,9 +141,10 @@ export const actions: ActionTree<TableState, State> = {
         });
       }
     }
+    state.isUpdated = false;
   },
   async updateCell(
-    { commit },
+    { state, commit },
     payload: {
       rowIndex: number;
       cellIndex: number;
@@ -143,6 +152,7 @@ export const actions: ActionTree<TableState, State> = {
     }
   ): Promise<void> {
     commit("updateCell", payload);
+    state.isUpdated = false;
   },
   async setColumnType({ state, commit }, payload: { index: number; type: TableDataType }): Promise<void> {
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
@@ -159,6 +169,7 @@ export const actions: ActionTree<TableState, State> = {
       });
     }
     commit("clearSortStatus");
+    state.isUpdated = false;
   },
   async pullTable({ dispatch, rootGetters }, payload: { tableId: number }): Promise<void> {
     await dispatch("user/refreshExpired", null, { root: true });
@@ -171,7 +182,6 @@ export const actions: ActionTree<TableState, State> = {
       }
     }
   },
-
   async pushTable({ dispatch, rootGetters, getters, state }): Promise<void> {
     if (state.dataId === undefined) return;
     await dispatch("user/refreshExpired", null, { root: true });
@@ -180,6 +190,7 @@ export const actions: ActionTree<TableState, State> = {
         { uId: state.dataId, jsonContent: getters["tableJson"] },
         rootGetters["user/accessToken"]
       );
+      state.isUpdated = true;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message);
