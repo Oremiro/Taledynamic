@@ -8,12 +8,22 @@
         <n-divider />
         <div v-if="!isNaN(telegramId)">
           <div style="margin-bottom: 1rem">
-            <n-text v-if="telegramName">Подключить аккаунт <n-text type="primary">{{ telegramName }}</n-text>?</n-text>
+            <n-text v-if="telegramName">
+              Подключить аккаунт
+              <n-text type="primary">
+                {{ telegramName }}
+              </n-text>
+              ?
+            </n-text>
             <n-text v-else>Подключить аккаунт?</n-text>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 1rem">
-            <n-button type="primary" ghost @click="bindAccount">Подключить</n-button>
-            <n-button type="error" ghost @click="router.push({ name: 'Main' })">Не подключать</n-button>
+            <n-button type="primary" ghost :loading="isLoading" :disabled="isLoading" @click="bindAccount"
+              >Подключить</n-button
+            >
+            <n-button type="error" ghost :disabled="isLoading" @click="router.push({ name: 'Main' })"
+              >Не подключать</n-button
+            >
           </div>
         </div>
         <div v-else>
@@ -43,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { NDivider, useMessage } from "naive-ui";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "@/store";
@@ -56,13 +66,20 @@ const message = useMessage();
 const telegramId = computed<number>(() => (typeof route.query.tgId === "string" ? parseInt(route.query.tgId) : NaN));
 const telegramName = computed<string>(() => (typeof route.query.tgName === "string" ? route.query.tgName : ""));
 
+const isLoading = ref<boolean>(false);
+
 async function bindAccount(): Promise<void> {
+  isLoading.value = true;
   try {
+    await store.dispatch("user/refreshExpired");
     console.log();
+    router.push({ name: "AccountSettings" });
   } catch (error) {
     if (error instanceof Error) {
       message.error(error.message);
     }
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>
