@@ -1,7 +1,14 @@
 <template>
-  <n-page-header style="padding: 0 .35rem;" @back="backToMain">
+  <n-page-header style="padding: 0 0.35rem" @back="backToMain">
     <template #title>
-      <n-menu :value="currentTable?.id" mode="horizontal" :options="tablesListMenu" />
+      <div style="display: flex; align-items: center">
+        <n-button text>
+          <n-icon size="1.4rem">
+            <save-icon />
+          </n-icon>
+        </n-button>
+        <n-menu :value="currentTable?.id" mode="horizontal" :options="tablesListMenu" />
+      </div>
     </template>
   </n-page-header>
 </template>
@@ -13,6 +20,7 @@ import { NPageHeader, useMessage, MenuOption } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { TableDto } from "@/models/api/responses";
 import { useStore } from "@/store";
+import { SaveIcon } from "@/components/icons";
 
 const props = defineProps<{
   workspaceId: number;
