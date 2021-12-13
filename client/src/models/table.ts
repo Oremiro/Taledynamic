@@ -7,10 +7,16 @@ export enum TableDataType {
 }
 
 export type TableData = string | number | Date | null;
+export type TableDataJson = string | number | null;
 
 export enum TableRowsSortType {
   Ascending,
   Descending
+}
+
+export interface TableCellJson {
+  data: TableDataJson;
+  type: TableDataType;
 }
 
 export class TableCell {
@@ -29,6 +35,11 @@ export class TableCell {
   }
 }
 
+export interface TableHeaderJson {
+  name: string;
+  type: TableDataType;
+}
+
 export class TableHeader {
   readonly id: symbol;
   name: string;
@@ -41,6 +52,10 @@ export class TableHeader {
   }
 }
 
+export interface TableRowJson {
+  cells: TableCellJson[];
+}
+
 export class TableRow {
   readonly id: symbol;
   cells: TableCell[];
@@ -49,4 +64,10 @@ export class TableRow {
     this.id = Symbol("id");
     this.cells = cells.map((cell) => new TableCell(cell.data, cell.type));
   }
+}
+
+
+export interface TableJson {
+  headers: TableHeaderJson[];
+  rows: TableRowJson[];
 }

@@ -12,7 +12,7 @@ import {
   TableDataDeleteResponse
 } from "@/models/api/responses";
 
-export class TableApi {
+export class TableDataApi {
   private static readonly axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASEURL + "/data/table",
     withCredentials: true

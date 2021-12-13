@@ -1,8 +1,44 @@
 import { State, TableState } from "@/models/store";
-import { TableCell, TableRow, TableHeader, TableDataType, TableRowsSortType, TableData } from "@/models/table";
+import {
+  TableCell,
+  TableRow,
+  TableHeader,
+  TableDataType,
+  TableRowsSortType,
+  TableData,
+  TableJson
+} from "@/models/table";
 import { ActionTree } from "vuex";
 
 export const actions: ActionTree<TableState, State> = {
+  async setJsonTable({ commit }, payload: { jsonTable: string }): Promise<void> {
+    const parsedTable: Partial<TableJson> = JSON.parse(payload.jsonTable);
+
+    const tableRows: TableRow[] = [];
+    if (parsedTable.rows !== undefined) {
+      for (const parsedRow of parsedTable.rows) {
+        const rowCells: TableCell[] = [];
+        for (const parsedCell of parsedRow.cells) {
+          rowCells.push(
+            new TableCell(
+              parsedCell.type === TableDataType.Date && typeof parsedCell.data === "string"
+                ? new Date(parsedCell.data)
+                : parsedCell.data,
+              parsedCell.type
+            )
+          );
+        }
+        tableRows.push(new TableRow(rowCells));
+      }
+    }
+    let tableHeaders: TableHeader[] = [];
+    if (parsedTable.headers === undefined) {
+      tableHeaders.push(new TableHeader("Колонка #1", TableDataType.Text));
+    } else {
+      tableHeaders = parsedTable.headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
+    }
+    commit("setTable", { headers: tableHeaders, rows: tableRows });
+  },
   async addRow({ state, commit }): Promise<void> {
     const row: TableRow = new TableRow(state.headers.map((item) => new TableCell(null, item.type)));
     commit("pushRow", { row: row });

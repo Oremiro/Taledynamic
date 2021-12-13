@@ -1,5 +1,5 @@
 import { State, TableSortStatus, TableState } from "@/models/store";
-import { TableHeader, TableRow } from "@/models/table";
+import { TableHeader, TableJson, TableRow } from "@/models/table";
 import { GetterTree } from "vuex";
 
 export const getters: GetterTree<TableState, State> = {
@@ -17,5 +17,8 @@ export const getters: GetterTree<TableState, State> = {
   },
   sortStatus(state: TableState): TableSortStatus | undefined {
     return state.sortStatus;
+  },
+  tableJson(state: TableState): TableJson {
+    return JSON.parse(JSON.stringify({ headers: state.headers, rows: state.rows.slice(0, -1) }));
   }
 };
