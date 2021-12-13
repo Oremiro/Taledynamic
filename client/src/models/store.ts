@@ -64,6 +64,7 @@ export interface TableSortStatus {
 }
 
 export interface TableState {
+  dataId?: string;
   headers: TableHeader[];
   rows: TableRow[];
   editableRowIndex?: number;

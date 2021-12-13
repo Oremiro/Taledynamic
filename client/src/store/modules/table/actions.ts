@@ -1,3 +1,4 @@
+import { TableDataApi } from "@/helpers/api/tableData";
 import { State, TableState } from "@/models/store";
 import {
   TableCell,
@@ -8,10 +9,11 @@ import {
   TableData,
   TableJson
 } from "@/models/table";
+import axios from "axios";
 import { ActionTree } from "vuex";
 
 export const actions: ActionTree<TableState, State> = {
-  async setJsonTable({ commit }, payload: { jsonTable: string }): Promise<void> {
+  async setJsonTable({ commit }, payload: { dataId: string; jsonTable: string }): Promise<void> {
     const parsedTable: Partial<TableJson> = JSON.parse(payload.jsonTable);
 
     const tableRows: TableRow[] = [];
@@ -33,10 +35,11 @@ export const actions: ActionTree<TableState, State> = {
     }
     let tableHeaders: TableHeader[] = [];
     if (parsedTable.headers === undefined) {
-      tableHeaders.push(new TableHeader("Колонка #1", TableDataType.Text));
+      tableHeaders.push(new TableHeader("Column #1", TableDataType.Text));
     } else {
       tableHeaders = parsedTable.headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
     }
+    commit("setDataId", { dataId: payload.dataId });
     commit("setTable", { headers: tableHeaders, rows: tableRows });
   },
   async addRow({ state, commit }): Promise<void> {
@@ -156,5 +159,31 @@ export const actions: ActionTree<TableState, State> = {
       });
     }
     commit("clearSortStatus");
+  },
+  async pullTable({ dispatch, rootGetters }, payload: { tableId: number }): Promise<void> {
+    await dispatch("user/refreshExpired", null, { root: true });
+    try {
+      const { data } = await TableDataApi.get({ id: payload.tableId }, rootGetters["user/accessToken"]);
+      await dispatch("setJsonTable", { dataId: data.item.uId, jsonTable: data.item.tableData });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.status);
+      }
+    }
+  },
+
+  async pushTable({ dispatch, rootGetters, getters, state }): Promise<void> {
+    if (state.dataId === undefined) return;
+    await dispatch("user/refreshExpired", null, { root: true });
+    try {
+      await TableDataApi.update(
+        { uId: state.dataId, jsonContent: getters["tableJson"] },
+        rootGetters["user/accessToken"]
+      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.status);
+      }
+    }
   }
 };

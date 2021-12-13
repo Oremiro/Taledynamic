@@ -2,7 +2,7 @@
   <n-page-header style="padding: 0 0.35rem" @back="backToMain">
     <template #title>
       <div style="display: flex; align-items: center">
-        <n-button text>
+        <n-button text @click="pushTable">
           <n-icon size="1.4rem">
             <save-icon />
           </n-icon>
@@ -68,6 +68,10 @@ async function setTableName(): Promise<void> {
 const router = useRouter();
 function backToMain() {
   router.push({ name: "Main" });
+}
+
+async function pushTable(): Promise<void> {
+  await store.dispatch("table/pushTable");
 }
 
 onMounted(async () => {
