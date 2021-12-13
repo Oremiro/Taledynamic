@@ -167,7 +167,7 @@ export const actions: ActionTree<TableState, State> = {
       await dispatch("setJsonTable", { dataId: data.item.uId, jsonTable: data.item.tableData });
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.status);
+        throw new Error(error.message);
       }
     }
   },
@@ -182,7 +182,7 @@ export const actions: ActionTree<TableState, State> = {
       );
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.status);
+        throw new Error(error.message);
       }
     }
   }

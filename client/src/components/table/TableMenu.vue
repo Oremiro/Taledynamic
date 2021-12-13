@@ -2,7 +2,14 @@
   <n-page-header style="padding: 0 0.35rem" @back="backToMain">
     <template #title>
       <div style="display: flex; align-items: center">
-        <n-button text @click="pushTable">
+        <n-spin v-if="savingStatus === 0" :size="22">
+          <template #icon>
+            <n-icon>
+              <arrow-sync-icon />
+            </n-icon>
+          </template>
+        </n-spin>
+        <n-button v-else :type="savingStatus == 2 ? 'error' : 'default'" text @click="pushTable">
           <n-icon size="1.4rem">
             <save-icon />
           </n-icon>
@@ -16,11 +23,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, h } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { NPageHeader, useMessage, MenuOption } from "naive-ui";
+import { NPageHeader, useMessage, MenuOption, NSpin } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { TableDto } from "@/models/api/responses";
 import { useStore } from "@/store";
-import { SaveIcon } from "@/components/icons";
+import { SaveIcon, ArrowSyncIcon } from "@/components/icons";
+import { InitializationStatus } from "@/models";
+import { debounce } from "@/helpers";
 
 const props = defineProps<{
   workspaceId: number;
@@ -70,9 +79,28 @@ function backToMain() {
   router.push({ name: "Main" });
 }
 
-async function pushTable(): Promise<void> {
-  await store.dispatch("table/pushTable");
-}
+const savingStatus = ref<InitializationStatus>(InitializationStatus.Success);
+
+const pushTable = debounce(
+  async () => {
+    try {
+      await store.dispatch("table/pushTable");
+      savingStatus.value = InitializationStatus.Success;
+      message.success("Изменения сохранены")
+    } catch (error) {
+      savingStatus.value = InitializationStatus.Error;
+      if (error instanceof Error) {
+        message.error("При сохранении произошла ошибка")
+      }
+    }
+  },
+  1000,
+  {
+    immediateFunc: () => {
+      savingStatus.value = InitializationStatus.Pending;
+    }
+  }
+);
 
 onMounted(async () => {
   await setTableName();
