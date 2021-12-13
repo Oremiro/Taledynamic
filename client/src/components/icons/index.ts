@@ -14,6 +14,8 @@ import NumberSymbolIcon from "@/components/icons/NumberSymbolIcon.vue";
 import TextIcon from "@/components/icons/TextIcon.vue";
 import AppsListIcon from "@/components/icons/AppsListIcon.vue";
 import FolderIcon from "@/components/icons/FolderIcon.vue";
+import SaveIcon from "@/components/icons/SaveIcon.vue";
+import ArrowSyncIcon from "@/components/icons/ArrowSyncIcon.vue";
 
 export {
   AddIcon,
@@ -31,5 +33,7 @@ export {
   NumberSymbolIcon,
   TextIcon,
   AppsListIcon,
-  FolderIcon
+  FolderIcon,
+  SaveIcon,
+  ArrowSyncIcon
 };
