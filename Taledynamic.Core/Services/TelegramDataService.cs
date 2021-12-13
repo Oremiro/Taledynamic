@@ -1,6 +1,6 @@
 namespace Taledynamic.Core.Services
 {
-    public class TelegramDataService
+    public partial class TelegramService
     {
         
     }

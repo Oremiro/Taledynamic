@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Taledynamic.Api.Attributes;
+using Taledynamic.Core.Interfaces;
 
 namespace Taledynamic.Api.Controllers
 {
@@ -10,29 +11,27 @@ namespace Taledynamic.Api.Controllers
     [Route("integration/[controller]")]
     public class TelegramController: BaseController
     {
-        public TelegramController()
+        private ITelegramService _telegramService { get; set; }
+        private ITelegramDataService _telegramDataService { get; set; }
+        public TelegramController(ITelegramService telegramService, ITelegramDataService telegramDataService)
         {
-            
+            _telegramService = telegramService;
+            _telegramDataService = telegramDataService;
         }
 
-        [HttpPost("create")]
-        public void Create()
+        [HttpPost("authorize")]
+        public async Task Authorize()
         {
             throw new NotImplementedException();
         }
 
         [HttpGet("get")]
-        public void Get()
+        public async Task Get()
         {
             throw new NotImplementedException();
         }
-        [HttpPut("update")]
-        public void Update()
-        {
-            throw new NotImplementedException();
-        }
-        [HttpDelete("delete")]
-        public void Delete()
+        [HttpPost("revoke")]
+        public async Task Revoke()
         {
             throw new NotImplementedException();
         }
