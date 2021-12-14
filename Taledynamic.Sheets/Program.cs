@@ -13,9 +13,10 @@ namespace Taledynamic.Sheets
 {
     class GSheets
     {
-        //public static string spreadsheetId = null;
+        //static string spreadsheetId = null;
+        //static SheetsService service = null;
 
-        GSheets()
+        public GSheets()
         {
 
         }
@@ -61,19 +62,63 @@ namespace Taledynamic.Sheets
             // TODO: Из БД достать spreadsheetId 
         }
 
+        public static void CreateSheet(SheetsService service, String spreadsheetId, string tableName)
+        {
+            /*CopySheetToAnotherSpreadsheetRequest body = new();
+            body.DestinationSpreadsheetId = spreadsheetId;
+            //SpreadsheetsResource.SheetsResource resource = service.Spreadsheets.Sheets;  
+            SpreadsheetsResource.SheetsResource.CopyToRequest request =
+                service.Spreadsheets.Sheets.CopyTo(body, spreadsheetId, 0);
+            SheetProperties response = request.Execute();
+            ClearCells(service, spreadsheetId, response.Title);
+            int? sheetId = response.SheetId; // TODO: Сохранить в БД для линковки с рабочим пространством
+            */
+
+            AddSheetRequest addSheetRequest = new();
+            addSheetRequest.Properties = new SheetProperties();
+            addSheetRequest.Properties.Title = tableName;
+            BatchUpdateSpreadsheetRequest requestBody = new();
+            requestBody.Requests = new List<Request>();
+            requestBody.Requests.Add(new Request
+            {
+                AddSheet = addSheetRequest
+            });
+
+            var batchUpdateRequest =
+                service.Spreadsheets.BatchUpdate(requestBody, spreadsheetId);
+
+            batchUpdateRequest.Execute();
+
+        }
+
+        public static void DeleteSheet(SheetsService service, String spreadsheetId, string tableName)
+        {
+
+            var req = JsonConvert.DeserializeObject<IEnumerable<ValueRange>>(
+            "batch_update_values = { 'requests: [ { 'addSheet': { 'properties': {'title': worksheetNam } } } ] }");
+
+            List <ValueRange> data = new List<ValueRange>(req);  // TODO: Update placeholder value.
+
+            BatchUpdateValuesRequest requestBody = new BatchUpdateValuesRequest();
+            requestBody.ValueInputOption = "";
+            requestBody.Data = data;
+
+            SpreadsheetsResource.ValuesResource.BatchUpdateRequest request = 
+                service.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
+
+            BatchUpdateValuesResponse response = request.Execute();
+
+            Console.WriteLine(JsonConvert.SerializeObject(response));
+        }
+
         public static String GetCells(SheetsService service, String spreadsheetId, string tableName, string cellRange="")
         {
-            String range;
-            if (cellRange == "")
-                range = tableName;
-            else
-                range = tableName + "!" + cellRange;
+            String range = (cellRange == "") ? (tableName) : (tableName + "!" + cellRange);
             SpreadsheetsResource.ValuesResource.GetRequest request =
                     service.Spreadsheets.Values.Get(spreadsheetId, range);
             ValueRange response = request.Execute();
 
             String values = JsonConvert.SerializeObject(response.Values);
-            
             return values;
         }
 
@@ -139,15 +184,11 @@ namespace Taledynamic.Sheets
 
         public static void ClearCells(SheetsService service, String spreadsheetId, string tableName, string cellRange="")
         {
-            String range;
-            if (cellRange == "")
-                range = tableName;
-            else
-                range = tableName+"!"+cellRange;
+            String range = (cellRange == "") ? (tableName) : (tableName + "!" + cellRange);
             ClearValuesRequest requestBody = new ClearValuesRequest();
             SpreadsheetsResource.ValuesResource.ClearRequest request = 
                 service.Spreadsheets.Values.Clear(requestBody, spreadsheetId, range);
-            ClearValuesResponse response = request.Execute();
+            request.Execute();
         }
 
 
@@ -199,14 +240,21 @@ namespace Taledynamic.Sheets
             };
             //UpdateCells(service, spreadsheetId, "Лист2", table);
 
-            UpdateCell(service, spreadsheetId, "Лист3", "C3", "|i want ");
-            UpdateCell(service, spreadsheetId, "Лист3", "D3", "want new");
-            UpdateCell(service, spreadsheetId, "Лист3", "E3", "Лист Блять");
+            /*UpdateCell(service, spreadsheetId, "ЛистТип3", "A3", "Немогу");
+            UpdateCell(service, spreadsheetId, "ЛистТип3", "B3", "Сделать");
+            UpdateCell(service, spreadsheetId, "ЛистТип3", "C3", "Лист");
 
-            String response = GetCells(service, spreadsheetId, "Лист2", "C3");
+            String response = GetCells(service, spreadsheetId, "ЛистТип3");
             var values = JsonConvert.DeserializeObject<List<IList<Object>>>(response);
-            justPrint(values);
+            justPrint(values);*/
 
+            //ClearCells(service, spreadsheetId, "ЛистТип3");
+            //CreateSheet(service, spreadsheetId, "НовыйЛист");
+
+
+            CreateSheet(service, spreadsheetId, "УРААААА");
+
+            //DeleteSheet(service, spreadsheetId, "ThirdTable");
         }
     }
 }
