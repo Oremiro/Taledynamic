@@ -1,5 +1,12 @@
 <template>
-  <n-layout embedded>
+  <n-result
+    v-if="isLoadingError"
+    status="error"
+    title="Ошибка при загрузке таблицы"
+    description="Возможно, Вы что-то делаете не так"
+    style="margin-top: 5rem"
+  />
+  <n-layout v-else embedded>
     <n-scrollbar x-scrollable style="padding-bottom: 1rem">
       <table-menu :workspace-id="workspaceId" :table-id="tableId" />
       <n-table :single-line="false" style="width: max-content; margin-right: 1rem">
@@ -11,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from "vue-router";
-import { NTable, useDialog } from "naive-ui";
+import { NTable, useDialog, useMessage } from "naive-ui";
 import { useStore } from "@/store";
 import TableHeadVue from "@/components/table/TableHead.vue";
 import TableBodyVue from "@/components/table/TableBody.vue";
@@ -63,10 +70,21 @@ async function onBeforeRoute() {
 onBeforeRouteLeave(onBeforeRoute);
 onBeforeRouteUpdate(onBeforeRoute);
 
+const message = useMessage();
+
+const isLoadingError = ref<boolean>(true);
+
 watch(
   () => props.tableId,
   async () => {
-    await store.dispatch("table/pullTable", { tableId: tableId.value });
+    try {
+      await store.dispatch("table/pullTable", { tableId: tableId.value });
+      isLoadingError.value = false;
+    } catch (error) {
+      if (error instanceof Error) {
+        message.error("При загрузке таблицы возникла ошибка");
+      }
+    }
   },
   { immediate: true }
 );

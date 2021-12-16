@@ -51,12 +51,13 @@
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
+    <n-image width="100" src="data:image/gif;base64,R0lGODdhAQABAPAAAP8AAAAAACwAAAAAAQABAAACAkQBADs="/>
   </n-config-provider>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, nextTick, watch } from "vue";
-import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars, NInput, NTable } from "naive-ui";
+import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars, NInput, NTable, NImage } from "naive-ui";
 import { TableData, TableDataType } from "@/models/table";
 
 const emit = defineEmits<{
@@ -74,7 +75,8 @@ const props = defineProps<{
 const cellDataText = ref<string | null>(null);
 const cellDataNumber = ref<number | null>(null);
 const cellDataDate = ref<number | null>(null);
-// const cellDataAttachment = ref<string>();
+const cellDataImage = ref<string | null>(null);
+
 watch(
   () => props.data,
   () => {
