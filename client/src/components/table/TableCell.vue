@@ -51,14 +51,23 @@
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
-    <n-image width="100" src="data:image/gif;base64,R0lGODdhAQABAPAAAP8AAAAAACwAAAAAAQABAAACAkQBADs="/>
+    <table-cell-image v-if="type === 3" />
   </n-config-provider>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, nextTick, watch } from "vue";
-import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars, NInput, NTable, NImage } from "naive-ui";
+import {
+  NInputNumber,
+  NDatePicker,
+  GlobalThemeOverrides,
+  useThemeVars,
+  NInput,
+  NTable,
+  useMessage,
+} from "naive-ui";
 import { TableData, TableDataType } from "@/models/table";
+import TableCellImage from "@/components/table/TableCellImage.vue";
 
 const emit = defineEmits<{
   (e: "update", index: number, data: TableData): void;
@@ -75,7 +84,11 @@ const props = defineProps<{
 const cellDataText = ref<string | null>(null);
 const cellDataNumber = ref<number | null>(null);
 const cellDataDate = ref<number | null>(null);
-const cellDataImage = ref<string | null>(null);
+const cellDataImage = ref<string | null>("data:image/jpeg;base64,R0lGODdhAQABAPAAAP8AAAAAACwAAAAAAQABAAACAkQBADs=");
+const cellDataFile = ref<string | null>(null);
+
+const message = useMessage();
+
 
 watch(
   () => props.data,

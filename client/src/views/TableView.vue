@@ -72,15 +72,15 @@ onBeforeRouteUpdate(onBeforeRoute);
 
 const message = useMessage();
 
-const isLoadingError = ref<boolean>(true);
+const isLoadingError = ref<boolean>(false);
 
 watch(
   () => props.tableId,
   async () => {
     try {
       await store.dispatch("table/pullTable", { tableId: tableId.value });
-      isLoadingError.value = false;
     } catch (error) {
+      isLoadingError.value = true;
       if (error instanceof Error) {
         message.error("При загрузке таблицы возникла ошибка");
       }
