@@ -52,6 +52,7 @@
       @mouseleave="$emit('mouseLeaveCell')"
     />
     <table-cell-image v-if="type === 3" :value="cellDataImage" @update="dataUpdateHandler"/>
+    <table-cell-file v-if="type === 4" />
   </n-config-provider>
 </template>
 
@@ -67,6 +68,7 @@ import {
 } from "naive-ui";
 import { TableData, TableDataType } from "@/models/table";
 import TableCellImage from "@/components/table/TableCellImage.vue";
+import TableCellFile from "@/components/table/TableCellFile.vue";
 
 const emit = defineEmits<{
   (e: "update", index: number, data: TableData): void;
