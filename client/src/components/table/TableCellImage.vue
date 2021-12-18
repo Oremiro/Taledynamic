@@ -1,7 +1,7 @@
 <template>
   <div style="height: 34px">
-    <div v-if="isFileUploaded" style="display: flex; gap: .6rem;">
-      <n-image :height="34" object-fit="contain" :src="fileBase64" />
+    <div v-if="isFileUploaded" style="display: flex; gap: 0.6rem">
+      <n-image :height="34" object-fit="contain" :src="fileBase64 ?? ''" />
       <dynamically-typed-button type="error" text @click="deleteImage">
         <n-icon size="1rem">
           <dismiss-icon />
@@ -16,6 +16,7 @@
       file-list-style="margin: 0"
       style="height: 100%; position: relative"
       @before-upload="onBeforeUpload"
+      @finish="onFinish"
     >
       <n-upload-dragger
         style="
@@ -35,10 +36,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { NImage, NUpload, NUploadDragger, UploadCustomRequestOptions, UploadFileInfo, useMessage } from "naive-ui";
 import { DismissIcon } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
+
+const props = defineProps<{
+  value: string | null;
+}>();
+
+const emit = defineEmits<{
+  (e: "update", value: string | null): void;
+}>();
 
 interface OnBeforeUploadOptions {
   file: UploadFileInfo;
@@ -46,13 +55,18 @@ interface OnBeforeUploadOptions {
 }
 
 const isFileUploaded = ref<boolean>(false);
-const fileBase64 = ref<string>();
+const fileBase64 = ref<string | null>(props.value);
+
+watch(() => props.value, (value) => {
+  if (value !== null) isFileUploaded.value = true;
+  fileBase64.value = value;
+}, { immediate: true })
 
 const message = useMessage();
 
 async function onBeforeUpload({ file }: OnBeforeUploadOptions) {
   if (file.file?.type !== "image/png" && file.file?.type !== "image/jpeg") {
-    message.error("Тип изображения может быть только jpeg или png")
+    message.error("Тип изображения может быть только jpeg или png");
     return false;
   }
   return true;
@@ -79,7 +93,6 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
   } else {
     try {
       fileBase64.value = await toBase64(file.file);
-      isFileUploaded.value = true;
       onFinish();
     } catch (error) {
       onError();
@@ -87,8 +100,20 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
   }
 }
 
-function deleteImage() {
+interface onFinishOptions {
+  file: UploadFileInfo;
+  event?: Event;
+}
+
+function onFinish({ file }: onFinishOptions): UploadFileInfo | undefined {
+  isFileUploaded.value = true;
+  emit("update", fileBase64.value);
+  return file;
+}
+
+function deleteImage(): void {
   isFileUploaded.value = false;
-  fileBase64.value = "";
+  fileBase64.value = null;
+  emit("update", null);
 }
 </script>

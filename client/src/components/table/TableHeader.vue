@@ -74,6 +74,7 @@
         >
       </n-popconfirm>
       <n-button
+        :disabled="header.type === 3 || header.type === 4"
         size="small"
         secondary
         :type="tableSortStatus?.index === index ? 'success' : 'default'"

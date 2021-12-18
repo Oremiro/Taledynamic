@@ -25,7 +25,7 @@
           maxRows: 6
         }"
         placeholder=""
-        @update:value="dataUpdateHandler(cellDataText)"
+        @update:value="dataUpdateHandler"
         @blur="hideTextArea"
         @mouseenter="$emit('mouseEnterCell')"
         @mouseleave="$emit('mouseLeaveCell')"
@@ -36,7 +36,7 @@
       v-model:value="cellDataNumber"
       :show-button="false"
       placeholder=""
-      @update:value="dataUpdateHandler(cellDataNumber)"
+      @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
@@ -47,11 +47,11 @@
       :first-day-of-week="0"
       placeholder=""
       format="dd.MM.yyyy"
-      @update:value="dataUpdateHandler(cellDataDate)"
+      @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
-    <table-cell-image v-if="type === 3" />
+    <table-cell-image v-if="type === 3" :value="cellDataImage" @update="dataUpdateHandler"/>
   </n-config-provider>
 </template>
 
@@ -64,7 +64,6 @@ import {
   useThemeVars,
   NInput,
   NTable,
-  useMessage,
 } from "naive-ui";
 import { TableData, TableDataType } from "@/models/table";
 import TableCellImage from "@/components/table/TableCellImage.vue";
@@ -84,10 +83,8 @@ const props = defineProps<{
 const cellDataText = ref<string | null>(null);
 const cellDataNumber = ref<number | null>(null);
 const cellDataDate = ref<number | null>(null);
-const cellDataImage = ref<string | null>("data:image/jpeg;base64,R0lGODdhAQABAPAAAP8AAAAAACwAAAAAAQABAAACAkQBADs=");
+const cellDataImage = ref<string | null>(null);
 const cellDataFile = ref<string | null>(null);
-
-const message = useMessage();
 
 
 watch(
@@ -96,6 +93,7 @@ watch(
     cellDataText.value = props.type === TableDataType.Text && typeof props.data === "string" ? props.data : null;
     cellDataNumber.value = props.type === TableDataType.Number && typeof props.data === "number" ? props.data : null;
     cellDataDate.value = props.type === TableDataType.Date && props.data instanceof Date ? props.data.getTime() : null;
+    cellDataImage.value = props.type === TableDataType.Image && typeof props.data === "string" ? props.data : null;
   },
   { immediate: true }
 );
@@ -127,13 +125,13 @@ const isTextAreaShown = ref<boolean>(false);
 const textAreaInputRef = ref<InstanceType<typeof NInput>>();
 const textInputRef = ref<InstanceType<typeof NInput>>();
 
-async function showTextArea() {
+async function showTextArea(): Promise<void> {
   isTextAreaShown.value = true;
   await nextTick();
   textAreaInputRef.value?.focus();
 }
 
-function hideTextArea() {
+function hideTextArea(): void {
   isTextAreaShown.value = false;
 }
 
