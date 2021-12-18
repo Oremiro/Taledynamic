@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Taledynamic.Api.Attributes;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.DAL.Models.DTOs;
 using Taledynamic.DAL.Models.Requests.FileRequests;
@@ -12,6 +13,7 @@ namespace Taledynamic.Api.Controllers
 {
     [ApiController]
     [Route("data/[controller]")]
+    [JwtAuthorize]
     public class FileController: BaseController
     { 
         private IFileService _fileService { get; }
@@ -21,7 +23,7 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpGet("get/file")]
-        public async Task<GenericGetResponse<FileDto>> GetFile([FromQuery] GetFileRequest request)
+        public async Task<FileContentResult> GetFile([FromQuery] GetFileRequest request)
         {
             Log.Information($"[{nameof(FileController)}]: Method 'GetFile' started.");
             var response = await _fileService.GetFileAsync(request);
@@ -45,6 +47,6 @@ namespace Taledynamic.Api.Controllers
             var response = await _fileService.CreateFileAsync(request);
             Log.Information($"[{nameof(FileController)}]: Method 'CreateFile' ended.");
             return response;
-        }
+        } 
     }
 }
