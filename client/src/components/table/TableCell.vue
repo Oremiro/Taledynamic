@@ -51,22 +51,15 @@
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
-    <table-cell-image v-if="type === 3" :value="cellDataImage" @update="dataUpdateHandler"/>
-    <table-cell-file v-if="type === 4" />
+    <table-cell-image v-if="type === 3" :value="cellDataImage" @update="dataUpdateHandler" />
+    <table-cell-file v-if="type === 4" :value="cellDataFile" @update="dataUpdateHandler" />
   </n-config-provider>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, nextTick, watch } from "vue";
-import {
-  NInputNumber,
-  NDatePicker,
-  GlobalThemeOverrides,
-  useThemeVars,
-  NInput,
-  NTable,
-} from "naive-ui";
-import { TableData, TableDataType } from "@/models/table";
+import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars, NInput, NTable } from "naive-ui";
+import { isTableDataFile, TableData, TableDataFile, TableDataType } from "@/models/table";
 import TableCellImage from "@/components/table/TableCellImage.vue";
 import TableCellFile from "@/components/table/TableCellFile.vue";
 
@@ -86,8 +79,7 @@ const cellDataText = ref<string | null>(null);
 const cellDataNumber = ref<number | null>(null);
 const cellDataDate = ref<number | null>(null);
 const cellDataImage = ref<string | null>(null);
-const cellDataFile = ref<string | null>(null);
-
+const cellDataFile = ref<TableDataFile | null>(null);
 
 watch(
   () => props.data,
@@ -96,6 +88,7 @@ watch(
     cellDataNumber.value = props.type === TableDataType.Number && typeof props.data === "number" ? props.data : null;
     cellDataDate.value = props.type === TableDataType.Date && props.data instanceof Date ? props.data.getTime() : null;
     cellDataImage.value = props.type === TableDataType.Image && typeof props.data === "string" ? props.data : null;
+    cellDataFile.value = props.type === TableDataType.File && isTableDataFile(props.data) ? props.data : null;
   },
   { immediate: true }
 );
@@ -113,7 +106,7 @@ const lightThemeOverrides = reactive<GlobalThemeOverrides>({
   }
 });
 
-function dataUpdateHandler(data: string | number | null): void {
+function dataUpdateHandler(data: string | number | TableDataFile | null): void {
   let normalizedData: TableData;
   if (props.type === TableDataType.Date && typeof data === "number") {
     normalizedData = new Date(data);

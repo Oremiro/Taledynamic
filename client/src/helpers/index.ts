@@ -78,7 +78,7 @@ export function debounce<A extends unknown[], R>(
   };
 }
 
-export async function toBase64(file: File): Promise<string> {
+export async function toDataURL(file: File): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.readAsDataURL(file);

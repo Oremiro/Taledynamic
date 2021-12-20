@@ -33,7 +33,7 @@ import { ref, watch } from "vue";
 import { NImage, NUpload, NUploadDragger, UploadCustomRequestOptions, useMessage } from "naive-ui";
 import { DismissIcon } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
-import { toBase64 } from "@/helpers";
+import { toDataURL } from "@/helpers";
 import { OnBeforeUpload, OnFinish } from "@/components/table/upload";
 
 const props = defineProps<{
@@ -72,7 +72,7 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
     onError();
   } else {
     try {
-      fileBase64.value = await toBase64(file.file);
+      fileBase64.value = await toDataURL(file.file);
       onFinish();
     } catch (error) {
       onError();

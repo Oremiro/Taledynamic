@@ -11,8 +11,8 @@
         gap: 0.5rem;
       "
     >
-      <n-button text @click="downloadFile">{{ fileList[0].name }}</n-button>
-      <dynamically-typed-button type="error" text>
+      <n-button text @click="downloadFile">{{ name }}</n-button>
+      <dynamically-typed-button type="error" text @click="removeFile">
         <n-icon size="1rem">
           <dismiss-icon />
         </n-icon>
@@ -20,7 +20,6 @@
     </div>
     <n-upload
       v-else
-      v-model:file-list="fileList"
       :show-file-list="false"
       :max="1"
       :custom-request="customRequest"
@@ -39,21 +38,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { NUpload, NUploadDragger, UploadCustomRequestOptions, UploadFileInfo, useMessage } from "naive-ui";
-import { toBase64 } from "@/helpers";
+import { ref, watch } from "vue";
+import { NUpload, NUploadDragger, UploadCustomRequestOptions, useMessage } from "naive-ui";
+import { toDataURL } from "@/helpers";
 import { OnBeforeUpload, OnFinish } from "@/components/table/upload";
 import { DismissIcon } from "@/components/icons";
 import DynamicallyTypedButton from "@/components/DynamicallyTypedButton.vue";
 import { FileApi } from "@/helpers/api/file";
 import { useStore } from "@/store";
+import { TableDataFile } from "@/models/table";
 
-const isFileUploaded = ref<boolean>(false);
+const props = defineProps<{
+  value: TableDataFile | null;
+}>();
+
+const emit = defineEmits<{
+  (e: "update", value: TableDataFile | null): void;
+}>();
 
 const isTextTipShown = ref<boolean>(false);
-const fileList = ref<UploadFileInfo[]>([]);
 
-const uId = ref<string>("");
+const isFileUploaded = ref<boolean>(false);
+const uId = ref<string | null>(null);
+const name = ref<string>("");
+
+watch(
+  () => props.value,
+  (value) => {
+    if (value !== null) {
+      isFileUploaded.value = true;
+      uId.value = value.uId;
+      name.value = value.name;
+    }
+  },
+  { immediate: true }
+);
 
 const store = useStore();
 
@@ -62,13 +81,14 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
     onError();
   } else {
     try {
-      const fileBase64 = await toBase64(file.file);
+      const fileBase64 = await toDataURL(file.file);
       await store.dispatch("user/refreshExpired");
       const { data } = await FileApi.create(
         { fileBase64: fileBase64, type: file.file.type },
         store.getters["user/accessToken"]
       );
       uId.value = data.item.id;
+      name.value = file.name;
       onFinish();
     } catch (error) {
       onError();
@@ -89,14 +109,16 @@ const onBeforeUpload: OnBeforeUpload = async ({ file }) => {
 
 const onFinish: OnFinish = ({ file }) => {
   isFileUploaded.value = true;
+  emit("update", { uId: uId.value, name: name.value });
   return file;
 };
 
 async function downloadFile(): Promise<void> {
+  if (uId.value === null) return;
   try {
     await store.dispatch("user/refreshExpired");
     const { data } = await FileApi.getLink({ uId: uId.value }, store.getters["user/accessToken"]);
-    await downloadUsingFetch(data.item.base64String, "test");
+    await downloadUsingFetch(data.item.base64String, name.value);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -104,17 +126,23 @@ async function downloadFile(): Promise<void> {
   }
 }
 
-async function downloadUsingFetch(dataUrl: string, filename: string) {
-  const res = await fetch(dataUrl);
+async function downloadUsingFetch(dataURL: string, filename: string) {
+  const res = await fetch(dataURL);
   const fileBlob = await res.blob();
-  const fileUrl = URL.createObjectURL(fileBlob);
+  const fileURL = URL.createObjectURL(fileBlob);
   const anchor = document.createElement("a");
-  anchor.href = fileUrl;
+  anchor.href = fileURL;
   anchor.download = filename;
   anchor.click();
-  URL.revokeObjectURL(fileUrl);
+  URL.revokeObjectURL(fileURL);
 }
 
+async function removeFile() {
+  isFileUploaded.value = false;
+  uId.value = null;
+  name.value = "";
+  emit("update", null);
+}
 </script>
 
 <style scoped lang="scss">
