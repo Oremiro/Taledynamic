@@ -1,7 +1,10 @@
 <template>
   <div style="height: 34px; position: relative">
+    <div v-if="isPending" style="padding: 0 .7rem; display: flex; align-items: center; height: 100%">
+      <n-skeleton :sharp="false" />
+    </div>
     <div
-      v-if="isFileUploaded"
+      v-else-if="uId !== null"
       style="
         height: 100%;
         display: flex;
@@ -12,7 +15,7 @@
       "
     >
       <n-button text @click="downloadFile">
-        <n-ellipsis style="max-width: 10rem; line-height: initial;" :tooltip="{ delay: 500 }">
+        <n-ellipsis style="max-width: 10rem; line-height: initial" :tooltip="{ delay: 500 }">
           {{ name }}
         </n-ellipsis>
       </n-button>
@@ -43,7 +46,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { NUpload, NUploadDragger, UploadCustomRequestOptions, useMessage, NEllipsis } from "naive-ui";
+import { NUpload, NUploadDragger, UploadCustomRequestOptions, useMessage, NEllipsis, NSkeleton } from "naive-ui";
 import { toDataURL } from "@/helpers";
 import { OnBeforeUpload, OnFinish } from "@/components/table/upload";
 import { DismissIcon } from "@/components/icons";
@@ -61,8 +64,8 @@ const emit = defineEmits<{
 }>();
 
 const isTextTipShown = ref<boolean>(false);
+const isPending = ref<boolean>(false);
 
-const isFileUploaded = ref<boolean>(false);
 const uId = ref<string | null>(null);
 const name = ref<string>("");
 
@@ -70,7 +73,6 @@ watch(
   () => props.value,
   (value) => {
     if (value !== null) {
-      isFileUploaded.value = true;
       uId.value = value.uId;
       name.value = value.name;
     }
@@ -85,6 +87,7 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
     onError();
   } else {
     try {
+      isPending.value = true;
       const fileBase64 = await toDataURL(file.file);
       await store.dispatch("user/refreshExpired");
       const { data } = await FileApi.create(
@@ -95,8 +98,12 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
       name.value = file.name;
       onFinish();
     } catch (error) {
-      console.log(error);
+      if (error instanceof Error) {
+        message.error(error.message);
+      }
       onError();
+    } finally {
+      isPending.value = false;
     }
   }
 }
@@ -121,7 +128,6 @@ const onBeforeUpload: OnBeforeUpload = async ({ file }) => {
 };
 
 const onFinish: OnFinish = ({ file }) => {
-  isFileUploaded.value = true;
   emit("update", { uId: uId.value, name: name.value });
   return file;
 };
@@ -129,13 +135,16 @@ const onFinish: OnFinish = ({ file }) => {
 async function downloadFile(): Promise<void> {
   if (uId.value === null) return;
   try {
+    isPending.value = true;
     await store.dispatch("user/refreshExpired");
     const { data } = await FileApi.getLink({ uId: uId.value }, store.getters["user/accessToken"]);
     await downloadUsingFetch(data.item.base64String, name.value);
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error);
+      message.error(error.message);
     }
+  } finally {
+    isPending.value = false;
   }
 }
 
@@ -151,7 +160,6 @@ async function downloadUsingFetch(dataURL: string, filename: string) {
 }
 
 async function removeFile() {
-  isFileUploaded.value = false;
   uId.value = null;
   name.value = "";
   emit("update", null);

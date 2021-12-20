@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, h, watch } from "vue";
+import { ref, computed, onMounted, h, watch, onUnmounted } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { NPageHeader, useMessage, MenuOption, NSpin, NEllipsis } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
@@ -142,4 +142,10 @@ watch(
   },
   { immediate: true }
 );
+
+onUnmounted(() => {
+  if (autoSavingTimer.value !== undefined) {
+    clearInterval(autoSavingTimer.value);
+  }
+});
 </script>

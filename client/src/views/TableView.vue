@@ -3,7 +3,7 @@
     v-if="isLoadingError"
     status="error"
     title="Ошибка при загрузке таблицы"
-    description="Возможно, Вы что-то делаете не так"
+    description="Возможно, Вы делаете что-то не так"
     style="margin-top: 5rem"
   />
   <n-layout v-else embedded>
