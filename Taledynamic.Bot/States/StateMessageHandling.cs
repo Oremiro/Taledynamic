@@ -84,7 +84,7 @@ namespace TaleDynamicBot.States
                 {
                     await botClient.DownloadFileAsync(file.FilePath,saveImageStream);
                 }
-                string base64Image = Convert.ToBase64String(File.ReadAllBytes($"{message.Chat.Username}_file.jpg"));
+                string base64Image = Convert.ToBase64String(await File.ReadAllBytesAsync($"{message.Chat.Username}_file.jpg"));
                 
                 /*var values = new Dictionary<string, string>
                 {
