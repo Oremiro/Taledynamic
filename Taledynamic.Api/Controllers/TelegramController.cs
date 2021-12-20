@@ -1,18 +1,23 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Taledynamic.Api.Attributes;
 using Taledynamic.Core.Interfaces;
+using Taledynamic.DAL.Models.DTOs;
+using Taledynamic.DAL.Models.Requests.TelegramRequests;
+using Taledynamic.DAL.Models.Responses;
 
 namespace Taledynamic.Api.Controllers
 {
     [ApiController]
     [JwtAuthorize]
     [Route("integration/[controller]")]
-    public class TelegramController: BaseController
+    public class TelegramController : BaseController
     {
         private ITelegramService _telegramService { get; set; }
         private ITelegramDataService _telegramDataService { get; set; }
+
         public TelegramController(ITelegramService telegramService, ITelegramDataService telegramDataService)
         {
             _telegramService = telegramService;
@@ -30,35 +35,47 @@ namespace Taledynamic.Api.Controllers
         {
             throw new NotImplementedException();
         }
+
         [HttpPost("revoke")]
         public async Task Revoke()
         {
             throw new NotImplementedException();
         }
-        
+
         [HttpPost("data/create")]
-        public void CreateData()
+        public async Task<GenericCreateResponse<TelegramDataDto>> CreateData([FromBody] CreateTelegramDataRequest request)
         {
-            throw new NotImplementedException();
+            Log.Information($"[{nameof(TableController)}]: Method 'CreateData' started.");
+            var response = await _telegramDataService.CreateTelegramDataAsync(request);
+            Log.Information($"[{nameof(TableController)}]: Method 'CreateData' started.");
+            return response;
         }
-        
+
         [HttpGet("data/get")]
-        public void GetData()
+        public async Task<GenericGetResponse<TelegramDataDto>> GetData([FromQuery] GetTelegramDataRequest request)
         {
-            throw new NotImplementedException();
+            Log.Information($"[{nameof(TableController)}]: Method 'GetData' started.");
+            var response = await _telegramDataService.ReadTelegramDataAsync(request);
+            Log.Information($"[{nameof(TableController)}]: Method 'GetData' started.");
+            return response;
         }
-        
+
         [HttpPut("data/update")]
-        public void UpdateData()
+        public async Task<EmptyUpdateResponse> UpdateData([FromBody] UpdateTelegramDataRequest request)
         {
-            throw new NotImplementedException();
+            Log.Information($"[{nameof(TableController)}]: Method 'UpdateData' started.");
+            var response = await _telegramDataService.UpdateTelegramDataAsync(request);
+            Log.Information($"[{nameof(TableController)}]: Method 'UpdateData' started.");
+            return response;
         }
-        
+
         [HttpDelete("data/delete")]
-        public void DeleteData()
+        public async Task<GenericDeleteResponse<TelegramDataDto>> DeleteData([FromBody] DeleteTelegramDataRequest request)
         {
-            throw new NotImplementedException();
+            Log.Information($"[{nameof(TableController)}]: Method 'DeleteData' started.");
+            var response = await _telegramDataService.DeleteTelegramDataAsync(request);
+            Log.Information($"[{nameof(TableController)}]: Method 'DeleteData' started.");
+            return response;
         }
-        
     }
 }
