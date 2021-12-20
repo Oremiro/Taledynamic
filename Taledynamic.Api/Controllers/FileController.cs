@@ -23,6 +23,7 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpGet("get/file")]
+        [DisableRequestSizeLimit]
         public async Task<FileContentResult> GetFile([FromQuery] GetFileRequest request)
         {
             Log.Information($"[{nameof(FileController)}]: Method 'GetFile' started.");
@@ -32,6 +33,7 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpGet("get/link")]
+        [DisableRequestSizeLimit]
         public async Task<GenericGetResponse<FileDto>> GetFileLink([FromQuery] GetFileLinkRequest request)
         {
             Log.Information($"[{nameof(FileController)}]: Method 'GetFileLink' started.");
@@ -41,6 +43,7 @@ namespace Taledynamic.Api.Controllers
         }
 
         [HttpPost("create")]
+        [DisableRequestSizeLimit]
         public async Task<GenericCreateResponse<FileDto>> CreateFile([FromBody] CreateFileRequest request)
         {
             Log.Information($"[{nameof(FileController)}]: Method 'CreateFile' started.");
