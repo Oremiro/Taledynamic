@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.8rem; gap: 0.5rem">
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.8rem; gap: 2rem">
     <div style="display: flex; gap: 0.5rem; align-items: center">
       <n-input
         v-model:value="header.name"
@@ -74,6 +74,7 @@
         >
       </n-popconfirm>
       <n-button
+        :disabled="header.type === 3 || header.type === 4"
         size="small"
         secondary
         :type="tableSortStatus?.index === index ? 'success' : 'default'"

@@ -27,8 +27,8 @@
       >
         <table-header-vue :index="index" @delete="deleteColumn(index)" />
       </th>
-      <th :style="!isCreatingInputShown ? { width: '3rem' } : {}">
-        <div style="display: flex; align-items: center; justify-content: center">
+      <th>
+        <div style="padding: 0 .6rem;">
           <n-form-item v-if="isCreatingInputShown" :show-label="false" :show-feedback="false" :rule="headerNameRule">
             <n-input
               ref="creatingInput"

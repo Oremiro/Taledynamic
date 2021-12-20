@@ -35,7 +35,11 @@ export class DraggableList {
   dragEnterHandler(e: DragEvent, index: number): void {
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = "move";
-      const transferObject: ListTransferObject = JSON.parse(e.dataTransfer.getData("transferString"));
+      const transferString: string = e.dataTransfer.getData("transferString");
+      if (transferString === "") {
+        return;
+      }
+      const transferObject: ListTransferObject = JSON.parse(transferString);
       if (!isListTransferObject(transferObject)) {
         return;
       }
@@ -57,7 +61,11 @@ export class DraggableList {
 
   dropHandler(e: DragEvent, index: number, callback: (index: number, itemIndex: number) => void) {
     if (e.dataTransfer) {
-      const transferObject: ListTransferObject = JSON.parse(e.dataTransfer.getData("transferString"));
+      const transferString: string = e.dataTransfer.getData("transferString");
+      if (transferString === "") {
+        return;
+      }
+      const transferObject: ListTransferObject = JSON.parse(transferString);
       if (!isListTransferObject(transferObject)) {
         return;
       }

@@ -1,12 +1,15 @@
 import { MutationTree } from "vuex";
 import { TableState } from "@/models/store";
-import { TableRow, TableHeader, TableCell, TableDataType, TableRowsSortType } from "@/models/table";
+import { TableRow, TableHeader, TableCell, TableDataType, TableRowsSortType, TableData } from "@/models/table";
 
 export const mutations: MutationTree<TableState> = {
   setTable(state: TableState, payload: { rows: TableRow[]; headers: TableHeader[] }): void {
     state.headers = payload.headers;
     state.rows = payload.rows;
     state.rows.push(new TableRow(payload.headers.map((item) => new TableCell(null, item.type))));
+  },
+  setDataId(state: TableState, payload: { dataId: string }): void {
+    state.dataId = payload.dataId;
   },
   pushRow(state: TableState, payload: { row: TableRow }): void {
     state.rows.push(payload.row);
@@ -40,7 +43,7 @@ export const mutations: MutationTree<TableState> = {
     payload: {
       rowIndex: number;
       cellIndex: number;
-      data?: string;
+      data?: TableData;
       type?: TableDataType;
     }
   ) {
