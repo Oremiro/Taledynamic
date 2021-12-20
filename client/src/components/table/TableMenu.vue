@@ -10,9 +10,7 @@
           </template>
         </n-spin>
         <n-tooltip v-else :show-arrow="false">
-          <template #default>
-            Последнее сохранение: {{ lastSavingDateTime.toLocaleString() }}
-          </template>
+          <template #default> Последнее сохранение: {{ lastSavingDateTime.toLocaleString() }} </template>
           <template #trigger>
             <n-button :type="savingStatus == 2 ? 'error' : 'default'" text @click="pushTable">
               <n-icon size="1.4rem">
@@ -30,7 +28,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, h, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { NPageHeader, useMessage, MenuOption, NSpin } from "naive-ui";
+import { NPageHeader, useMessage, MenuOption, NSpin, NEllipsis } from "naive-ui";
 import { TableApi } from "@/helpers/api/table";
 import { TableDto } from "@/models/api/responses";
 import { useStore } from "@/store";
@@ -49,17 +47,31 @@ const tablesListMenu = computed<MenuOption[]>(() =>
   tablesList.value.map((item) => ({
     label: () =>
       h(
-        RouterLink,
+        NEllipsis,
         {
-          to: {
-            name: "Table",
-            params: {
-              workspaceId: props.workspaceId,
-              tableId: item.id
-            }
+          style: {
+            maxWidth: "10rem"
           }
         },
-        { default: () => item.name }
+        {
+          default: () =>
+            h(
+              RouterLink,
+              {
+                to: {
+                  name: "Table",
+                  params: {
+                    workspaceId: props.workspaceId,
+                    tableId: item.id
+                  }
+                }
+              },
+              {
+                default: () => item.name
+              }
+            ),
+          tooltip: () => item.name
+        }
       ),
     key: item.id
   }))

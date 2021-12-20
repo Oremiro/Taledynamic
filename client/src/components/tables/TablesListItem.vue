@@ -2,7 +2,7 @@
   <transition name="fade" mode="out-in">
     <n-button-group v-if="!isInputShown">
       <n-button @click="navigateToTable">
-        <n-ellipsis style="max-width: 10rem" :tooltip="{ delay: 500 }">{{ name }}</n-ellipsis>
+        <n-ellipsis style="max-width: 10rem; line-height: initial;" :tooltip="{ delay: 500 }">{{ name }}</n-ellipsis>
       </n-button>
       <n-button v-if="editable" style="padding: 0.5rem" @click="isInputShown = true">
         <n-icon size="1.2rem">

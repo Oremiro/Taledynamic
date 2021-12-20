@@ -11,7 +11,11 @@
         gap: 0.5rem;
       "
     >
-      <n-button text @click="downloadFile">{{ name }}</n-button>
+      <n-button text @click="downloadFile">
+        <n-ellipsis style="max-width: 10rem; line-height: initial;" :tooltip="{ delay: 500 }">
+          {{ name }}
+        </n-ellipsis>
+      </n-button>
       <dynamically-typed-button type="error" text @click="removeFile">
         <n-icon size="1rem">
           <dismiss-icon />
@@ -39,7 +43,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { NUpload, NUploadDragger, UploadCustomRequestOptions, useMessage } from "naive-ui";
+import { NUpload, NUploadDragger, UploadCustomRequestOptions, useMessage, NEllipsis } from "naive-ui";
 import { toDataURL } from "@/helpers";
 import { OnBeforeUpload, OnFinish } from "@/components/table/upload";
 import { DismissIcon } from "@/components/icons";
@@ -91,6 +95,7 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
       name.value = file.name;
       onFinish();
     } catch (error) {
+      console.log(error);
       onError();
     }
   }
@@ -101,7 +106,15 @@ const message = useMessage();
 const onBeforeUpload: OnBeforeUpload = async ({ file }) => {
   if (file.file === null || file.file === undefined) return false;
   if (file.file.size === undefined || file.file.size > 10 * 1024 * 1024) {
-    message.error("Размер файла не должен превышать 10 Мб.");
+    message.error("Размер файла не должен превышать 10 Мб");
+    return false;
+  }
+  if (file.file.name.length > 100) {
+    message.error("Название файла не должно быть длиннее 100 символов");
+    return false;
+  }
+  if (file.file.type === "") {
+    message.error("Некорректный тип файла");
     return false;
   }
   return true;
