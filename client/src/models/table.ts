@@ -6,8 +6,18 @@ export enum TableDataType {
   File
 }
 
-export type TableData = string | number | Date | null;
-export type TableDataJson = string | number | null;
+export interface TableDataFile {
+  uId: string | null;
+  name: string;
+}
+
+export function isTableDataFile(item: TableData): item is TableDataFile {
+  if (item === null) return false;
+  return (item as TableDataFile).uId !== undefined && (item as TableDataFile).name !== undefined;
+}
+
+export type TableData = string | number | Date | TableDataFile | null;
+export type TableDataJson = string | number | TableDataFile | null;
 
 export enum TableRowsSortType {
   Ascending,
@@ -65,7 +75,6 @@ export class TableRow {
     this.cells = cells.map((cell) => new TableCell(cell.data, cell.type));
   }
 }
-
 
 export interface TableJson {
   headers: TableHeaderJson[];
