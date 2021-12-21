@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taledynamic.DAL", "Taledyna
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleDynamicBot", "Taledynamic.Bot\TaleDynamicBot.csproj", "{F2C121DD-14F2-460C-9380-E94CB38B82A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taledynamic.Sheets", "TaleDynamic.Sheets\Taledynamic.Sheets.csproj", "{7CEEFB12-1CD1-49CD-9BE9-002D99F46929}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taledynamic.Sheets", "Taledynamic.Sheets\Taledynamic.Sheets.csproj", "{7CEEFB12-1CD1-49CD-9BE9-002D99F46929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
