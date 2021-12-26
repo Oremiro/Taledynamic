@@ -123,7 +123,7 @@ namespace Taledynamic.Core.Services
             }
             
             var result =
-                await _documents.FindAsync(document => document.Id == request.UId);
+                await _documents.FindAsync(document => document.Id == table.MongoDbUId);
             
             JsonModel jsonModel = result.FirstOrDefault();
 
@@ -136,7 +136,7 @@ namespace Taledynamic.Core.Services
                 Message = null,
                 Item = new TableDataDto()
                 {
-                    UId = request.UId,
+                    UId = table.MongoDbUId,
                     TableData = validJsonString
                 }
             };

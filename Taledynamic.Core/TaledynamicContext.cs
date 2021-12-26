@@ -9,6 +9,7 @@ namespace Taledynamic.Core
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Workspace> Workspaces { get; set; }
         public DbSet<Table> Tables { get; set; }
+        public DbSet<TelegramUser> TelegramUsers { get; set; }
         public TaledynamicContext(DbContextOptions<TaledynamicContext> options) : base(options)
         {
         }
@@ -19,6 +20,8 @@ namespace Taledynamic.Core
                 .HasIndex(p => p.UserId);
             modelBuilder.Entity<Table>()
                 .HasIndex(p => p.WorkspaceId);
+            modelBuilder.Entity<TelegramUser>()
+                .HasIndex(p => p.UserId);
         }
     }
 }

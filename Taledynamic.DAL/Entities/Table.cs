@@ -10,6 +10,7 @@ namespace Taledynamic.DAL.Entities
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
         public string MongoDbUId { get; set; }
+       // public bool? IsImmutable { get; set; }
         [ForeignKey("WorkspaceId")]
         public virtual Workspace Workspace { get; set; }
         [Required]

@@ -25,7 +25,7 @@
           maxRows: 6
         }"
         placeholder=""
-        @update:value="dataUpdateHandler(cellDataText)"
+        @update:value="dataUpdateHandler"
         @blur="hideTextArea"
         @mouseenter="$emit('mouseEnterCell')"
         @mouseleave="$emit('mouseLeaveCell')"
@@ -36,7 +36,7 @@
       v-model:value="cellDataNumber"
       :show-button="false"
       placeholder=""
-      @update:value="dataUpdateHandler(cellDataNumber)"
+      @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
@@ -47,17 +47,21 @@
       :first-day-of-week="0"
       placeholder=""
       format="dd.MM.yyyy"
-      @update:value="dataUpdateHandler(cellDataDate)"
+      @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
+    <table-cell-image v-if="type === 3" :value="cellDataImage" @update="dataUpdateHandler" />
+    <table-cell-file v-if="type === 4" :value="cellDataFile" @update="dataUpdateHandler" />
   </n-config-provider>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, nextTick, watch } from "vue";
 import { NInputNumber, NDatePicker, GlobalThemeOverrides, useThemeVars, NInput, NTable } from "naive-ui";
-import { TableData, TableDataType } from "@/models/table";
+import { isTableDataFile, TableData, TableDataFile, TableDataType } from "@/models/table";
+import TableCellImage from "@/components/table/TableCellImage.vue";
+import TableCellFile from "@/components/table/TableCellFile.vue";
 
 const emit = defineEmits<{
   (e: "update", index: number, data: TableData): void;
@@ -74,13 +78,17 @@ const props = defineProps<{
 const cellDataText = ref<string | null>(null);
 const cellDataNumber = ref<number | null>(null);
 const cellDataDate = ref<number | null>(null);
-// const cellDataAttachment = ref<string>();
+const cellDataImage = ref<string | null>(null);
+const cellDataFile = ref<TableDataFile | null>(null);
+
 watch(
   () => props.data,
   () => {
     cellDataText.value = props.type === TableDataType.Text && typeof props.data === "string" ? props.data : null;
     cellDataNumber.value = props.type === TableDataType.Number && typeof props.data === "number" ? props.data : null;
     cellDataDate.value = props.type === TableDataType.Date && props.data instanceof Date ? props.data.getTime() : null;
+    cellDataImage.value = props.type === TableDataType.Image && typeof props.data === "string" ? props.data : null;
+    cellDataFile.value = props.type === TableDataType.File && isTableDataFile(props.data) ? props.data : null;
   },
   { immediate: true }
 );
@@ -98,7 +106,7 @@ const lightThemeOverrides = reactive<GlobalThemeOverrides>({
   }
 });
 
-function dataUpdateHandler(data: string | number | null): void {
+function dataUpdateHandler(data: string | number | TableDataFile | null): void {
   let normalizedData: TableData;
   if (props.type === TableDataType.Date && typeof data === "number") {
     normalizedData = new Date(data);
@@ -112,13 +120,13 @@ const isTextAreaShown = ref<boolean>(false);
 const textAreaInputRef = ref<InstanceType<typeof NInput>>();
 const textInputRef = ref<InstanceType<typeof NInput>>();
 
-async function showTextArea() {
+async function showTextArea(): Promise<void> {
   isTextAreaShown.value = true;
   await nextTick();
   textAreaInputRef.value?.focus();
 }
 
-function hideTextArea() {
+function hideTextArea(): void {
   isTextAreaShown.value = false;
 }
 

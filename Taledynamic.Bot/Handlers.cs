@@ -25,23 +25,30 @@ namespace TaleDynamicBot
         public static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
             CancellationToken cancellationToken)
         {
-            var ErrorMessage = exception switch
+            var errorMessage = exception switch
             {
                 ApiRequestException apiRequestException =>
                     $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
                 _ => exception.ToString()
             };
 
-            Log.Error(ErrorMessage);
+            Log.Error(errorMessage);
             return Task.CompletedTask;
         }
 
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
             CancellationToken cancellationToken)
         {
+            var handler = update.Type switch
+            {
+                UpdateType.Message            => BotOnMessageReceived(botClient, update.Message!),
+                UpdateType.CallbackQuery      => BotOnCallbackQueryReceived(botClient, update.CallbackQuery!),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
             try
             {
-                await BotOnMessageReceived(botClient,update);
+                await handler;
             }
             catch (Exception exception)
             {
@@ -49,26 +56,35 @@ namespace TaleDynamicBot
             }
         }
 
-        public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Update update)
+        public static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery)
         {
-            Log.Information($"Receive message type: {update.Message.Type}");
+            await user.CallbackQueryHandler(botClient, callbackQuery);
+        }
 
-            switch (update.Message.Text)
+        public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
+        {
+            switch (message.Text)
             {
                 case "/auth":
-                    user.Auth(botClient, update);
+                    await user.Auth(botClient, message);
                     break;
                 case "/sending":
-                    user.SendingData(botClient, update);
+                    await user.SendingData(botClient, message);
                     break;
                 case "/stop_sending":
-                    user.StopSendingData(botClient, update);
+                    await user.StopSendingData(botClient, message);
                     break;
                 case "/usage":
-                    await Usage(botClient, update.Message);
+                    await Usage(botClient, message);
+                    break;
+                case "/start":
+                    await botClient.SendTextMessageAsync
+                    (   chatId:message.Chat.Id, 
+                        text:"Привет, я бот проекта TaleDynamic, пожалуйста, авторизуйтесь с помощью команды /auth."
+                    );
                     break;
                 default:
-                    user.DefaultAction(botClient,update);
+                    await user.DefaultAction(botClient,message);
                     break;
             }
         }

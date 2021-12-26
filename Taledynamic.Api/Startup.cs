@@ -61,8 +61,12 @@ namespace Taledynamic.Api
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWorkspaceService, WorkspaceService>();
             services.AddScoped<ITableService, TableService>();
-            services.AddScoped<ITableDataService, TableService>(); 
-            
+            services.AddScoped<ITableDataService, TableService>();
+            services.AddScoped<IFileService, FileService>();
+            services.AddScoped<ITableDataService, TableService>();
+            services.AddScoped<ITelegramService, TelegramService>();
+            services.AddScoped<ITelegramDataService, TelegramService>();
+
             # endregion
             services.AddSwaggerGen(options =>
             {

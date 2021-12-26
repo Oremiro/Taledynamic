@@ -51,6 +51,32 @@ namespace Taledynamic.Core.Migrations
                     b.ToTable("Tables");
                 });
 
+            modelBuilder.Entity("Taledynamic.DAL.Entities.TelegramUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TgApiKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TgUserId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TelegramUsers");
+                });
+
             modelBuilder.Entity("Taledynamic.DAL.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -110,6 +136,17 @@ namespace Taledynamic.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("Taledynamic.DAL.Entities.TelegramUser", b =>
+                {
+                    b.HasOne("Taledynamic.DAL.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Taledynamic.DAL.Entities.User", b =>
