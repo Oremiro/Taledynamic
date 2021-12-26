@@ -7,6 +7,7 @@ namespace Taledynamic.DAL.Models.DTOs
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        // public bool? IsImmutable { get; set; }
         public TableDto() {}
 
         public TableDto(Table table)
