@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace TaleDynamicBot
@@ -15,13 +16,16 @@ namespace TaleDynamicBot
             this._state.SetUser(this);
         }
 
-        public void Auth(ITelegramBotClient botClient, Update update) => this._state.Auth(botClient,update);
+        public async Task Auth(ITelegramBotClient botClient, Message message) => await this._state.Auth(botClient,message);
 
-        public void SendingData(ITelegramBotClient botClient,Update update) => this._state.SendingData(botClient,update.Message);
+        public async Task SendingData(ITelegramBotClient botClient,Message message) => await this._state.SendingData(botClient,message);
         
-        public void StopSendingData(ITelegramBotClient botClient,Update update) => this._state.StopSendingData(botClient,update);
+        public async Task StopSendingData(ITelegramBotClient botClient,Message message) => await this._state.StopSendingData(botClient,message);
 
-        public void DefaultAction(ITelegramBotClient botClient, Update update) => this._state.DefaultAction(botClient, update.Message);
+        public async Task DefaultAction(ITelegramBotClient botClient, Message message) => await this._state.DefaultAction(botClient, message);
+
+        public async Task CallbackQueryHandler(ITelegramBotClient botClient, CallbackQuery callbackQuery) =>
+            await this._state.CallbackQueryHandler(botClient, callbackQuery);
 
     }
 }
