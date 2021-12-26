@@ -8,6 +8,7 @@ namespace Taledynamic.DAL.MongoModels
     {
         [BsonId(IdGenerator = typeof(StringObjectIdGenerator))]
         public string Id { get; set; }        
+        public int PostgreSQLId { get; set; }
         public BsonDocument Document { get; set; }
         
     }

@@ -22,12 +22,13 @@ namespace Taledynamic.Core.Services
 {
     public partial class TelegramService: ITelegramDataService
     {
-        public async Task<EmptyUpdateResponse> UpdateTelegramDataAsync(UpdateTelegramDataRequest request)
+        public async Task<EmptyUpdateResponse> UpdateTelegramDataAsync(UpdateTelegramDataRequest request, User user)
         {
             string json = JsonSerializer.Serialize(request.JsonContent);
-            var jsonModel = new JsonModel()
+            var jsonModel = new TelegramJson()
             {
                 Id = request.UId,
+                PostgreSQLId = user.Id,
                 Document = BsonDocument.Parse(json)
             };
             
@@ -39,29 +40,17 @@ namespace Taledynamic.Core.Services
             };
         }
 
-        public async Task<GenericCreateResponse<TelegramDataDto>> CreateTelegramDataAsync(CreateTelegramDataRequest request)
+        public async Task<GenericCreateResponse<TelegramDataDto>> CreateTelegramDataAsync(CreateTelegramDataRequest request, User user)
         {
             string json = System.Text.Json.JsonSerializer.Serialize(request.JsonContent);
-            var jsonModel = new JsonModel()
+            var jsonModel = new TelegramJson()
             {
+                PostgreSQLId = user.Id,
                 Document = BsonDocument.Parse(json)
             };
             
             await _documents.InsertOneAsync(jsonModel);
             
-            var table = await _context
-                .Tables
-                .AsNoTracking()
-                .FirstOrDefaultAsync(w => w.IsActive);
-
-            if (table == null)
-            {
-                throw new NotFoundException("Table with requested ids is not found");
-            }
-            
-            table.MongoDbUId = jsonModel.Id;
-          
-            //await this.UpdateAsync(table);
             
             var dotnetValue = BsonTypeMapper.MapToDotNetValue(jsonModel.Document);
             var validJsonString = JsonConvert.SerializeObject(dotnetValue);
@@ -80,13 +69,13 @@ namespace Taledynamic.Core.Services
             return response;
         }
 
-        public async Task<GenericDeleteResponse<TelegramDataDto>> DeleteTelegramDataAsync(DeleteTelegramDataRequest request)
+        public async Task<GenericDeleteResponse<TelegramDataDto>> DeleteTelegramDataAsync(DeleteTelegramDataRequest request, User user)
         {
             var result = await _documents.DeleteOneAsync(document => document.Id == request.UId);
             return null;
         }
 
-        public async Task<GenericGetResponse<TelegramDataDto>> ReadTelegramDataAsync(GetTelegramDataRequest request)
+        public async Task<GenericGetResponse<TelegramDataDto>> ReadTelegramDataAsync(GetTelegramDataRequest request, User user)
         {
             var table = await _context
                 .Tables
@@ -98,16 +87,10 @@ namespace Taledynamic.Core.Services
                 throw new NotFoundException("Table with requested ids is not found");
             }
             
-            var validator = request.IsValid();
-            if (!validator.Status)
-            {
-                throw new BadRequestException(validator.Message);
-            }
-            
             var result =
                 await _documents.FindAsync(document => document.Id == request.UId);
             
-            JsonModel jsonModel = result.FirstOrDefault();
+            TelegramJson jsonModel = result.FirstOrDefault();
 
             var dotnetValue = BsonTypeMapper.MapToDotNetValue(jsonModel.Document);
             var validJsonString = JsonConvert.SerializeObject(dotnetValue);

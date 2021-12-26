@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Taledynamic.DAL.Entities;
 using Taledynamic.DAL.Models.DTOs;
 using Taledynamic.DAL.Models.Requests.TelegramRequests;
 using Taledynamic.DAL.Models.Responses;
@@ -7,9 +8,9 @@ namespace Taledynamic.Core.Interfaces
 {
     public interface ITelegramDataService
     {
-        public Task<EmptyUpdateResponse> UpdateTelegramDataAsync(UpdateTelegramDataRequest request);
-        public Task<GenericCreateResponse<TelegramDataDto>> CreateTelegramDataAsync(CreateTelegramDataRequest request);
-        public Task<GenericDeleteResponse<TelegramDataDto>> DeleteTelegramDataAsync(DeleteTelegramDataRequest request);
-        public Task<GenericGetResponse<TelegramDataDto>> ReadTelegramDataAsync(GetTelegramDataRequest request);
+        public Task<EmptyUpdateResponse> UpdateTelegramDataAsync(UpdateTelegramDataRequest request, User user);
+        public Task<GenericCreateResponse<TelegramDataDto>> CreateTelegramDataAsync(CreateTelegramDataRequest request, User user);
+        public Task<GenericDeleteResponse<TelegramDataDto>> DeleteTelegramDataAsync(DeleteTelegramDataRequest request, User user);
+        public Task<GenericGetResponse<TelegramDataDto>> ReadTelegramDataAsync(GetTelegramDataRequest request, User user);
     }
 }
