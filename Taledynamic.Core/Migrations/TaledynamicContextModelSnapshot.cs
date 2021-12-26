@@ -19,7 +19,7 @@ namespace Taledynamic.Core.Migrations
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            modelBuilder.Entity("Taledynamic.Core.Entities.Table", b =>
+            modelBuilder.Entity("Taledynamic.DAL.Entities.Table", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,6 +35,9 @@ namespace Taledynamic.Core.Migrations
                     b.Property<DateTime>("Modified")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("MongoDbUId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -48,7 +51,7 @@ namespace Taledynamic.Core.Migrations
                     b.ToTable("Tables");
                 });
 
-            modelBuilder.Entity("Taledynamic.Core.Entities.User", b =>
+            modelBuilder.Entity("Taledynamic.DAL.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,7 +72,7 @@ namespace Taledynamic.Core.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Taledynamic.Core.Entities.Workspace", b =>
+            modelBuilder.Entity("Taledynamic.DAL.Entities.Workspace", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -98,9 +101,9 @@ namespace Taledynamic.Core.Migrations
                     b.ToTable("Workspaces");
                 });
 
-            modelBuilder.Entity("Taledynamic.Core.Entities.Table", b =>
+            modelBuilder.Entity("Taledynamic.DAL.Entities.Table", b =>
                 {
-                    b.HasOne("Taledynamic.Core.Entities.Workspace", "Workspace")
+                    b.HasOne("Taledynamic.DAL.Entities.Workspace", "Workspace")
                         .WithMany()
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -109,9 +112,9 @@ namespace Taledynamic.Core.Migrations
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("Taledynamic.Core.Entities.User", b =>
+            modelBuilder.Entity("Taledynamic.DAL.Entities.User", b =>
                 {
-                    b.OwnsMany("Taledynamic.Core.Entities.RefreshToken", "RefreshTokens", b1 =>
+                    b.OwnsMany("Taledynamic.DAL.Entities.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -158,9 +161,9 @@ namespace Taledynamic.Core.Migrations
                     b.Navigation("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Taledynamic.Core.Entities.Workspace", b =>
+            modelBuilder.Entity("Taledynamic.DAL.Entities.Workspace", b =>
                 {
-                    b.HasOne("Taledynamic.Core.Entities.User", "User")
+                    b.HasOne("Taledynamic.DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

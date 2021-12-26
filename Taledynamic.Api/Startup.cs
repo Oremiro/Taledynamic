@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Taledynamic.Api.Middlewares;
@@ -14,6 +15,7 @@ using Taledynamic.Core;
 using Taledynamic.Core.Helpers;
 using Taledynamic.Core.Interfaces;
 using Taledynamic.Core.Services;
+using Taledynamic.DAL.Models.Internal;
 
 
 namespace Taledynamic.Api
@@ -30,7 +32,19 @@ namespace Taledynamic.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
+            //services.AddControllers().AddNewtonsoftJson();
+
             var connectionStrings = Configuration.GetSection("ConnectionStrings");
+            
+            # region mongodb
+            
+            services.Configure<MongoDbSettings>(
+                Configuration.GetSection(nameof(MongoDbSettings)));
+            services.AddSingleton<IMongoDbSettings>(sp =>
+                sp.GetRequiredService<IOptions<MongoDbSettings>>().Value);
+
+            # endregion
+
             services.AddDbContext<TaledynamicContext>(options =>
             {
                 options.UseNpgsql(connectionStrings["PostgresDatabase"],
@@ -39,6 +53,7 @@ namespace Taledynamic.Api
                         o.MigrationsAssembly("Taledynamic.Core");
                     });
             });
+            
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             
             # region dal services
@@ -46,7 +61,8 @@ namespace Taledynamic.Api
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWorkspaceService, WorkspaceService>();
             services.AddScoped<ITableService, TableService>();
-            
+            services.AddScoped<ITableDataService, TableService>();
+            services.AddScoped<IFileService, FileService>();
             # endregion
             services.AddSwaggerGen(options =>
             {
