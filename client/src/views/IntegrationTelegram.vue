@@ -74,17 +74,27 @@ async function authorize(): Promise<void> {
   isLoading.value = true;
   try {
     await store.dispatch("user/refreshExpired");
-    await IntegrationTelegramApi.authorize(
-      { telegramUserId: telegramId.value.toString() },
-      store.getters["user/accessToken"]
-    );
-    message.success("Аккаунт успешно подключен")
+    await IntegrationTelegramApi.get(store.getters["user/accessToken"]);
+    message.warning("К Вашей учетной записи подключен другой аккаунт Telegram");
     router.push({ name: "AccountSettings" });
   } catch (error) {
-    if(axios.isAxiosError(error)) {
-      if (error.response?.status === 400) {
-        message.error("Аккаунт с таким ID уже подключен")
-        router.push({ name: "Main" });        
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 404) {
+        try {
+          await IntegrationTelegramApi.authorize(
+            { telegramUserId: telegramId.value.toString() },
+            store.getters["user/accessToken"]
+          );
+          message.success("Аккаунт успешно подключен");
+          router.push({ name: "AccountSettings" });
+        } catch (error) {
+          if (axios.isAxiosError(error)) {
+            if (error.response?.status === 400) {
+              message.error("Аккаунт с таким ID уже подключен");
+              router.push({ name: "Main" });
+            }
+          }
+        }
       }
     }
     else if (error instanceof Error) {
