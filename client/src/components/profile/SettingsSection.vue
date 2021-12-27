@@ -55,7 +55,6 @@ async function showDeletionConfirmation(): Promise<void> {
     isDeletionConfirmationShown.value = true;
     buttonText.value = "Да";
     buttonType.value = "error";
-    // @ts-expect-error: vue-next #4397
     submitButtonRef.value?.holdDisabled();
   }
 }
@@ -64,7 +63,6 @@ function cancelDeletion() {
   isDeletionConfirmationShown.value = false;
   buttonText.value = "Удалить";
   buttonType.value = "default";
-  // @ts-expect-error: vue-next #4397
   submitButtonRef.value?.cancelHolding();
 }
 </script>

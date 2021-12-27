@@ -61,7 +61,6 @@ const tablesListRef = ref<InstanceType<typeof TablesList>>();
 const sortValue = ref<TablesSortType>();
 async function onSortTypeUpdate(value: TablesSortType): Promise<void> {
   localStorage.setItem("tablesSort", value.toString());
-  // @ts-expect-error: vue-next #4397
   await tablesListRef.value?.sortList(value);
   sortValue.value = value;
 }

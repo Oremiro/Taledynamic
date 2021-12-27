@@ -229,13 +229,11 @@ function submitForm(): void {
         }
       } finally {
         submitLoading.value = false;
-        // @ts-expect-error: vue-next #4397
         submitButtonRef.value?.holdDisabled();
       }
     } else {
       message.error("Данные не являются корректными");
       submitLoading.value = false;
-      // @ts-expect-error: vue-next #4397
       submitButtonRef.value?.holdDisabled();
     }
   });

@@ -113,7 +113,6 @@ const workspaceCreatingButton = ref<InstanceType<typeof DelayedButton>>();
 
 watch(workspaceCreatingButton, (value): void => {
   if (creatingButtonHolding.value) {
-    // @ts-expect-error: vue-next #4397
     value?.holdDisabled();
     creatingButtonHolding.value = false;
   }
