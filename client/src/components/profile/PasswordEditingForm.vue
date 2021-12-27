@@ -188,13 +188,11 @@ function submitForm(): void {
         }
       } finally {
         isSubmitButtonLoading.value = false;
-        // @ts-expect-error: vue-next #4397
         submitButtonRef.value?.holdDisabled();
       }
     } else {
       message.error("Данные не являются корректными");
       isSubmitButtonLoading.value = false;
-      // @ts-expect-error: vue-next #4397
       submitButtonRef.value?.holdDisabled();
     }
   });

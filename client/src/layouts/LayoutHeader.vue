@@ -82,25 +82,25 @@ const store = useStore();
 const route = useRoute();
 
 const menuOptions = computed((): Array<MenuOption | MenuGroupOption> => {
-  const baseMenuOptions: Array<MenuOption | MenuGroupOption> = [
-    {
-      label: () => h(RouterLink, { to: "/" }, { default: () => "Главная страница" }),
-      key: ""
-    }
-  ];
-
   if (store.getters["user/isLoggedIn"]) {
-    baseMenuOptions.push({
-      label: () => h(RouterLink, { to: "/account/data" }, { default: () => "Аккаунт" }),
-      key: "account"
-    });
+    return [
+      {
+        label: () => h(RouterLink, { to: "/" }, { default: () => "Главная страница" }),
+        key: ""
+      },
+      {
+        label: () => h(RouterLink, { to: "/account/data" }, { default: () => "Аккаунт" }),
+        key: "account"
+      }
+    ];
   } else {
-    baseMenuOptions.push({
-      label: () => h(RouterLink, { to: "/auth" }, { default: () => "Вход" }),
-      key: "auth"
-    });
+    return [
+      {
+        label: () => h(RouterLink, { to: "/auth" }, { default: () => "Вход и регистрация" }),
+        key: "auth"
+      }
+    ];
   }
-  return baseMenuOptions;
 });
 const currentPath = computed(() => route.path.split("/")[1]);
 
