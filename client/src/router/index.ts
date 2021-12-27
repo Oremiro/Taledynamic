@@ -46,9 +46,9 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: "/account/binding",
-    name: "AccountBinding",
-    component: () => import("@/views/AccountBindingView.vue")
+    path: "/integration/telegram",
+    name: "IntegrationTelegram",
+    component: () => import("@/views/IntegrationTelegram.vue")
   },
   {
     path: "/table/:workspaceId/:tableId",

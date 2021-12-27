@@ -18,7 +18,7 @@
             <n-text v-else>Подключить аккаунт?</n-text>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 1rem">
-            <n-button type="primary" ghost :loading="isLoading" :disabled="isLoading" @click="bindAccount"
+            <n-button type="primary" ghost :loading="isLoading" :disabled="isLoading" @click="authorize"
               >Подключить</n-button
             >
             <n-button type="error" ghost :disabled="isLoading" @click="router.push({ name: 'Main' })"
@@ -57,6 +57,8 @@ import { ref, computed } from "vue";
 import { NDivider, useMessage } from "naive-ui";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "@/store";
+import { IntegrationTelegramApi } from "@/helpers/api/integrations";
+import axios from "axios";
 
 const store = useStore();
 const router = useRouter();
@@ -68,14 +70,24 @@ const telegramName = computed<string>(() => (typeof route.query.tgName === "stri
 
 const isLoading = ref<boolean>(false);
 
-async function bindAccount(): Promise<void> {
+async function authorize(): Promise<void> {
   isLoading.value = true;
   try {
     await store.dispatch("user/refreshExpired");
-    console.log();
+    await IntegrationTelegramApi.authorize(
+      { telegramUserId: telegramId.value.toString() },
+      store.getters["user/accessToken"]
+    );
+    message.success("Аккаунт успешно подключен")
     router.push({ name: "AccountSettings" });
   } catch (error) {
-    if (error instanceof Error) {
+    if(axios.isAxiosError(error)) {
+      if (error.response?.status === 400) {
+        message.error("Аккаунт с таким ID уже подключен")
+        router.push({ name: "Main" });        
+      }
+    }
+    else if (error instanceof Error) {
       message.error(error.message);
     }
   } finally {
