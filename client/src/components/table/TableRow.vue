@@ -27,6 +27,7 @@
       :data="cell.data"
       :type="cell.type"
       :index="cellIndex"
+      :disabled="store.getters['table/isImmutable']"
       @update="cellUpdateHandler"
       @mouse-enter-cell="store.commit('table/setEditableRowIndex', { index: index })"
       @mouse-leave-cell="store.commit('table/clearEditableRowIndex')"

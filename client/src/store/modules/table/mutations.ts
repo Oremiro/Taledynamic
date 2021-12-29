@@ -6,8 +6,12 @@ export const mutations: MutationTree<TableState> = {
   setTable(state: TableState, payload: { rows: TableRow[]; headers: TableHeader[]; immutable?: boolean }): void {
     state.headers = payload.headers;
     state.rows = payload.rows;
-    state.immutable = payload.immutable;
-    state.rows.push(new TableRow(payload.headers.map((item) => new TableCell(null, item.type))));
+    if (payload.immutable !== undefined) {
+      state.immutable = payload.immutable;
+    }
+    if (!state.immutable) {
+      state.rows.push(new TableRow(payload.headers.map((item) => new TableCell(null, item.type))));
+    }
   },
   setDataId(state: TableState, payload: { dataId: string }): void {
     state.dataId = payload.dataId;

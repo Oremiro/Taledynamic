@@ -17,8 +17,8 @@ export const actions: ActionTree<TableState, State> = {
     const parsedTable: Partial<TableJson> = JSON.parse(payload.jsonTable);
 
     const tableRows: TableRow[] = [];
-    if (parsedTable.rows !== undefined) {
-      for (const parsedRow of parsedTable.rows) {
+    if (parsedTable.Rows !== undefined) {
+      for (const parsedRow of parsedTable.Rows) {
         const rowCells: TableCell[] = [];
         for (const parsedCell of parsedRow.cells) {
           rowCells.push(
@@ -34,10 +34,10 @@ export const actions: ActionTree<TableState, State> = {
       }
     }
     let tableHeaders: TableHeader[] = [];
-    if (parsedTable.headers === undefined) {
+    if (parsedTable.Headers === undefined) {
       tableHeaders.push(new TableHeader("Column #1", TableDataType.Text));
     } else {
-      tableHeaders = parsedTable.headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
+      tableHeaders = parsedTable.Headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
     }
 
     state.isUpdated = true;

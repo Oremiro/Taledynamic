@@ -23,5 +23,8 @@ export const getters: GetterTree<TableState, State> = {
   },
   isUpdated(state: TableState): boolean {
     return state.isUpdated;
+  },
+  isImmutable(state: TableState): boolean {
+    return state.immutable;
   }
 };

@@ -77,7 +77,7 @@ export class TableRow {
 }
 
 export interface TableJson {
-  headers: TableHeaderJson[];
-  rows: TableRowJson[];
+  Headers: TableHeaderJson[];
+  Rows: TableRowJson[];
   IsTelegramTable?: boolean;
 }
