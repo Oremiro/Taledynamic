@@ -80,7 +80,7 @@ namespace TaleDynamicBot
             Message message)
         {
             File picture = null;
-            string base64Image = "";
+            string base64Image = null;
             if (message?.Photo != null)
             {
                 var pictureId = message?.Photo.FirstOrDefault()?.FileId;
@@ -90,7 +90,7 @@ namespace TaleDynamicBot
                     await botClient.DownloadFileAsync(picture?.FilePath,saveImageStream);
                 }
                 base64Image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync($"{message.Chat.Username}_file.jpg"));
-
+                base64Image = $"data:image/jped;{base64Image}";
             }
 
             var text = message?.Text;

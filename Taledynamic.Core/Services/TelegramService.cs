@@ -280,7 +280,6 @@ namespace Taledynamic.Core.Services
 
         public void AddRow(DateTime datetime, string text, string picture)
         {
-           
             var row = new JsonTableRow(new List<JsonTableCell>()
             {
                 new JsonTableCell(datetime.ToString("s", System.Globalization.CultureInfo.InvariantCulture), JsonTableType.Date),
