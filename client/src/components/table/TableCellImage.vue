@@ -9,7 +9,7 @@
       </dynamically-typed-button>
     </div>
     <n-upload
-      v-else
+      v-else-if="!disabled"
       accept="image/png, image/jpeg"
       :max="1"
       :custom-request="customRequest"
@@ -38,6 +38,7 @@ import { OnBeforeUpload, OnFinish } from "@/components/table/upload";
 
 const props = defineProps<{
   value: string | null;
+  disabled: boolean;
 }>();
 
 const emit = defineEmits<{
