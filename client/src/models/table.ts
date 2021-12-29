@@ -79,4 +79,5 @@ export class TableRow {
 export interface TableJson {
   headers: TableHeaderJson[];
   rows: TableRowJson[];
+  immutable?: boolean;
 }

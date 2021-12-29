@@ -2,7 +2,12 @@
   <div class="container">
     <n-grid :cols="30" style="max-width: 40rem">
       <n-gi :span="8">
-        <n-card hoverable content-style="padding-left: 0; padding-right: 0">
+        <n-card hoverable content-style="padding-left: 0; padding-right: 0;">
+          <div style="padding: 0 2rem;">
+            <n-h4 style="margin-bottom: .9rem;">
+              <n-text type="primary">Аккаунт</n-text>
+            </n-h4>
+          </div>
           <n-menu :options="menuOptions" :value="route.path" style="padding: 0 0.8rem" />
         </n-card>
       </n-gi>

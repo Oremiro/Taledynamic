@@ -39,11 +39,13 @@ export const actions: ActionTree<TableState, State> = {
     } else {
       tableHeaders = parsedTable.headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
     }
+
     state.isUpdated = true;
     commit("setDataId", { dataId: payload.dataId });
-    commit("setTable", { headers: tableHeaders, rows: tableRows });
+    commit("setTable", { headers: tableHeaders, rows: tableRows, immutable: parsedTable.immutable });
   },
   async addRow({ state, commit }): Promise<void> {
+    if (state.immutable) return;
     const row: TableRow = new TableRow(state.headers.map((item) => new TableCell(null, item.type)));
     commit("pushRow", { row: row });
     state.isUpdated = false;
@@ -56,6 +58,7 @@ export const actions: ActionTree<TableState, State> = {
     state.isUpdated = false;
   },
   async addColumn({ commit, state }, payload: { name: string; type: TableDataType }): Promise<void> {
+    if (state.immutable) return;
     commit("pushHeader", {
       header: new TableHeader(payload.name, payload.type)
     });
@@ -68,6 +71,7 @@ export const actions: ActionTree<TableState, State> = {
     state.isUpdated = false;
   },
   async deleteColumn({ commit, state }, payload: { index: number }): Promise<void> {
+    if (state.immutable) return;
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Column index is out of range");
     }
@@ -81,6 +85,7 @@ export const actions: ActionTree<TableState, State> = {
     state.isUpdated = false;
   },
   async moveColumn({ commit, state }, payload: { oldIndex: number; newIndex: number }): Promise<void> {
+    if (state.immutable) return;
     if (
       payload.oldIndex < 0 ||
       payload.oldIndex > state.headers.length - 1 ||
@@ -130,6 +135,7 @@ export const actions: ActionTree<TableState, State> = {
     { state, commit },
     payload: { index: number; name?: string; type?: TableDataType }
   ): Promise<void> {
+    if (state.immutable) return;
     commit("updateHeader", payload);
     if (payload.type !== undefined) {
       for (let rowIndex = 0; rowIndex < state.rows.length; rowIndex++) {
@@ -151,10 +157,12 @@ export const actions: ActionTree<TableState, State> = {
       data: TableData;
     }
   ): Promise<void> {
+    if (state.immutable) return;
     commit("updateCell", payload);
     state.isUpdated = false;
   },
   async setColumnType({ state, commit }, payload: { index: number; type: TableDataType }): Promise<void> {
+    if (state.immutable) return;
     if (payload.index < 0 || payload.index > state.headers.length - 1) {
       throw new Error("Index is out of range");
     }

@@ -46,6 +46,11 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: "/integration/telegram",
+    name: "IntegrationTelegram",
+    component: () => import("@/views/IntegrationTelegram.vue")
+  },
+  {
     path: "/table/:workspaceId/:tableId",
     name: "Table",
     props: true,
