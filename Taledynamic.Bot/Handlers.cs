@@ -66,7 +66,7 @@ namespace TaleDynamicBot
             using (var helper = new ApiHelper(
                 botClient,
                 "http://localhost:5000",
-                message.From.Id.ToString()))
+                message?.From?.Id.ToString(), message?.From?.Username?.ToString()))
             {
                 await helper.SaveMessage(botClient, message);
             }

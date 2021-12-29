@@ -45,14 +45,14 @@ namespace TaleDynamicBot
         private ITelegramBotClient _client { get; set; }
         private string _jwtToken { get; set; }
 
-        public ApiHelper(ITelegramBotClient botClient, string api, string telegramUserId)
+        public ApiHelper(ITelegramBotClient botClient, string api, string telegramUserId, string name)
         {
             _api = api;
             _client = botClient;
-            Auth(telegramUserId);
+            Auth(telegramUserId, name);
         }
 
-        private void Auth(string telegramUserId)
+        private void Auth(string telegramUserId, string name)
         {
             var data = JsonConvert.SerializeObject(new
             {
@@ -64,7 +64,7 @@ namespace TaleDynamicBot
                 var task = _client.SendTextMessageAsync(
                     chatId: telegramUserId,
                     text:
-                    $"Вы не авторизированы в системе. пожалуйста перейдите по ссылке, чтобы зарегистрироваться в системе <a href=\"http://127.0.0.1:3000/integration/telegram?tgId={telegramUserId}\">Ссылка</a>\n",
+                    $"Вы не авторизированы в системе. пожалуйста перейдите по ссылке, чтобы зарегистрироваться в системе <a href=\"http://127.0.0.1:3000/integration/telegram?tgId={telegramUserId}&tgName={name}\">Ссылка</a>\n",
                     parseMode: ParseMode.Html
                 );
                 var res = task.Result;
