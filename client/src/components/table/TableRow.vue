@@ -10,7 +10,7 @@
     style="padding: 0 0.5rem"
   >
     <div style="display: flex; align-items: center; justify-content: center">
-      <span v-if="!last">{{ index + 1 }}</span>
+      <span v-if="!last || store.getters['table/isImmutable']">{{ index + 1 }}</span>
       <n-icon v-else size="1rem">
         <add-icon />
       </n-icon>
@@ -34,8 +34,11 @@
     />
   </td>
   <td style="padding: 0">
-    <div v-if="!last" style="display: flex; align-items: center; justify-content: center">
-      <n-popconfirm v-if="!last" v-model:show="isConfirmDeletionShown">
+    <div
+      v-if="!last || store.getters['table/isImmutable']"
+      style="display: flex; align-items: center; justify-content: center; padding: 0 0.5rem"
+    >
+      <n-popconfirm v-model:show="isConfirmDeletionShown">
         <template #icon>
           <n-icon :color="themeVars.errorColor">
             <error-circle-icon />

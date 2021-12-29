@@ -17,8 +17,8 @@ export const actions: ActionTree<TableState, State> = {
     const parsedTable: Partial<TableJson> = JSON.parse(payload.jsonTable);
 
     const tableRows: TableRow[] = [];
-    if (parsedTable.Rows !== undefined) {
-      for (const parsedRow of parsedTable.Rows) {
+    if (parsedTable.rows !== undefined) {
+      for (const parsedRow of parsedTable.rows) {
         const rowCells: TableCell[] = [];
         for (const parsedCell of parsedRow.cells) {
           rowCells.push(
@@ -34,15 +34,15 @@ export const actions: ActionTree<TableState, State> = {
       }
     }
     let tableHeaders: TableHeader[] = [];
-    if (parsedTable.Headers === undefined) {
+    if (parsedTable.headers === undefined) {
       tableHeaders.push(new TableHeader("Column #1", TableDataType.Text));
     } else {
-      tableHeaders = parsedTable.Headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
+      tableHeaders = parsedTable.headers.map((parsedHeader) => new TableHeader(parsedHeader.name, parsedHeader.type));
     }
 
     state.isUpdated = true;
     commit("setDataId", { dataId: payload.dataId });
-    commit("setTable", { headers: tableHeaders, rows: tableRows, immutable: parsedTable.IsTelegramTable });
+    commit("setTable", { headers: tableHeaders, rows: tableRows, immutable: parsedTable.immutable });
   },
   async addRow({ state, commit }): Promise<void> {
     if (state.immutable) return;

@@ -4,5 +4,5 @@ export const state: TableState = {
   headers: [],
   rows: [],
   isUpdated: true,
-  immutable: false
+  immutable: true
 };
