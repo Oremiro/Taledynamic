@@ -6,6 +6,7 @@
         :maxlength="100"
         autosize
         size="small"
+        :readonly="store.getters['table/isImmutable']"
         placeholder=""
         :style="{
           'background-color': themeVars.tableHeaderColor,
@@ -57,7 +58,7 @@
             placement="right"
             @update:value="onColumnTypeUpdate"
           >
-            <n-button size="small" secondary style="padding: 0 0.3rem">
+            <n-button size="small" secondary style="padding: 0 0.3rem" :disabled="store.getters['table/isImmutable']">
               <n-icon size="1.1rem">
                 <text-icon v-if="columnType === 0" />
                 <number-symbol-icon v-else-if="columnType === 1" />

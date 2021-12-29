@@ -18,7 +18,7 @@
             draggableList.dragStartIndex !== undefined &&
             index > draggableList.dragStartIndex
         }"
-        :draggable="index !== store.getters['table/editableHeaderIndex']"
+        :draggable="index !== store.getters['table/editableHeaderIndex'] && !store.getters['table/isImmutable']"
         @dragstart="draggableList.dragStartHandler($event, index)"
         @dragend="draggableList.dragEndHandler"
         @drop.prevent="draggableList.dropHandler($event, index, dropCallback)"
@@ -28,7 +28,7 @@
         <table-header-vue :index="index" @delete="deleteColumn(index)" />
       </th>
       <th>
-        <div style="padding: 0 .6rem;">
+        <div v-if="!store.getters['table/isImmutable']" style="padding: 0 .6rem;">
           <n-form-item v-if="isCreatingInputShown" :show-label="false" :show-feedback="false" :rule="headerNameRule">
             <n-input
               ref="creatingInput"
