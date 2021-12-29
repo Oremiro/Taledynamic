@@ -44,11 +44,11 @@
     <n-date-picker
       v-if="type === 2"
       v-model:value="cellDataDate"
-      :actions="[]"
+      type="datetime"
       :first-day-of-week="0"
       placeholder=""
       :readonly="disabled"
-      format="dd.MM.yyyy"
+      format="dd.MM.yyyy HH:mm"
       @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
