@@ -36,6 +36,7 @@
       v-model:value="cellDataNumber"
       :show-button="false"
       placeholder=""
+      :readonly="disabled"
       @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
@@ -43,10 +44,11 @@
     <n-date-picker
       v-if="type === 2"
       v-model:value="cellDataDate"
-      :actions="[]"
+      type="datetime"
       :first-day-of-week="0"
       placeholder=""
-      format="dd.MM.yyyy"
+      :readonly="disabled"
+      format="dd.MM.yyyy HH:mm"
       @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
@@ -73,6 +75,7 @@ const props = defineProps<{
   data: TableData;
   index: number;
   type: TableDataType;
+  disabled: boolean;
 }>();
 
 const cellDataText = ref<string | null>(null);
@@ -121,6 +124,7 @@ const textAreaInputRef = ref<InstanceType<typeof NInput>>();
 const textInputRef = ref<InstanceType<typeof NInput>>();
 
 async function showTextArea(): Promise<void> {
+  if (props.disabled) return;
   isTextAreaShown.value = true;
   await nextTick();
   textAreaInputRef.value?.focus();
