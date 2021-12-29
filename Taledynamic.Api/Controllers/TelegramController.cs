@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Taledynamic.Api.Attributes;
@@ -7,11 +8,11 @@ using Taledynamic.Core.Interfaces;
 using Taledynamic.DAL.Models.DTOs;
 using Taledynamic.DAL.Models.Requests.TelegramRequests;
 using Taledynamic.DAL.Models.Responses;
+using Taledynamic.DAL.Models.Responses.UserResponses;
 
 namespace Taledynamic.Api.Controllers
 {
     [ApiController]
-    [JwtAuthorize]
     [Route("integration/[controller]")]
     public class TelegramController : BaseController
     {
@@ -22,8 +23,29 @@ namespace Taledynamic.Api.Controllers
         {
             _telegramService = telegramService;
             _telegramDataService = telegramDataService;
+            
         }
 
+        [AllowAnonymous]
+        [HttpPost("tg-authorize")]
+        public async Task<AuthenticateResponse> TgTokenAuthorize([FromBody] TelegramAuthorizeRequest request)
+        {
+            Log.Information($"[{nameof(TableController)}]: Method 'CreateData' started.");
+            var response = await _telegramService.TgAuthorize(request);
+            Log.Information($"[{nameof(TableController)}]: Method 'CreateData' started.");
+            return response;
+        }
+        [JwtAuthorize]
+        [HttpPost("sync-table")]
+        public async Task<OkResult> SyncTable([FromBody] CreateTelegramDataRequest request)
+        {
+            Log.Information($"[{nameof(TableController)}]: Method 'GetData' started.");
+      
+            await _telegramService.SyncTable(request, CustomUser);
+            Log.Information($"[{nameof(TableController)}]: Method 'GetData' started.");
+            return Ok();
+        }
+        [JwtAuthorize]
         [HttpPost("authorize")]
         public async Task<GenericCreateResponse<TelegramUserDto>> Authorize([FromBody] TelegramAuthorizeRequest request)
         {
@@ -41,7 +63,7 @@ namespace Taledynamic.Api.Controllers
             Log.Information($"[{nameof(TableController)}]: Method 'CreateData' started.");
             return response;
         }
-
+        [JwtAuthorize]
         [HttpPost("revoke")]
         public async Task<GenericDeleteResponse<TelegramUserDto>> Revoke([FromBody] TelegramRevokeRequest request)
         {
@@ -50,7 +72,7 @@ namespace Taledynamic.Api.Controllers
             Log.Information($"[{nameof(TableController)}]: Method 'CreateData' started.");
             return response;
         }
-
+        [JwtAuthorize]
         [HttpPost("data/create")]
         public async Task<GenericCreateResponse<TelegramDataDto>> CreateData([FromBody] CreateTelegramDataRequest request)
         {
@@ -59,7 +81,7 @@ namespace Taledynamic.Api.Controllers
             Log.Information($"[{nameof(TableController)}]: Method 'CreateData' started.");
             return response;
         }
-
+        [JwtAuthorize]
         [HttpGet("data/get")]
         public async Task<GenericGetResponse<TelegramDataDto>> GetData([FromQuery] GetTelegramDataRequest request)
         {
@@ -68,7 +90,7 @@ namespace Taledynamic.Api.Controllers
             Log.Information($"[{nameof(TableController)}]: Method 'GetData' started.");
             return response;
         }
-
+        [JwtAuthorize]
         [HttpPut("data/update")]
         public async Task<EmptyUpdateResponse> UpdateData([FromBody] UpdateTelegramDataRequest request)
         {
@@ -77,7 +99,7 @@ namespace Taledynamic.Api.Controllers
             Log.Information($"[{nameof(TableController)}]: Method 'UpdateData' started.");
             return response;
         }
-
+        [JwtAuthorize]
         [HttpDelete("data/delete")]
         public async Task<GenericDeleteResponse<TelegramDataDto>> DeleteData([FromBody] DeleteTelegramDataRequest request)
         {
