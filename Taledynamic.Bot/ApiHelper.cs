@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,6 +12,7 @@ using Taledynamic.DAL.Models.Responses.UserResponses;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using File = Telegram.Bot.Types.File;
 
 namespace TaleDynamicBot
 {
@@ -86,11 +88,16 @@ namespace TaleDynamicBot
 
             var text = message?.Text;
             var date = message?.Date;
+            using (var saveImageStream = new FileStream($"{message.Chat.Username}_file.jpg", FileMode.Create))
+            {
+                await botClient.DownloadFileAsync(picture.FilePath,saveImageStream);
+            }
+            string base64Image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync($"{message.Chat.Username}_file.jpg"));
             var telegramUpdateMessage = new
             {
                 JsonContent = new
                 {
-                    Picture = "",
+                    Picture = base64Image,
                     DateTime = date.ToString(),
                     Text = text
                 }
