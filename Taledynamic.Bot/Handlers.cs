@@ -63,29 +63,12 @@ namespace TaleDynamicBot
 
         public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
         {
-            switch (message.Text)
+            using (var helper = new ApiHelper(
+                botClient,
+                "http://localhost:5000",
+                message.From.Id.ToString()))
             {
-                case "/auth":
-                    await user.Auth(botClient, message);
-                    break;
-                case "/sending":
-                    await user.SendingData(botClient, message);
-                    break;
-                case "/stop_sending":
-                    await user.StopSendingData(botClient, message);
-                    break;
-                case "/usage":
-                    await Usage(botClient, message);
-                    break;
-                case "/start":
-                    await botClient.SendTextMessageAsync
-                    (   chatId:message.Chat.Id, 
-                        text:"Привет, я бот проекта TaleDynamic, пожалуйста, авторизуйтесь с помощью команды /auth."
-                    );
-                    break;
-                default:
-                    await user.DefaultAction(botClient,message);
-                    break;
+                await helper.SaveMessage(botClient, message);
             }
         }
         static async Task<Message> Usage(ITelegramBotClient botClient, Message message)
