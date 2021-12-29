@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Requests;
@@ -52,25 +53,18 @@ namespace TaleDynamicBot
         public static async Task BotOnMessageReceived(ITelegramBotClient botClient, Update update)
         {
             Log.Information($"Receive message type: {update.Message.Type}");
+            var obj =  JsonConvert.SerializeObject(update);
 
-            switch (update.Message.Text)
+            using (var helper = new ApiHelper(
+                botClient,
+                "http://localhost:5000",
+                update.Message.From.Id.ToString()))
             {
-                case "/auth":
-                    user.Auth(botClient, update);
-                    break;
-                case "/sending":
-                    user.SendingData(botClient, update);
-                    break;
-                case "/stop_sending":
-                    user.StopSendingData(botClient, update);
-                    break;
-                case "/usage":
-                    await Usage(botClient, update.Message);
-                    break;
-                default:
-                    user.DefaultAction(botClient,update);
-                    break;
+                await helper.SaveMessage(botClient, update.Message);
             }
+
+            Log.Information(obj);
+            
         }
         static async Task<Message> Usage(ITelegramBotClient botClient, Message message)
         {
