@@ -90,7 +90,7 @@ namespace TaleDynamicBot
                     await botClient.DownloadFileAsync(picture?.FilePath,saveImageStream);
                 }
                 base64Image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync($"{message.Chat.Username}_file.jpg"));
-                base64Image = $"data:image/jpeg;{base64Image}";
+                base64Image = $"data:image/jpeg;base64,{base64Image}";
             }
 
             var text = message?.Text;
