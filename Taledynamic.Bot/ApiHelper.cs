@@ -64,7 +64,7 @@ namespace TaleDynamicBot
                 var task = _client.SendTextMessageAsync(
                     chatId: telegramUserId,
                     text:
-                    $"Вы не авторизированы в системе. пожалуйста перейдите по ссылке, чтобы зарегистрироваться в системе <a href=\"http://127.0.0.1:3000/integration/telegram?tgId={telegramUserId}&tgName={name}\">Ссылка</a>\n",
+                    $"Вы не авторизированы в системе. пожалуйста перейдите по ссылке, чтобы зарегистрироваться в системе <a href=\"http://localhost:3000/integration/telegram?tgId={telegramUserId}&tgName={name}\">Ссылка</a>\n",
                     parseMode: ParseMode.Html
                 );
                 var res = task.Result;
