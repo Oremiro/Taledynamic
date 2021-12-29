@@ -47,13 +47,13 @@
       type="datetime"
       :first-day-of-week="0"
       placeholder=""
-      :readonly="disabled"
+      :disabled="disabled"
       format="dd.MM.yyyy HH:mm"
       @update:value="dataUpdateHandler"
       @mouseenter="$emit('mouseEnterCell')"
       @mouseleave="$emit('mouseLeaveCell')"
     />
-    <table-cell-image v-if="type === 3" :value="cellDataImage" @update="dataUpdateHandler" />
+    <table-cell-image v-if="type === 3" :value="cellDataImage" :disabled="disabled" @update="dataUpdateHandler" />
     <table-cell-file v-if="type === 4" :value="cellDataFile" @update="dataUpdateHandler" />
   </n-config-provider>
 </template>
