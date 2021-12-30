@@ -5,8 +5,7 @@
       :key="row.id"
       :draggable="
         index !== tableRows.length - 1 &&
-        store.getters['table/editableRowIndex'] !== index &&
-        !store.getters['table/isImmutable']
+        store.getters['table/editableRowIndex'] !== index
       "
       @dragstart="draggableList.dragStartHandler($event, index)"
       @dragend="draggableList.dragEndHandler($event)"

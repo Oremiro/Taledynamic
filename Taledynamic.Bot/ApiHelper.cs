@@ -83,24 +83,26 @@ namespace TaleDynamicBot
             string base64Image = null;
             if (message?.Photo != null)
             {
-                var pictureId = message?.Photo.FirstOrDefault()?.FileId;
+                var pictureId = message.Photo[^1].FileId;
                 picture = await botClient.GetFileAsync(pictureId);
-                using (var saveImageStream = new FileStream($"{message.Chat.Username}_file.jpg", FileMode.Create))
+                string fileName = $"{message.Chat.Username}_file.jpg";
+                using (var saveImageStream = new FileStream(fileName, FileMode.Create))
                 {
-                    await botClient.DownloadFileAsync(picture?.FilePath,saveImageStream);
+                    await botClient.DownloadFileAsync(picture?.FilePath, saveImageStream);
                 }
-                base64Image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync($"{message.Chat.Username}_file.jpg"));
+                base64Image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(fileName));
+                System.IO.File.Delete(fileName);
                 base64Image = $"data:image/jpeg;base64,{base64Image}";
             }
 
-            var text = message?.Text;
-            var date = message?.Date;
-             var telegramUpdateMessage = new
+            var text = message?.Caption ?? message?.Text;
+            DateTime? date = message?.Date;
+            var telegramUpdateMessage = new
             {
                 JsonContent = new
                 {
                     Picture = base64Image,
-                    DateTime = date.ToString(),
+                    DateTime = date?.ToLocalTime().ToString(),
                     Text = text
                 }
             };

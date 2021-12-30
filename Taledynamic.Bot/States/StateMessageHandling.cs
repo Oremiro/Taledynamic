@@ -103,6 +103,7 @@ namespace TaleDynamicBot.States
 
         public override async Task CallbackQueryHandler(ITelegramBotClient botclient, CallbackQuery callbackQuery)
         {
+            await botclient.AnswerCallbackQueryAsync(callbackQuery.Id, "Success");
             /*var response = await client.GetAsync("auth/User/send"); //get запрос
 
             var responseString = await response.Content.ReadAsStringAsync();

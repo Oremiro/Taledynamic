@@ -42,10 +42,9 @@ export const actions: ActionTree<TableState, State> = {
 
     state.isUpdated = true;
     commit("setDataId", { dataId: payload.dataId });
-    commit("setTable", { headers: tableHeaders, rows: tableRows, immutable: parsedTable.immutable });
+    commit("setTable", { headers: tableHeaders, rows: tableRows, immutable: parsedTable.immutable ?? false });
   },
   async addRow({ state, commit }): Promise<void> {
-    if (state.immutable) return;
     const row: TableRow = new TableRow(state.headers.map((item) => new TableCell(null, item.type)));
     commit("pushRow", { row: row });
     state.isUpdated = false;
@@ -157,7 +156,6 @@ export const actions: ActionTree<TableState, State> = {
       data: TableData;
     }
   ): Promise<void> {
-    if (state.immutable) return;
     commit("updateCell", payload);
     state.isUpdated = false;
   },
