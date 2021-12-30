@@ -9,9 +9,7 @@ export const mutations: MutationTree<TableState> = {
     if (payload.immutable !== undefined) {
       state.immutable = payload.immutable;
     }
-    if (!state.immutable) {
-      state.rows.push(new TableRow(payload.headers.map((item) => new TableCell(null, item.type))));
-    }
+    state.rows.push(new TableRow(payload.headers.map((item) => new TableCell(null, item.type))));
   },
   setDataId(state: TableState, payload: { dataId: string }): void {
     state.dataId = payload.dataId;

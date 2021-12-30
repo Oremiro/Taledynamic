@@ -19,13 +19,7 @@ export const getters: GetterTree<TableState, State> = {
     return state.sortStatus;
   },
   tableJson(state: TableState): TableJson {
-    let rows: TableRow[];
-    if (state.immutable) {
-      rows = state.rows;
-    } else {
-      rows = state.rows.slice(0, -1);
-    }
-    return JSON.parse(JSON.stringify({ headers: state.headers, rows: rows }));
+    return JSON.parse(JSON.stringify({ headers: state.headers, rows: state.rows.slice(0, -1) }));
   },
   isUpdated(state: TableState): boolean {
     return state.isUpdated;
