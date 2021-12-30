@@ -42,7 +42,7 @@ export const actions: ActionTree<TableState, State> = {
 
     state.isUpdated = true;
     commit("setDataId", { dataId: payload.dataId });
-    commit("setTable", { headers: tableHeaders, rows: tableRows, immutable: parsedTable.immutable });
+    commit("setTable", { headers: tableHeaders, rows: tableRows, immutable: parsedTable.immutable ?? false });
   },
   async addRow({ state, commit }): Promise<void> {
     const row: TableRow = new TableRow(state.headers.map((item) => new TableCell(null, item.type)));
