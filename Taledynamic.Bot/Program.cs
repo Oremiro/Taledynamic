@@ -16,7 +16,6 @@ namespace TaleDynamicBot
         { 
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string fullPath = Directory.GetParent(baseDirectory)?.Parent?.Parent?.Parent?.FullName;
-          Console.WriteLine(fullPath);
 
             var botClient = new TelegramBotClient(Configuration.BotToken);
 
@@ -28,7 +27,7 @@ namespace TaleDynamicBot
             
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
-                .WriteTo.File(fullPath + @"\Logs\Logs.txt",rollingInterval: RollingInterval.Day)
+                .WriteTo.File(fullPath + @"/Logs/Logs.txt",rollingInterval: RollingInterval.Day)
                 .CreateLogger();
             
             ReceiverOptions receiverOptions = new()
